@@ -1,0 +1,38 @@
+/* Editor chrome tokens — warm dark UI, deliberately distinct from the canvas.
+   Ported from the handoff README's "Design tokens — editor chrome" table. */
+:root {
+  --surface-drawer: #191817;
+  --surface-pagebar: #1c1b19;
+  --surface-rail: #201e1c;
+  --surface-tile: #262321;
+  --surface-tile-hover: #2b2825;
+  --surface-active-row: #2f2b28;
+
+  --border-bar: #282523;
+  --border-default: #322e2b;
+  --border-button: #3d3835;
+  --border-chip: #4a453f;
+  --border-hover: #55504a;
+
+  --text-primary: #e9e5df;
+  --text-secondary: #d5d0c9;
+  --text-tree: #b8b1a9;
+  --text-tertiary: #a49d96;
+  --text-muted: #99928b;
+  --text-label: #8d8680;
+  --text-section-label: #7d766f;
+  --text-meta: #6f6a64;
+  --text-group-label: #5f5952;
+
+  --danger: #e9a08a;
+  --accent: #0e1cdf; /* overridden by the active theme's accent */
+
+  --radius-chip: 5px;
+  --radius-input: 6px;
+  --radius-button: 7px;
+  --radius-tile: 8px;
+  --radius-panel: 10px;
+
+  --font-ui: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
