@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './Landing.css';
+import './MomentumHandScript.css';
 
 const FEATURES = [
   { title: 'Design on a real canvas', body: 'Drag, drop, and arrange sections the way you actually think about a page — not a form full of fields.' },

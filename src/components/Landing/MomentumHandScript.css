@@ -1,0 +1,7 @@
+/* Use the handwriting preset as a single display accent, not a global font. */
+.landing-hero h1 {
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.12;
+}
