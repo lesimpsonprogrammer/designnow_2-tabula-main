@@ -11,6 +11,7 @@ type AuthValue = {
   user: User;
   org: Org;
   client: SupabaseClient;
+  isPlatformAdmin: boolean;
   signOut: () => Promise<void>;
 };
 
@@ -44,6 +45,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [accessCode, setAccessCode] = useState('');
   const [orgBusy, setOrgBusy] = useState(false);
   const [orgError, setOrgError] = useState('');
+  const [isPlatformAdmin, setIsPlatformAdmin] = useState(false);
 
   useEffect(() => {
     if (!client) return;
@@ -68,6 +70,13 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   const loadMemberships = async () => {
     if (!client || !session?.user) return;
+    const { data: adminRecord } = await client
+      .from('tabula_platform_admins')
+      .select('user_id')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+    setIsPlatformAdmin(Boolean(adminRecord));
+
     const { data: memberships } = await client
       .from('tabula_memberships')
       .select('org_id, role, tabula_organizations(id, name, slug, plan, trial_ends_at)')
@@ -101,6 +110,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
       setOrgs(null);
       setInvites(null);
       setActiveOrgId(null);
+      setIsPlatformAdmin(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.id]);
@@ -113,12 +123,13 @@ export function AuthGate({ children }: { children: ReactNode }) {
       user: session.user,
       org: active,
       client,
+      isPlatformAdmin,
       signOut: async () => {
         const { error } = await client.auth.signOut();
         if (error) throw error;
       },
     };
-  }, [session, client, orgs, activeOrgId]);
+  }, [session, client, orgs, activeOrgId, isPlatformAdmin]);
 
   const submitAuth = async (event: FormEvent) => {
     event.preventDefault();

@@ -2,11 +2,13 @@ import { useRef, useState } from 'react';
 import { flushPendingSave, openProjectFile, prepareProjectDownload, useTabulaStore } from '../../store/useTabulaStore';
 import { CompletionIndicator } from '../Completion/CompletionIndicator';
 import { useAuth } from '../Auth/AuthGate';
+import { LicenseAdmin } from '../LicenseAdmin/LicenseAdmin';
 
 export function Header() {
-  const { user, org, signOut } = useAuth();
+  const { user, org, isPlatformAdmin, signOut } = useAuth();
   const projectInputRef = useRef<HTMLInputElement>(null);
   const [fileError, setFileError] = useState('');
+  const [licenseAdminOpen, setLicenseAdminOpen] = useState(false);
   const preview = useTabulaStore((s) => s.preview);
   const togglePreview = useTabulaStore((s) => s.togglePreview);
   const undo = useTabulaStore((s) => s.undo);
@@ -64,6 +66,7 @@ export function Header() {
             </span>
           ) : null}
           <span className="header-user" title={user.email}>{org.name} · {user.email}</span>
+          {isPlatformAdmin ? <button type="button" onClick={() => setLicenseAdminOpen(true)}>Licenses</button> : null}
           <button type="button" className="header-link-btn" onClick={() => void signOut()}>Sign out</button>
         </div>
 
@@ -105,6 +108,7 @@ export function Header() {
           <button onClick={togglePreview}>{preview ? 'Edit' : 'Preview'}</button>
         </div>
       </div>
+      {licenseAdminOpen ? <LicenseAdmin onClose={() => setLicenseAdminOpen(false)} /> : null}
     </header>
   );
 }
