@@ -1,11 +1,12 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { appEnv } from './env';
 
 const CONFIG_KEY = 'tabula.supabase.config';
 export type SupabaseConfig = { url: string; publishableKey: string };
 
 export function getSupabaseConfig(): SupabaseConfig | null {
-  const envUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
-  const envKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
+  const envUrl = appEnv.supabase.url;
+  const envKey = appEnv.supabase.publishableKey;
   if (envUrl && envKey) return { url: envUrl, publishableKey: envKey };
   try {
     const value = JSON.parse(window.localStorage.getItem(CONFIG_KEY) ?? 'null') as Partial<SupabaseConfig> | null;
