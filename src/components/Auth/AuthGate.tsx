@@ -2,8 +2,9 @@ import { createContext, useContext, useEffect, useMemo, useState, type FormEvent
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
 import { makeSupabaseClient, saveSupabaseConfig } from '../../lib/supabase';
 import { slugify } from '../../lib/slug';
+import { Landing } from '../Landing/Landing';
 
-type Org = { id: string; name: string; slug: string; role: 'owner' | 'admin' | 'member' };
+type Org = { id: string; name: string; slug: string; role: 'owner' | 'admin' | 'member'; plan: 'trial' | 'active' | 'expired'; trialEndsAt: string };
 type Invite = { id: string; org_id: string; email: string; role: 'admin' | 'member'; tabula_organizations: { name: string } | null };
 
 type AuthValue = {
@@ -29,6 +30,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [setupKey, setSetupKey] = useState('');
   const [setupError, setSetupError] = useState('');
 
+  const [showAuthForm, setShowAuthForm] = useState(false);
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,6 +41,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [invites, setInvites] = useState<Invite[] | null>(null);
   const [activeOrgId, setActiveOrgId] = useState<string | null>(null);
   const [orgName, setOrgName] = useState('');
+  const [accessCode, setAccessCode] = useState('');
   const [orgBusy, setOrgBusy] = useState(false);
   const [orgError, setOrgError] = useState('');
 
@@ -67,14 +70,14 @@ export function AuthGate({ children }: { children: ReactNode }) {
     if (!client || !session?.user) return;
     const { data: memberships } = await client
       .from('tabula_memberships')
-      .select('org_id, role, tabula_organizations(id, name, slug)')
+      .select('org_id, role, tabula_organizations(id, name, slug, plan, trial_ends_at)')
       .eq('user_id', session.user.id);
 
     const list: Org[] = (memberships ?? [])
       .map((m) => {
-        const o = m.tabula_organizations as unknown as { id: string; name: string; slug: string } | null;
+        const o = m.tabula_organizations as unknown as { id: string; name: string; slug: string; plan: Org['plan']; trial_ends_at: string } | null;
         if (!o) return null;
-        return { id: o.id, name: o.name, slug: o.slug, role: m.role as Org['role'] };
+        return { id: o.id, name: o.name, slug: o.slug, role: m.role as Org['role'], plan: o.plan, trialEndsAt: o.trial_ends_at };
       })
       .filter((o): o is Org => o !== null);
 
@@ -138,11 +141,11 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   const createOrg = async (event: FormEvent) => {
     event.preventDefault();
-    if (!client || !orgName.trim()) return;
+    if (!client || !orgName.trim() || !accessCode.trim()) return;
     setOrgBusy(true);
     setOrgError('');
     const slug = slugify(orgName) + '-' + Math.random().toString(36).slice(2, 7);
-    const { error } = await client.rpc('tabula_create_organization', { org_name: orgName.trim(), org_slug: slug });
+    const { error } = await client.rpc('tabula_create_organization', { org_name: orgName.trim(), org_slug: slug, access_code: accessCode.trim() });
     if (error) {
       setOrgError(error.message);
       setOrgBusy(false);
@@ -208,6 +211,14 @@ export function AuthGate({ children }: { children: ReactNode }) {
   }
 
   if (!session?.user) {
+    if (!showAuthForm) {
+      return (
+        <Landing
+          onSignIn={() => { setMode('signin'); setShowAuthForm(true); }}
+          onSignUp={() => { setMode('signup'); setShowAuthForm(true); }}
+        />
+      );
+    }
     return (
       <main className="auth-screen">
         <section className="auth-card" aria-labelledby="auth-title">
@@ -224,6 +235,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
             {mode === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Create one"}
           </button>
           {message ? <p className="auth-message" role="status">{message}</p> : null}
+          <button type="button" className="auth-back-link" onClick={() => setShowAuthForm(false)}>← Back</button>
         </section>
       </main>
     );
@@ -239,8 +251,11 @@ export function AuthGate({ children }: { children: ReactNode }) {
         <section className="auth-card" aria-labelledby="org-title">
           <span className="auth-brand">Tabula</span>
           <h1 id="org-title">
-            {invites && invites.length > 0 ? 'You have a pending invitation' : 'Create your organization'}
+            {invites && invites.length > 0 ? 'You have a pending invitation' : 'Tabula is invite-only for now'}
           </h1>
+          {!(invites && invites.length > 0) ? (
+            <p>Have an access code? Enter it below to create your organization.</p>
+          ) : null}
 
           {invites && invites.length > 0 ? (
             <div className="auth-invites">
@@ -250,13 +265,15 @@ export function AuthGate({ children }: { children: ReactNode }) {
                   <button type="button" disabled={orgBusy} onClick={() => void acceptInvite(invite.id)}>Accept</button>
                 </div>
               ))}
-              <p className="auth-or">— or —</p>
+              <p className="auth-or">— or, with an access code —</p>
             </div>
           ) : null}
 
           <form onSubmit={createOrg}>
             <label htmlFor="org-name">Organization name</label>
             <input id="org-name" type="text" required value={orgName} onChange={(event) => setOrgName(event.target.value)} placeholder="Acme Inc." />
+            <label htmlFor="org-access-code">Access code</label>
+            <input id="org-access-code" type="text" required value={accessCode} onChange={(event) => setAccessCode(event.target.value)} placeholder="Ask your Tabula contact for a code" />
             <button type="submit" disabled={orgBusy}>{orgBusy ? 'Creating…' : 'Create organization'}</button>
           </form>
           {orgError ? <p className="auth-message" role="alert">{orgError}</p> : null}

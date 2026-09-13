@@ -22,6 +22,9 @@ export function Header() {
   const projectId = useTabulaStore((s) => s.projectId);
   const returnToStart = useTabulaStore((s) => s.returnToStart);
 
+  const trialDaysLeft = Math.ceil((new Date(org.trialEndsAt).getTime() - Date.now()) / 86_400_000);
+  const trialExpired = org.plan === 'trial' && trialDaysLeft <= 0;
+
   const readProject = (file: globalThis.File) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -54,6 +57,11 @@ export function Header() {
         <button disabled={!future} onClick={redo}>Redo</button>
       </div>
       <div className="header-right">
+        {org.plan === 'trial' ? (
+          <span className={`trial-pill${trialExpired ? ' trial-pill-expired' : ''}`}>
+            {trialExpired ? 'Trial ended' : `Trial · ${trialDaysLeft} day${trialDaysLeft === 1 ? '' : 's'} left`}
+          </span>
+        ) : null}
         <span className="header-user" title={user.email}>{org.name} · {user.email}</span>
         <button type="button" onClick={() => void signOut()}>Sign out</button>
         <span role="status" aria-live="polite" className="autosave-status"

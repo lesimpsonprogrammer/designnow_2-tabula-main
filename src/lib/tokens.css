@@ -26,6 +26,7 @@
 
   --danger: #e9a08a;
   --accent: #0e1cdf; /* overridden by the active theme's accent */
+  --brand-gradient: linear-gradient(90deg, #7b2ff7, #ff5ea8 55%, #ffb84d);
 
   --radius-chip: 5px;
   --radius-input: 6px;
