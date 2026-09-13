@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import './Landing.css';
 import './MomentumHandScript.css';
+import './LandingButtons.css';
 
 const FEATURES = [
   { title: 'Design on a real canvas', body: 'Drag, drop, and arrange sections the way you actually think about a page — not a form full of fields.' },
@@ -24,7 +25,7 @@ export function Landing({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp
         <span className="landing-brand">Tabula Design Now</span>
         <div className="landing-nav-actions">
           <button type="button" className="landing-nav-signin" onClick={onSignIn}>Sign in</button>
-          <button type="button" className="landing-nav-cta" onClick={onSignUp}>Request access</button>
+          <button type="button" className="landing-nav-cta" aria-label="Request access from navigation" onClick={onSignUp}>Request access</button>
         </div>
       </header>
 
@@ -37,7 +38,7 @@ export function Landing({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp
           teams by invite while we're in early access — request a code to get started.
         </p>
         <div className="landing-hero-actions">
-          <button type="button" className="landing-hero-cta" onClick={onSignUp}>Request access</button>
+          <button type="button" className="landing-hero-cta" aria-label="Request early access to Tabula" onClick={onSignUp}>Request access</button>
           <button type="button" className="landing-hero-secondary" onClick={onSignIn}>Sign in</button>
         </div>
       </section>

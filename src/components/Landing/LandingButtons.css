@@ -1,0 +1,23 @@
+.landing-nav-cta,
+.landing-hero-cta {
+  color: #26123f;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.landing-hero-cta {
+  min-height: 48px;
+}
+
+.landing-nav-cta:hover,
+.landing-hero-cta:hover {
+  background: #ffffff;
+  color: #26123f;
+}
+
+.landing-nav-cta:focus-visible,
+.landing-hero-cta:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #4c1d95;
+}
