@@ -251,10 +251,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
         <section className="auth-card" aria-labelledby="org-title">
           <span className="auth-brand">Tabula</span>
           <h1 id="org-title">
-            {invites && invites.length > 0 ? 'You have a pending invitation' : 'Tabula is invite-only for now'}
+            {invites && invites.length > 0 ? 'You have a pending invitation' : 'Design your organization'}
           </h1>
           {!(invites && invites.length > 0) ? (
-            <p>Have an access code? Enter it below to create your organization.</p>
+            <p>Tabula is invite-only for now — enter your access code below to set it up.</p>
           ) : null}
 
           {invites && invites.length > 0 ? (
@@ -274,7 +274,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
             <input id="org-name" type="text" required value={orgName} onChange={(event) => setOrgName(event.target.value)} placeholder="Acme Inc." />
             <label htmlFor="org-access-code">Access code</label>
             <input id="org-access-code" type="text" required value={accessCode} onChange={(event) => setAccessCode(event.target.value)} placeholder="Ask your Tabula contact for a code" />
-            <button type="submit" disabled={orgBusy}>{orgBusy ? 'Creating…' : 'Create organization'}</button>
+            <button type="submit" disabled={orgBusy}>{orgBusy ? 'Designing…' : 'Design organization'}</button>
           </form>
           {orgError ? <p className="auth-message" role="alert">{orgError}</p> : null}
         </section>
