@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import './Landing.css';
 
 const FEATURES = [
@@ -7,6 +8,15 @@ const FEATURES = [
 ];
 
 export function Landing({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp: () => void }) {
+  const [activeFeature, setActiveFeature] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveFeature((i) => (i + 1) % FEATURES.length);
+    }, 3200);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <main className="landing">
       <header className="landing-nav">
@@ -32,8 +42,8 @@ export function Landing({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp
       </section>
 
       <section className="landing-features">
-        {FEATURES.map((f) => (
-          <div key={f.title} className="landing-feature">
+        {FEATURES.map((f, i) => (
+          <div key={f.title} className={`landing-feature${i === activeFeature ? ' landing-feature-active' : ''}`}>
             <h2>{f.title}</h2>
             <p>{f.body}</p>
           </div>

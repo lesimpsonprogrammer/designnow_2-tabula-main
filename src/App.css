@@ -18,6 +18,7 @@
 .auth-card label { color: var(--text-secondary); font-size: 12px; }
 .auth-card input { min-height: 42px; padding: 0 12px; border: 1px solid var(--border-default); border-radius: var(--radius-input); background: var(--surface-drawer); color: var(--text-primary); font: 14px var(--font-ui); }
 .auth-card form button { min-height: 42px; margin-top: 4px; border: none; background: var(--brand-gradient); color: #1a0b3d; font-weight: 700; }
+.auth-card form button:hover:not(:disabled) { background: #ffffff; color: #1a0b3d; }
 .auth-card code { display: block; margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: #0d0c0b; color: var(--text-secondary); font-size: 11px; }
 .auth-message, .auth-loading { color: var(--text-secondary); font-size: 12px; }
 .auth-switch-mode { display: block; width: 100%; margin-top: 14px; padding: 6px 0; border: none; background: transparent; text-align: center; }
@@ -104,6 +105,7 @@
 .start-actions button span { color: var(--text-muted); font-size: 10px; line-height: 1.4; }
 .start-actions .start-primary { border: none; background: var(--brand-gradient); }
 .start-actions .start-primary strong, .start-actions .start-primary span { color: #1a0b3d; }
+.start-actions .start-primary:hover:not(:disabled) { background: #ffffff; border-color: #ffffff; }
 .start-recent { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 10px; padding: 10px 12px; background: transparent; }
 .start-recent small { color: var(--text-meta); font: 9px var(--font-mono); }
 .start-error { color: var(--danger) !important; font-size: 11px; margin-top: 10px !important; }

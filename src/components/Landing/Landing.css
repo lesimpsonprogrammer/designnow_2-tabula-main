@@ -89,7 +89,7 @@
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(255, 138, 77, 0.35);
 }
-.landing-nav-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(255, 138, 77, 0.45); }
+.landing-nav-cta:hover { background: #ffffff; color: #26123f; transform: translateY(-1px); box-shadow: 0 10px 26px rgba(255, 138, 77, 0.45); }
 
 .landing-hero {
   max-width: 780px;
@@ -141,7 +141,7 @@
   cursor: pointer;
   box-shadow: 0 12px 30px rgba(255, 138, 77, 0.4);
 }
-.landing-hero-cta:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 16px 38px rgba(255, 138, 77, 0.5); }
+.landing-hero-cta:hover { background: #ffffff; color: #26123f; transform: translateY(-2px) scale(1.02); box-shadow: 0 16px 38px rgba(255, 138, 77, 0.5); }
 .landing-hero-secondary {
   background: rgba(255,255,255,0.12);
   border: 1.5px solid rgba(255,255,255,0.4);
@@ -169,6 +169,13 @@
   border-radius: 20px;
   padding: 28px 24px;
   backdrop-filter: blur(6px);
+  transition: transform 0.5s ease, border-color 0.5s ease, background 0.5s ease, box-shadow 0.5s ease;
+}
+.landing-feature-active {
+  background: rgba(255,255,255,0.2);
+  border-color: #ffe14d;
+  box-shadow: 0 0 0 1px rgba(255,225,77,0.4), 0 18px 40px rgba(0,0,0,0.25);
+  transform: translateY(-6px);
 }
 .landing-feature h2 {
   font-size: 19px;
