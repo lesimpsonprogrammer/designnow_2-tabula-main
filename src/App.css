@@ -20,6 +20,8 @@
 .auth-card form button { min-height: 42px; margin-top: 4px; border-color: var(--accent); background: var(--accent); color: #fff; }
 .auth-card code { display: block; margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: #0d0c0b; color: var(--text-secondary); font-size: 11px; }
 .auth-message, .auth-loading { color: var(--text-secondary); font-size: 12px; }
+.auth-switch-mode { display: block; width: 100%; margin-top: 14px; padding: 6px 0; border: none; background: transparent; text-align: center; }
+.auth-switch-mode:hover:not(:disabled) { background: transparent; text-decoration: underline; }
 .header-user { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-meta); font-size: 10px; }
 
 /* Header */
