@@ -57,41 +57,53 @@ export function Header() {
         <button disabled={!future} onClick={redo}>Redo</button>
       </div>
       <div className="header-right">
-        {org.plan === 'trial' ? (
-          <span className={`trial-pill${trialExpired ? ' trial-pill-expired' : ''}`}>
-            {trialExpired ? 'Trial ended' : `Trial · ${trialDaysLeft} day${trialDaysLeft === 1 ? '' : 's'} left`}
+        <div className="header-group header-group-session">
+          {org.plan === 'trial' ? (
+            <span className={`trial-pill${trialExpired ? ' trial-pill-expired' : ''}`}>
+              {trialExpired ? 'Trial ended' : `Trial · ${trialDaysLeft} day${trialDaysLeft === 1 ? '' : 's'} left`}
+            </span>
+          ) : null}
+          <span className="header-user" title={user.email}>{org.name} · {user.email}</span>
+          <button type="button" className="header-link-btn" onClick={() => void signOut()}>Sign out</button>
+        </div>
+
+        <span className="header-divider" aria-hidden="true" />
+
+        <div className="header-group">
+          <span role="status" aria-live="polite" className="autosave-status"
+            title={savedAt ? `Last saved in this browser: ${new Date(savedAt).toLocaleString()}` : 'Autosaves in this browser'}>
+            {saveStatus === 'error' ? 'Autosave failed' : saveStatus === 'pending' ? 'Saving…' : saveStatus === 'saved' ? 'Saved locally' : 'Autosave ready'}
           </span>
-        ) : null}
-        <span className="header-user" title={user.email}>{org.name} · {user.email}</span>
-        <button type="button" onClick={() => void signOut()}>Sign out</button>
-        <span role="status" aria-live="polite" className="autosave-status"
-          title={savedAt ? `Last saved in this browser: ${new Date(savedAt).toLocaleString()}` : 'Autosaves in this browser'}>
-          {saveStatus === 'error' ? 'Autosave failed — use Save to download a copy' : saveStatus === 'pending' ? 'Saving…' : saveStatus === 'saved' ? 'Saved locally' : 'Autosave ready'}
-        </span>
-        {saveStatus === 'error' && <button type="button" onClick={flushPendingSave}>Retry autosave</button>}
-        <button type="button" onClick={() => projectInputRef.current?.click()}>Open</button>
-        <a className="header-action-link" href="#" download onClick={(event) => prepareProjectDownload(event.currentTarget)}>Save</a>
-        <input
-          ref={projectInputRef}
-          className="project-file-input"
-          type="file"
-          accept=".tabula,.json,application/json"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) readProject(file);
-            event.target.value = '';
-          }}
-        />
-        {fileError ? <span className="header-file-error" role="alert">{fileError}</span> : null}
-        <button
-          className={rightRailOpen ? 'active' : ''}
-          aria-pressed={rightRailOpen}
-          title={`${rightRailOpen ? 'Hide' : 'Show'} Inspect and Theme`}
-          onClick={toggleRightRail}
-        >
-          Inspector {rightRailOpen ? '−' : '+'}
-        </button>
-        <button onClick={togglePreview}>{preview ? 'Edit' : 'Preview'}</button>
+          {saveStatus === 'error' && <button type="button" onClick={flushPendingSave}>Retry autosave</button>}
+          <button type="button" onClick={() => projectInputRef.current?.click()}>Open</button>
+          <a className="header-action-link" href="#" download onClick={(event) => prepareProjectDownload(event.currentTarget)}>Save</a>
+          <input
+            ref={projectInputRef}
+            className="project-file-input"
+            type="file"
+            accept=".tabula,.json,application/json"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) readProject(file);
+              event.target.value = '';
+            }}
+          />
+          {fileError ? <span className="header-file-error" role="alert">{fileError}</span> : null}
+        </div>
+
+        <span className="header-divider" aria-hidden="true" />
+
+        <div className="header-group">
+          <button
+            className={rightRailOpen ? 'active' : ''}
+            aria-pressed={rightRailOpen}
+            title={`${rightRailOpen ? 'Hide' : 'Show'} Inspect and Theme`}
+            onClick={toggleRightRail}
+          >
+            Inspector {rightRailOpen ? '−' : '+'}
+          </button>
+          <button onClick={togglePreview}>{preview ? 'Edit' : 'Preview'}</button>
+        </div>
       </div>
     </header>
   );

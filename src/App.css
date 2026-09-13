@@ -59,8 +59,13 @@
 .header-project-number { color: var(--text-meta); font: 10px var(--font-mono); }
 .header-file-error { color: var(--danger); font-size: 10px; }
 .project-file-input { position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-.header-center, .header-right { display: flex; gap: 8px; }
+.header-center, .header-right { display: flex; align-items: center; gap: 8px; }
 .header-center { align-items: center; }
+.header-group { display: flex; align-items: center; gap: 8px; }
+.header-group-session { gap: 10px; }
+.header-divider { width: 1px; height: 20px; background: var(--border-default); flex: 0 0 auto; }
+.header-link-btn { padding: 0; border: none; background: transparent; color: var(--text-tertiary); font-size: 11px; text-decoration: underline; text-underline-offset: 2px; }
+.header-link-btn:hover { background: transparent; color: var(--text-primary); }
 
 /* Completion estimate */
 .completion-indicator { position: relative; }
