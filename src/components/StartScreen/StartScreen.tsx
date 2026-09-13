@@ -6,6 +6,7 @@ export function StartScreen() {
   const [error, setError] = useState('');
   const [isDraggingFile, setIsDraggingFile] = useState(false);
   const startNewProject = useTabulaStore((state) => state.startNewProject);
+  const openMomentumTemplate = useTabulaStore((state) => state.openMomentumTemplate);
   const continueRecentProject = useTabulaStore((state) => state.continueRecentProject);
   const hasRecentProject = useTabulaStore((state) => state.hasRecentProject);
   const projectName = useTabulaStore((state) => state.projectName);
@@ -58,7 +59,11 @@ export function StartScreen() {
         <p>Open or drag in a Tabula project file, or begin with a clear canvas.</p>
 
         <div className="start-actions">
-          <button type="button" className="start-primary" onClick={startNewProject}>
+          <button type="button" className="start-primary" onClick={openMomentumTemplate}>
+            <strong>Open Momentum Data Solutions</strong>
+            <span>The site's real pages, ready to edit — no file needed</span>
+          </button>
+          <button type="button" onClick={startNewProject}>
             <strong>Start from scratch</strong>
             <span>Creates a new project ID and number</span>
           </button>

@@ -434,6 +434,7 @@ type Actions = {
   toggleSnap: () => void;
   toggleDrawer: () => void;
   startNewProject: () => void;
+  openMomentumTemplate: () => void;
   continueRecentProject: () => void;
   returnToStart: () => void;
 };
@@ -1225,6 +1226,32 @@ export const useTabulaStore = create<State & Actions>((set, get) => ({
       activePageId: page.id,
       objects: [],
       sections: page.sections,
+      selectedId: null,
+      selectedSectionId: null,
+      editingId: null,
+      groupSelection: [],
+      past: [],
+      future: [],
+      preview: false,
+      savedAt: null,
+      nextId: 1,
+    });
+  },
+  openMomentumTemplate: () => {
+    const { pages, folders, homePage } = seedSite();
+    const now = Date.now();
+    set({
+      projectOpen: true,
+      hasRecentProject: true,
+      projectId: makeProjectId(),
+      projectNumber: nextProjectNumber(),
+      projectName: 'Momentum Data Solutions',
+      projectCreatedAt: now,
+      pages,
+      folders,
+      activePageId: homePage.id,
+      objects: homePage.objects,
+      sections: homePage.sections,
       selectedId: null,
       selectedSectionId: null,
       editingId: null,
