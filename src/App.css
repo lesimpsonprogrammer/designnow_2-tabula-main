@@ -24,32 +24,46 @@
 .auth-screen::before {
   width: min(1150px, 150vmax);
   height: min(1150px, 150vmax);
-  transform: translate(-50%, -50%) rotate(0deg);
   background: conic-gradient(from 0deg, #7b2ff7, #ff5ea8 30%, #ffb84d 55%, #0e1cdf 80%, #7b2ff7 100%);
   filter: blur(60px);
   opacity: .55;
   -webkit-mask: radial-gradient(circle, transparent 0 300px, #000 340px 460px, transparent 500px);
   mask: radial-gradient(circle, transparent 0 300px, #000 340px 460px, transparent 500px);
-  animation: auth-ribbon-spin 46s linear infinite;
+  animation: auth-ribbon-orbit-a 22s linear infinite;
 }
 .auth-screen::after {
   width: min(800px, 110vmax);
   height: min(800px, 110vmax);
-  transform: translate(-50%, -50%) rotate(35deg);
   background: conic-gradient(from 90deg, #ff5ea8, #ffb84d 25%, #7b2ff7 60%, #0e1cdf 85%, #ff5ea8 100%);
   filter: blur(45px);
   opacity: .5;
   -webkit-mask: radial-gradient(circle, transparent 0 210px, #000 250px 330px, transparent 370px);
   mask: radial-gradient(circle, transparent 0 210px, #000 250px 330px, transparent 370px);
-  animation: auth-ribbon-spin-reverse 34s linear infinite;
+  animation: auth-ribbon-orbit-b 15s linear infinite;
 }
-@keyframes auth-ribbon-spin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+/* Each ring both spins (rotate) and swings its center around the card (translate offset),
+   so the ribbons visibly circle the login card rather than just rotating in place. */
+@keyframes auth-ribbon-orbit-a {
+  0%    { transform: translate(calc(-50% + 60px), calc(-50% + 0px))   rotate(0deg); }
+  12.5% { transform: translate(calc(-50% + 42px), calc(-50% + 42px))  rotate(45deg); }
+  25%   { transform: translate(calc(-50% + 0px),  calc(-50% + 60px))  rotate(90deg); }
+  37.5% { transform: translate(calc(-50% - 42px), calc(-50% + 42px))  rotate(135deg); }
+  50%   { transform: translate(calc(-50% - 60px), calc(-50% + 0px))   rotate(180deg); }
+  62.5% { transform: translate(calc(-50% - 42px), calc(-50% - 42px))  rotate(225deg); }
+  75%   { transform: translate(calc(-50% + 0px),  calc(-50% - 60px))  rotate(270deg); }
+  87.5% { transform: translate(calc(-50% + 42px), calc(-50% - 42px))  rotate(315deg); }
+  100%  { transform: translate(calc(-50% + 60px), calc(-50% + 0px))   rotate(360deg); }
 }
-@keyframes auth-ribbon-spin-reverse {
-  from { transform: translate(-50%, -50%) rotate(35deg); }
-  to { transform: translate(-50%, -50%) rotate(-325deg); }
+@keyframes auth-ribbon-orbit-b {
+  0%    { transform: translate(calc(-50% - 40px), calc(-50% + 0px))   rotate(35deg); }
+  12.5% { transform: translate(calc(-50% - 28px), calc(-50% - 28px))  rotate(-5deg); }
+  25%   { transform: translate(calc(-50% + 0px),  calc(-50% - 40px))  rotate(-45deg); }
+  37.5% { transform: translate(calc(-50% + 28px), calc(-50% - 28px))  rotate(-85deg); }
+  50%   { transform: translate(calc(-50% + 40px), calc(-50% + 0px))   rotate(-125deg); }
+  62.5% { transform: translate(calc(-50% + 28px), calc(-50% + 28px))  rotate(-165deg); }
+  75%   { transform: translate(calc(-50% + 0px),  calc(-50% + 40px))  rotate(-205deg); }
+  87.5% { transform: translate(calc(-50% - 28px), calc(-50% + 28px))  rotate(-245deg); }
+  100%  { transform: translate(calc(-50% - 40px), calc(-50% + 0px))   rotate(-285deg); }
 }
 @media (prefers-reduced-motion: reduce) {
   .auth-screen::before, .auth-screen::after { animation: none; }
