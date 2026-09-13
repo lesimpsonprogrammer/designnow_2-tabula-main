@@ -41,6 +41,8 @@ export const PALETTE_GROUPS: PaletteGroup[] = [
       { key: 'icon', glyph: '◇', label: 'Icon' },
       { key: 'logos', glyph: '⬡', label: 'Logo strip' },
       { key: 'table', glyph: '▦', label: 'Table' },
+      { key: 'splash', glyph: '✷', label: 'Color splash', hint: 'An artistic paint-splatter graphic in your theme colors' },
+      { key: 'logomark', glyph: '◈', label: 'Logo design', hint: 'A generated abstract logomark you can recolor and drop in as a brand mark' },
     ],
   },
   {

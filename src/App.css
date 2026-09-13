@@ -486,6 +486,27 @@ button.active, .rail-tab.active { background: var(--surface-active-row); color: 
 @keyframes cloud-float { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(5px); } }
 @media (prefers-reduced-motion: reduce) { .cloud-artwork-float, .cloud-outline { animation: none; } }
 
+.splash-artwork { width: 100%; height: 100%; }
+.splash-artwork svg { display: block; width: 100%; height: 100%; }
+.splash-blob { mix-blend-mode: normal; transform-box: fill-box; transform-origin: 50% 50%; }
+.splash-blob circle { fill-opacity: .88; }
+.splash-blob-1 { animation: splash-breathe 7s ease-in-out infinite; }
+.splash-blob-2 { animation: splash-breathe 8.4s ease-in-out infinite -2.1s; }
+.splash-blob-3 { animation: splash-breathe 6.2s ease-in-out infinite -3.4s; }
+@keyframes splash-breathe {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.06) rotate(4deg); }
+}
+@media (prefers-reduced-motion: reduce) { .splash-blob-1, .splash-blob-2, .splash-blob-3 { animation: none; } }
+
+.logomark-artwork { width: 100%; height: 100%; }
+.logomark-artwork svg { display: block; width: 100%; height: 100%; }
+.logomark-ring { transform-box: fill-box; transform-origin: 50% 50%; animation: logomark-spin 16s linear infinite; }
+.logomark-dot { animation: logomark-pulse 2.6s ease-in-out infinite; }
+@keyframes logomark-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes logomark-pulse { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .logomark-ring, .logomark-dot { animation: none; } }
+
 /* Floating navigation editor */
 .navigation-menu-panel {
   position: absolute;

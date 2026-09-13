@@ -20,7 +20,7 @@ function pageContentScore(page: Page) {
   const content = page.objects.filter((object) => !NON_CONTENT_KINDS.has(object.kind));
   if (!content.length) return 20;
   const complete = content.filter((object) => {
-    if (object.kind === 'image' || object.kind === 'logo' || object.kind === 'video' || object.kind === 'cloud') return meaningfulText(object.label);
+    if (object.kind === 'image' || object.kind === 'logo' || object.kind === 'video' || object.kind === 'cloud' || object.kind === 'splash' || object.kind === 'logomark') return meaningfulText(object.label);
     return meaningfulText(object.text);
   }).length;
   return Math.round(30 + (complete / content.length) * 70);

@@ -6,6 +6,7 @@ export function StartScreen() {
   const [error, setError] = useState('');
   const [isDraggingFile, setIsDraggingFile] = useState(false);
   const startNewProject = useTabulaStore((state) => state.startNewProject);
+  const startLogoProject = useTabulaStore((state) => state.startLogoProject);
   const openMomentumTemplate = useTabulaStore((state) => state.openMomentumTemplate);
   const continueRecentProject = useTabulaStore((state) => state.continueRecentProject);
   const hasRecentProject = useTabulaStore((state) => state.hasRecentProject);
@@ -55,7 +56,7 @@ export function StartScreen() {
 
       <section className="start-card" aria-labelledby="start-title">
         <span className="start-brand">Tabula</span>
-        <h1 id="start-title">What would you like to build?</h1>
+        <h1 id="start-title">What are we designing today?</h1>
         <p>Open or drag in a Tabula project file, or begin with a clear canvas.</p>
 
         <div className="start-actions">
@@ -66,6 +67,10 @@ export function StartScreen() {
           <button type="button" onClick={startNewProject}>
             <strong>Start from scratch</strong>
             <span>Creates a new project ID and number</span>
+          </button>
+          <button type="button" onClick={startLogoProject}>
+            <strong>Design a logo</strong>
+            <span>Starts a fresh canvas with an editable logomark to build from</span>
           </button>
           <button type="button" onClick={() => inputRef.current?.click()}>
             <strong>Open project file</strong>

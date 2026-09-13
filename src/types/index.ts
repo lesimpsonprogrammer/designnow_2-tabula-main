@@ -7,11 +7,11 @@ export type Kind =
   // Layout
   | 'box' | 'card' | 'divider' | 'spacer' | 'nav' | 'breadcrumb' | 'footer' | 'accordion'
   // Media
-  | 'image' | 'logo' | 'video' | 'cloud' | 'icon' | 'logos' | 'table'
+  | 'image' | 'logo' | 'video' | 'cloud' | 'icon' | 'logos' | 'table' | 'splash' | 'logomark'
   // Forms
   | 'button' | 'reminder' | 'form' | 'input' | 'checkbox';
 
-export const BLOCK_KINDS: Kind[] = ['image', 'logo', 'box', 'card', 'divider', 'spacer', 'video', 'cloud', 'icon'];
+export const BLOCK_KINDS: Kind[] = ['image', 'logo', 'box', 'card', 'divider', 'spacer', 'video', 'cloud', 'icon', 'splash', 'logomark'];
 export const HEAD_KINDS: Kind[] = ['heading', 'subhead', 'nav', 'stat', 'quote'];
 
 export type NavLink = { id: string; label: string; href: string; children?: NavLink[] };

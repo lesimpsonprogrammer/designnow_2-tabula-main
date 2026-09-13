@@ -73,6 +73,57 @@ function CloudGraphic() {
   );
 }
 
+let splashFilterSeed = 0;
+
+function SplashGraphic() {
+  const [idBase] = useState(() => `splash-${++splashFilterSeed}`);
+  return (
+    <div className="splash-artwork">
+      <svg viewBox="0 0 300 300" role="img" aria-label="Artistic paint splash">
+        <defs>
+          <filter id={`${idBase}-a`} x="-60%" y="-60%" width="220%" height="220%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="4" result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="34" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+          <filter id={`${idBase}-b`} x="-60%" y="-60%" width="220%" height="220%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02 0.026" numOctaves="2" seed="9" result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+          <filter id={`${idBase}-c`} x="-60%" y="-60%" width="220%" height="220%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.016 0.022" numOctaves="2" seed="17" result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="30" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
+        <g className="splash-blob splash-blob-1" filter={`url(#${idBase}-a)`}>
+          <circle cx="140" cy="150" r="90" fill="#7b2ff7" />
+          <circle cx="205" cy="205" r="22" fill="#7b2ff7" />
+          <circle cx="90" cy="220" r="14" fill="#7b2ff7" />
+        </g>
+        <g className="splash-blob splash-blob-2" filter={`url(#${idBase}-b)`}>
+          <circle cx="185" cy="110" r="66" fill="#ff5ea8" />
+          <circle cx="240" cy="150" r="16" fill="#ff5ea8" />
+        </g>
+        <g className="splash-blob splash-blob-3" filter={`url(#${idBase}-c)`}>
+          <circle cx="110" cy="95" r="46" fill="#ffb84d" />
+          <circle cx="70" cy="140" r="12" fill="#ffb84d" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function LogomarkGraphic({ color }: { color: string }) {
+  return (
+    <div className="logomark-artwork">
+      <svg viewBox="0 0 100 100" role="img" aria-label="Logo design">
+        <circle className="logomark-ring" cx="50" cy="50" r="42" fill="none" stroke={color} strokeWidth="6" strokeDasharray="200" strokeDashoffset="60" />
+        <path d="M28 30h44M50 30v42" fill="none" stroke={color} strokeWidth="10" strokeLinecap="round" />
+        <circle className="logomark-dot" cx="50" cy="78" r="6" fill={color} />
+      </svg>
+    </div>
+  );
+}
+
 type AlignmentGuide = {
   axis: 'x' | 'y';
   position: number;
@@ -391,6 +442,10 @@ export function Canvas({ mode = 'editor' }: CanvasProps) {
               </label>
             ) : o.kind === 'cloud' ? (
               <CloudGraphic />
+            ) : o.kind === 'splash' ? (
+              <SplashGraphic />
+            ) : o.kind === 'logomark' ? (
+              <LogomarkGraphic color={o.color} />
             ) : o.kind === 'icon' ? (
               isPreview && o.href && o.href !== '#' ? (
                 <a className="canvas-icon-link" href={o.href} aria-label={o.label || `${o.iconName} link`}><IconGraphic name={o.iconName} /></a>

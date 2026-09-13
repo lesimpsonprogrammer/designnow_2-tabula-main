@@ -145,6 +145,26 @@ nav.obj .nav-item:focus-within .nav-submenu { opacity: 1; pointer-events: auto; 
 .cloud-artwork .cloud-outline { fill: none; stroke: currentColor; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
 .cloud-artwork:hover { transform: translateY(-4px) rotate(2deg); transition: transform .35s ease; }
 
+.splash-artwork svg { display: block; width: 100%; height: 100%; }
+.splash-blob { transform-box: fill-box; transform-origin: 50% 50%; }
+.splash-blob-1 { animation: splash-breathe 7s ease-in-out infinite; }
+.splash-blob-2 { animation: splash-breathe 8.4s ease-in-out infinite -2.1s; }
+.splash-blob-3 { animation: splash-breathe 6.2s ease-in-out infinite -3.4s; }
+@keyframes splash-breathe {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.06) rotate(4deg); }
+}
+
+.logomark-artwork svg { display: block; width: 100%; height: 100%; }
+.logomark-ring { transform-box: fill-box; transform-origin: 50% 50%; animation: logomark-spin 16s linear infinite; }
+.logomark-dot { animation: logomark-pulse 2.6s ease-in-out infinite; }
+@keyframes logomark-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes logomark-pulse { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-blob-1, .splash-blob-2, .splash-blob-3, .logomark-ring, .logomark-dot { animation: none; }
+}
+
 @keyframes tabula-divider-shimmer {
   0%, 22% { background-position: 115% 0; opacity: .55; }
   42% { background-position: 50% 0; opacity: 1; }

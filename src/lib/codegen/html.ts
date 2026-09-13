@@ -8,6 +8,7 @@ import { inferRows, columnGap } from './layout';
 const FIXED_HEIGHT_KINDS = new Set([
   'image', 'logo', 'video', 'box', 'card', 'divider', 'spacer', 'table', 'nav',
   'footer', 'accordion', 'form', 'input', 'button', 'reminder', 'badge', 'checkbox',
+  'splash', 'logomark',
 ]);
 
 function esc(s: string): string {
@@ -130,6 +131,27 @@ function objectTag(o: Obj, theme: Theme): string {
     case 'icon':
       return tag(o.href && o.href !== '#' ? 'a' : 'div', `class="obj" data-kind="icon"${o.href && o.href !== '#' ? ` href="${escAttr(o.href)}"` : ''} aria-label="${escAttr(o.label || `${o.iconName} icon`)}" style="${st}"`,
         `<svg class="tabula-icon" viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g class="icon-motion">${ICON_SVG[o.iconName]}</g></svg>`);
+    case 'splash': {
+      const fid = `splash-${slug}`;
+      return tag('div', `class="obj splash-artwork" data-kind="splash" style="${st}"`,
+        '\n  <svg viewBox="0 0 300 300" role="img" aria-label="Artistic paint splash">\n' +
+        `    <defs>\n` +
+        `      <filter id="${fid}-a" x="-60%" y="-60%" width="220%" height="220%"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="4" result="n" /><feDisplacementMap in="SourceGraphic" in2="n" scale="34" xChannelSelector="R" yChannelSelector="G" /></filter>\n` +
+        `      <filter id="${fid}-b" x="-60%" y="-60%" width="220%" height="220%"><feTurbulence type="fractalNoise" baseFrequency="0.02 0.026" numOctaves="2" seed="9" result="n" /><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G" /></filter>\n` +
+        `      <filter id="${fid}-c" x="-60%" y="-60%" width="220%" height="220%"><feTurbulence type="fractalNoise" baseFrequency="0.016 0.022" numOctaves="2" seed="17" result="n" /><feDisplacementMap in="SourceGraphic" in2="n" scale="30" xChannelSelector="R" yChannelSelector="G" /></filter>\n` +
+        `    </defs>\n` +
+        `    <g class="splash-blob splash-blob-1" filter="url(#${fid}-a)"><circle cx="140" cy="150" r="90" fill="#7b2ff7" /><circle cx="205" cy="205" r="22" fill="#7b2ff7" /><circle cx="90" cy="220" r="14" fill="#7b2ff7" /></g>\n` +
+        `    <g class="splash-blob splash-blob-2" filter="url(#${fid}-b)"><circle cx="185" cy="110" r="66" fill="#ff5ea8" /><circle cx="240" cy="150" r="16" fill="#ff5ea8" /></g>\n` +
+        `    <g class="splash-blob splash-blob-3" filter="url(#${fid}-c)"><circle cx="110" cy="95" r="46" fill="#ffb84d" /><circle cx="70" cy="140" r="12" fill="#ffb84d" /></g>\n` +
+        '  </svg>\n');
+    }
+    case 'logomark':
+      return tag('div', `class="obj logomark-artwork" data-kind="logomark" style="${st}"`,
+        '\n  <svg viewBox="0 0 100 100" role="img" aria-label="Logo design">\n' +
+        `    <circle class="logomark-ring" cx="50" cy="50" r="42" fill="none" stroke="${escAttr(o.color)}" stroke-width="6" stroke-dasharray="200" stroke-dashoffset="60" />\n` +
+        `    <path d="M28 30h44M50 30v42" fill="none" stroke="${escAttr(o.color)}" stroke-width="10" stroke-linecap="round" />\n` +
+        `    <circle class="logomark-dot" cx="50" cy="78" r="6" fill="${escAttr(o.color)}" />\n` +
+        '  </svg>\n');
     case 'heading':
       return tag('h1', `class="obj" style="${st}"`, renderedText(o));
     case 'subhead':

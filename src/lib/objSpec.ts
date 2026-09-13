@@ -62,6 +62,10 @@ export function objSpec(kind: Kind, x: number, y: number, label?: string): Omit<
       return { ...base, w: 320, h: 420, color: '#1183f0', label: label || 'Interactive cloud network' };
     case 'icon':
       return { ...base, w: 32, h: 32, color: '#1183f0', iconName: 'database', label: label || 'Icon' };
+    case 'splash':
+      return { ...base, w: 340, h: 340, label: label || 'Color splash' };
+    case 'logomark':
+      return { ...base, w: 140, h: 140, color: '#0e1cdf', label: label || 'Logo design' };
     case 'logos':
       return { ...base, w: 720, h: 60, size: 15, color: '#8a827a', text: '⬡  Northline      ⬡  Verado      ⬡  Halstead      ⬡  Kerr & Co' };
     case 'table':

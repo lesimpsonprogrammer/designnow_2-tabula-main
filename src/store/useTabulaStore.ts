@@ -434,6 +434,7 @@ type Actions = {
   toggleSnap: () => void;
   toggleDrawer: () => void;
   startNewProject: () => void;
+  startLogoProject: () => void;
   openMomentumTemplate: () => void;
   continueRecentProject: () => void;
   returnToStart: () => void;
@@ -1235,6 +1236,38 @@ export const useTabulaStore = create<State & Actions>((set, get) => ({
       preview: false,
       savedAt: null,
       nextId: 1,
+    });
+  },
+  startLogoProject: () => {
+    const page = { ...blankPage('Home', null, 'draft'), home: true, slug: '' };
+    const now = Date.now();
+    let nextId = 1;
+    const objects = [
+      { ...makeObject('eyebrow', 380, 40, nextId++), text: 'Logo design' },
+      { ...makeObject('logomark', 380, 76, nextId++), w: 140, h: 140 },
+      { ...makeObject('text', 300, 240, nextId++), w: 300, text: 'Recolor, resize, or drag this mark anywhere — it’s yours to shape.' },
+    ];
+    set({
+      projectOpen: true,
+      hasRecentProject: true,
+      projectId: makeProjectId(),
+      projectNumber: nextProjectNumber(),
+      projectName: 'Untitled Logo',
+      projectCreatedAt: now,
+      pages: [{ ...page, objects }],
+      folders: [],
+      activePageId: page.id,
+      objects,
+      sections: page.sections,
+      selectedId: null,
+      selectedSectionId: null,
+      editingId: null,
+      groupSelection: [],
+      past: [],
+      future: [],
+      preview: false,
+      savedAt: null,
+      nextId,
     });
   },
   openMomentumTemplate: () => {
