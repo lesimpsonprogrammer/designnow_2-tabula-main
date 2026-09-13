@@ -1,6 +1,7 @@
 import { useTabulaStore } from '../../store/useTabulaStore';
 import { Inspector } from './Inspector';
 import { ThemePanel } from './ThemePanel';
+import { TypographyPanel } from './TypographyPanel';
 
 export function RightRail() {
   const rightTab = useTabulaStore((s) => s.rightTab);
@@ -12,12 +13,15 @@ export function RightRail() {
         <button className={`rail-tab${rightTab === 'inspect' ? ' active' : ''}`} onClick={() => setRightTab('inspect')}>
           Inspect
         </button>
+        <button className={`rail-tab${rightTab === 'typography' ? ' active' : ''}`} onClick={() => setRightTab('typography')}>
+          Typography
+        </button>
         <button className={`rail-tab${rightTab === 'theme' ? ' active' : ''}`} onClick={() => setRightTab('theme')}>
           Theme
         </button>
       </div>
       <div className="rail-body">
-        {rightTab === 'inspect' ? <Inspector /> : <ThemePanel />}
+        {rightTab === 'inspect' ? <Inspector /> : rightTab === 'typography' ? <TypographyPanel /> : <ThemePanel />}
       </div>
     </aside>
   );
