@@ -120,7 +120,7 @@ export type File = {
 };
 
 export type LeftTab = 'pages' | 'objects' | 'layers' | 'library' | 'events';
-export type RightTab = 'inspect' | 'theme';
+export type RightTab = 'inspect' | 'typography' | 'theme';
 export type Device = 'desktop' | 'tablet' | 'phone';
 
 export type State = {
