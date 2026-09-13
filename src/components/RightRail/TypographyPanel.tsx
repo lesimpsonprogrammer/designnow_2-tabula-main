@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { FONT_OPTIONS } from '../../lib/fonts';
+import { FONT_OPTIONS, TYPOGRAPHY_PRESETS } from '../../lib/fonts';
 import { HEAD_KINDS } from '../../types';
 import { useTabulaStore } from '../../store/useTabulaStore';
 
 const FONT_PAIRINGS = [
+  ...TYPOGRAPHY_PRESETS,
   { name: 'Modern', head: 'Archivo, sans-serif', body: 'DM Sans, sans-serif' },
   { name: 'Editorial', head: 'Instrument Serif, serif', body: 'DM Sans, sans-serif' },
   { name: 'Technical', head: 'Space Grotesk, sans-serif', body: 'DM Sans, sans-serif' },
