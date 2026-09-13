@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { FocusEventHandler } from 'react';
 import { useTabulaStore } from '../../store/useTabulaStore';
-import { FONT_OPTIONS } from '../../lib/fonts';
+import { FONT_OPTIONS, TYPOGRAPHY_PRESETS } from '../../lib/fonts';
 
 type NumberFieldProps = {
   label: string;
@@ -353,6 +353,26 @@ export function Inspector() {
             {FONT_OPTIONS.map((font) => <option key={font.label} value={font.value}>{font.label}</option>)}
           </select>
         </label>
+        {obj.kind === 'heading' || obj.kind === 'subhead' ? (
+          <label>
+            Typography preset
+            <select
+              aria-label="Typography preset for selected heading"
+              value={TYPOGRAPHY_PRESETS.find((preset) => preset.head === obj.fontFamily)?.name ?? ''}
+              onFocus={beginEdit}
+              onChange={(event) => {
+                const preset = TYPOGRAPHY_PRESETS.find((candidate) => candidate.name === event.target.value);
+                patch({ fontFamily: preset?.head ?? '' });
+              }}
+            >
+              <option value="">Project theme typography</option>
+              {TYPOGRAPHY_PRESETS.map((preset) => (
+                <option key={preset.name} value={preset.name}>{preset.name}</option>
+              ))}
+            </select>
+            <small>Applies to this selected heading only. Momentum Hand Script pairs with DM Sans body text.</small>
+          </label>
+        ) : null}
         {obj.text ? (
           <div className="inspector-text-spacing">
             <RangeField label="Word spacing" value={obj.wordSpacing ?? 0} min={-10} max={40} onFocus={beginEdit} onChange={(wordSpacing) => patch({ wordSpacing })} />
