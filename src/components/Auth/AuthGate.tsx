@@ -1,9 +1,15 @@
 import { createContext, useContext, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
 import { makeSupabaseClient, saveSupabaseConfig } from '../../lib/supabase';
+import { slugify } from '../../lib/slug';
+
+type Org = { id: string; name: string; slug: string; role: 'owner' | 'admin' | 'member' };
+type Invite = { id: string; org_id: string; email: string; role: 'admin' | 'member'; tabula_organizations: { name: string } | null };
 
 type AuthValue = {
   user: User;
+  org: Org;
+  client: SupabaseClient;
   signOut: () => Promise<void>;
 };
 
@@ -22,9 +28,19 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [setupUrl, setSetupUrl] = useState('');
   const [setupKey, setSetupKey] = useState('');
   const [setupError, setSetupError] = useState('');
+
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+
+  const [orgs, setOrgs] = useState<Org[] | null>(null);
+  const [invites, setInvites] = useState<Invite[] | null>(null);
+  const [activeOrgId, setActiveOrgId] = useState<string | null>(null);
+  const [orgName, setOrgName] = useState('');
+  const [orgBusy, setOrgBusy] = useState(false);
+  const [orgError, setOrgError] = useState('');
 
   useEffect(() => {
     if (!client) return;
@@ -47,28 +63,107 @@ export function AuthGate({ children }: { children: ReactNode }) {
     };
   }, [client]);
 
+  const loadMemberships = async () => {
+    if (!client || !session?.user) return;
+    const { data: memberships } = await client
+      .from('tabula_memberships')
+      .select('org_id, role, tabula_organizations(id, name, slug)')
+      .eq('user_id', session.user.id);
+
+    const list: Org[] = (memberships ?? [])
+      .map((m) => {
+        const o = m.tabula_organizations as unknown as { id: string; name: string; slug: string } | null;
+        if (!o) return null;
+        return { id: o.id, name: o.name, slug: o.slug, role: m.role as Org['role'] };
+      })
+      .filter((o): o is Org => o !== null);
+
+    setOrgs(list);
+    setActiveOrgId((current) => current ?? list[0]?.id ?? null);
+
+    if (list.length === 0) {
+      const { data: pending } = await client
+        .from('tabula_invites')
+        .select('id, org_id, email, role, tabula_organizations(name)')
+        .is('accepted_at', null);
+      setInvites((pending ?? []) as unknown as Invite[]);
+    } else {
+      setInvites([]);
+    }
+  };
+
+  useEffect(() => {
+    if (session?.user) void loadMemberships();
+    else {
+      setOrgs(null);
+      setInvites(null);
+      setActiveOrgId(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id]);
+
   const authValue = useMemo<AuthValue | null>(() => {
     if (!session?.user || !client) return null;
+    const active = orgs?.find((o) => o.id === activeOrgId);
+    if (!active) return null;
     return {
       user: session.user,
+      org: active,
+      client,
       signOut: async () => {
         const { error } = await client.auth.signOut();
         if (error) throw error;
       },
     };
-  }, [session]);
+  }, [session, client, orgs, activeOrgId]);
 
-  const requestLink = async (event: FormEvent) => {
+  const submitAuth = async (event: FormEvent) => {
     event.preventDefault();
-    if (!client || !email.trim()) return;
+    if (!client || !email.trim() || !password) return;
     setBusy(true);
     setMessage('');
-    const { error } = await client.auth.signInWithOtp({
-      email: email.trim(),
-      options: { emailRedirectTo: window.location.origin },
-    });
-    setMessage(error ? error.message : 'Check your email for your secure Tabula sign-in link.');
+    if (mode === 'signup') {
+      const { data, error } = await client.auth.signUp({ email: email.trim(), password });
+      if (error) {
+        setMessage(error.message);
+      } else if (!data.session) {
+        setMessage('Account created — check your email to confirm it, then sign in.');
+      }
+    } else {
+      const { error } = await client.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) setMessage(error.message);
+    }
     setBusy(false);
+  };
+
+  const createOrg = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!client || !orgName.trim()) return;
+    setOrgBusy(true);
+    setOrgError('');
+    const slug = slugify(orgName) + '-' + Math.random().toString(36).slice(2, 7);
+    const { error } = await client.rpc('tabula_create_organization', { org_name: orgName.trim(), org_slug: slug });
+    if (error) {
+      setOrgError(error.message);
+      setOrgBusy(false);
+      return;
+    }
+    await loadMemberships();
+    setOrgBusy(false);
+  };
+
+  const acceptInvite = async (inviteId: string) => {
+    if (!client) return;
+    setOrgBusy(true);
+    setOrgError('');
+    const { error } = await client.rpc('tabula_accept_invite', { invite_id: inviteId });
+    if (error) {
+      setOrgError(error.message);
+      setOrgBusy(false);
+      return;
+    }
+    await loadMemberships();
+    setOrgBusy(false);
   };
 
   const saveSetup = (event: FormEvent) => {
@@ -112,19 +207,59 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return <main className="auth-screen"><p className="auth-loading">Securing your workspace…</p></main>;
   }
 
-  if (!authValue) {
+  if (!session?.user) {
     return (
       <main className="auth-screen">
         <section className="auth-card" aria-labelledby="auth-title">
           <span className="auth-brand">Tabula</span>
-          <h1 id="auth-title">Sign in to your workspace</h1>
-          <p>Enter your email and we’ll send you a secure sign-in link. No password required.</p>
-          <form onSubmit={requestLink}>
+          <h1 id="auth-title">{mode === 'signup' ? 'Create your account' : 'Sign in to your workspace'}</h1>
+          <form onSubmit={submitAuth}>
             <label htmlFor="auth-email">Email address</label>
             <input id="auth-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@company.com" />
-            <button type="submit" disabled={busy}>{busy ? 'Sending…' : 'Email me a sign-in link'}</button>
+            <label htmlFor="auth-password">Password</label>
+            <input id="auth-password" type="password" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 8 characters" />
+            <button type="submit" disabled={busy}>{busy ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}</button>
           </form>
+          <button type="button" className="auth-switch-mode" onClick={() => { setMode(mode === 'signup' ? 'signin' : 'signup'); setMessage(''); }}>
+            {mode === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Create one"}
+          </button>
           {message ? <p className="auth-message" role="status">{message}</p> : null}
+        </section>
+      </main>
+    );
+  }
+
+  if (orgs === null) {
+    return <main className="auth-screen"><p className="auth-loading">Loading your workspace…</p></main>;
+  }
+
+  if (!authValue) {
+    return (
+      <main className="auth-screen">
+        <section className="auth-card" aria-labelledby="org-title">
+          <span className="auth-brand">Tabula</span>
+          <h1 id="org-title">
+            {invites && invites.length > 0 ? 'You have a pending invitation' : 'Create your organization'}
+          </h1>
+
+          {invites && invites.length > 0 ? (
+            <div className="auth-invites">
+              {invites.map((invite) => (
+                <div key={invite.id} className="auth-invite-row">
+                  <span>{invite.tabula_organizations?.name ?? 'A team'} invited you as {invite.role}</span>
+                  <button type="button" disabled={orgBusy} onClick={() => void acceptInvite(invite.id)}>Accept</button>
+                </div>
+              ))}
+              <p className="auth-or">— or —</p>
+            </div>
+          ) : null}
+
+          <form onSubmit={createOrg}>
+            <label htmlFor="org-name">Organization name</label>
+            <input id="org-name" type="text" required value={orgName} onChange={(event) => setOrgName(event.target.value)} placeholder="Acme Inc." />
+            <button type="submit" disabled={orgBusy}>{orgBusy ? 'Creating…' : 'Create organization'}</button>
+          </form>
+          {orgError ? <p className="auth-message" role="alert">{orgError}</p> : null}
         </section>
       </main>
     );

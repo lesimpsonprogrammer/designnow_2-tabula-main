@@ -4,7 +4,7 @@ import { CompletionIndicator } from '../Completion/CompletionIndicator';
 import { useAuth } from '../Auth/AuthGate';
 
 export function Header() {
-  const { user, signOut } = useAuth();
+  const { user, org, signOut } = useAuth();
   const projectInputRef = useRef<HTMLInputElement>(null);
   const [fileError, setFileError] = useState('');
   const preview = useTabulaStore((s) => s.preview);
@@ -54,7 +54,7 @@ export function Header() {
         <button disabled={!future} onClick={redo}>Redo</button>
       </div>
       <div className="header-right">
-        <span className="header-user" title={user.email}>{user.email}</span>
+        <span className="header-user" title={user.email}>{org.name} · {user.email}</span>
         <button type="button" onClick={() => void signOut()}>Sign out</button>
         <span role="status" aria-live="polite" className="autosave-status"
           title={savedAt ? `Last saved in this browser: ${new Date(savedAt).toLocaleString()}` : 'Autosaves in this browser'}>
