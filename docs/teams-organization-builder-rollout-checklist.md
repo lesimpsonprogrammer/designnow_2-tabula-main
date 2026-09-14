@@ -1,0 +1,26 @@
+# Teams Organization Builder — Rollout Checklist
+
+- [x] Teams-only license gate
+- [x] Org Admin / Site Admin / Section Leader / Site Designer / Logo Designer model
+- [x] Four-step Organization Builder
+- [x] Template recommendation step
+- [x] Environment setup step
+- [x] Role appointment as final step
+- [x] Persistent Organization Builder access for Org Admin
+- [x] Teams Settings
+- [x] Site Admin view-only Settings behavior
+- [x] User Access Change request and Org Admin approval workflow
+- [x] Automated lint and production build verification
+- [x] Identify Tabula Design Now Supabase project (`zkydfxtmzomypkaykhod`)
+- [x] Apply Teams migration to Tabula Supabase project
+- [x] Run Supabase security/performance advisors
+- [x] Apply Teams access-request RLS/index optimization
+- [x] Activate a Teams license for test organization (`Master Account`, 5 seats)
+- [x] Verify Teams license gate resolves active
+- [x] Verify Master Account owner resolves to Org Admin
+- [ ] Test Org Admin onboarding flow against deployed UI
+- [ ] Test Site Admin access request flow
+- [ ] Test non-admin role restrictions
+- [ ] Verify Individual Edition is unchanged
+- [ ] Preview deployment / browser QA
+- [ ] Merge to main

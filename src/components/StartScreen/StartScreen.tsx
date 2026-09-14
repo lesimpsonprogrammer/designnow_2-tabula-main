@@ -1,16 +1,22 @@
 import { useRef, useState } from 'react';
 import { openProjectFile, useTabulaStore } from '../../store/useTabulaStore';
+import { useTeams } from '../Teams/TeamsProvider';
+import { useTutorial } from '../Tutorial/Tutorial';
 
 export function StartScreen() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
   const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const { licenseType, isTeamsEdition, canOpenBuilder, canOpenSettings, openBuilder, openSettings } = useTeams();
+  const { completed: tutorialCompleted, openTutorial } = useTutorial();
   const startNewProject = useTabulaStore((state) => state.startNewProject);
   const openMomentumTemplate = useTabulaStore((state) => state.openMomentumTemplate);
   const continueRecentProject = useTabulaStore((state) => state.continueRecentProject);
   const hasRecentProject = useTabulaStore((state) => state.hasRecentProject);
   const projectName = useTabulaStore((state) => state.projectName);
   const projectNumber = useTabulaStore((state) => state.projectNumber);
+
+  const editionLabel = licenseType === 'teams' ? 'Teams Edition' : licenseType === 'individual' ? 'Individual Edition' : 'Tabula';
 
   const readProject = (file: globalThis.File) => {
     const reader = new FileReader();
@@ -57,6 +63,22 @@ export function StartScreen() {
         <span className="start-brand">Tabula</span>
         <h1 id="start-title">What would you like to build?</h1>
         <p>Open or drag in a Tabula project file, or begin with a clear canvas.</p>
+
+        <div className="tutorial-start-card">
+          <div>
+            <strong>{editionLabel} tutorial</strong>
+            <span>{tutorialCompleted ? 'Completed — reopen it anytime for a refresher.' : 'Take the guided tour and finish with a five-question knowledge check.'}</span>
+          </div>
+          <button type="button" onClick={openTutorial}>{tutorialCompleted ? 'Review tutorial' : 'Start tutorial'}</button>
+        </div>
+
+        {isTeamsEdition && (canOpenBuilder || canOpenSettings) ? (
+          <div className="teams-start-tools">
+            <span>Teams Edition</span>
+            {canOpenBuilder ? <button type="button" onClick={openBuilder}>Organization Builder</button> : null}
+            {canOpenSettings ? <button type="button" onClick={openSettings}>Organization Settings</button> : null}
+          </div>
+        ) : null}
 
         <div className="start-actions">
           <button type="button" className="start-primary" onClick={openMomentumTemplate}>

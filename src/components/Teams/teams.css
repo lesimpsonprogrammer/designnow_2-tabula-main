@@ -1,0 +1,676 @@
+.teams-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgb(10 9 9 / 78%);
+  backdrop-filter: blur(10px);
+  font-family: var(--font-ui);
+}
+
+.teams-modal {
+  width: min(1180px, 96vw);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--text-primary);
+  background: #171614;
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  box-shadow: 0 30px 90px rgb(0 0 0 / 45%);
+}
+
+.teams-modal-header,
+.teams-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 24px;
+  background: var(--surface-pagebar);
+}
+
+.teams-modal-header {
+  border-bottom: 1px solid var(--border-bar);
+}
+
+.teams-modal-header h2,
+.teams-step-heading h3,
+.teams-role-card h4,
+.teams-member-list h4 {
+  margin: 0;
+  font-weight: 650;
+}
+
+.teams-modal-header h2 {
+  margin-top: 3px;
+  font-size: 22px;
+}
+
+.teams-modal-header p,
+.teams-step-heading p,
+.teams-role-card p,
+.teams-note,
+.teams-member-list > p,
+.teams-request-list > p {
+  margin: 6px 0 0;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.teams-kicker {
+  display: block;
+  color: #bca8ff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.teams-close,
+.teams-modal button,
+.teams-modal select,
+.teams-modal input,
+.teams-modal textarea {
+  font: inherit;
+}
+
+.teams-close,
+.teams-modal button {
+  color: var(--text-secondary);
+  background: #24211f;
+  border: 1px solid var(--border-button);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.teams-close,
+.teams-modal-footer button,
+.teams-role-card-heading button,
+.teams-settings-nav button,
+.teams-request-actions button,
+.teams-user-actions button {
+  padding: 9px 13px;
+}
+
+.teams-modal button:hover:not(:disabled) {
+  border-color: var(--border-hover);
+  background: #2c2825;
+}
+
+.teams-modal button:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+.teams-modal .teams-primary {
+  color: white;
+  background: linear-gradient(90deg, #7b2ff7, #bb4eff 55%, #ff8d4c);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.teams-modal .teams-primary:hover:not(:disabled) {
+  background: linear-gradient(90deg, #8540f4, #c65dff 55%, #ff985c);
+}
+
+.teams-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0 24px;
+  background: #141311;
+  border-bottom: 1px solid var(--border-bar);
+}
+
+.teams-steps button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 52px;
+  padding: 0 10px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  text-align: left;
+}
+
+.teams-steps button span {
+  display: inline-grid;
+  width: 23px;
+  height: 23px;
+  place-items: center;
+  color: var(--text-meta);
+  background: var(--surface-tile);
+  border: 1px solid var(--border-button);
+  border-radius: 50%;
+  font-size: 11px;
+}
+
+.teams-steps button.active {
+  color: var(--text-primary);
+  border-bottom-color: #b44cff;
+}
+
+.teams-steps button.active span,
+.teams-steps button.complete span {
+  color: white;
+  background: #6f36d9;
+  border-color: #9a65f3;
+}
+
+.teams-modal-body,
+.teams-settings-content {
+  min-height: 0;
+  overflow: auto;
+}
+
+.teams-modal-body {
+  padding: 26px 28px 34px;
+}
+
+.teams-step-panel {
+  display: grid;
+  gap: 24px;
+}
+
+.teams-step-heading {
+  max-width: 760px;
+}
+
+.teams-step-heading h3 {
+  font-size: 18px;
+}
+
+.teams-form-grid,
+.teams-user-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.teams-modal label {
+  display: grid;
+  gap: 7px;
+  color: var(--text-tree);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.teams-modal input,
+.teams-modal select,
+.teams-modal textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  color: var(--text-primary);
+  background: #11100f;
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  outline: none;
+}
+
+.teams-modal input,
+.teams-modal select {
+  min-height: 39px;
+  padding: 8px 10px;
+}
+
+.teams-modal textarea {
+  padding: 10px;
+  resize: vertical;
+}
+
+.teams-modal input:focus,
+.teams-modal select:focus,
+.teams-modal textarea:focus {
+  border-color: #7e57e8;
+  box-shadow: 0 0 0 2px rgb(126 87 232 / 14%);
+}
+
+.teams-inline-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  color: var(--text-tree);
+  background: var(--surface-tile);
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  font-size: 12px;
+}
+
+.teams-inline-options strong {
+  margin-right: 4px;
+  color: var(--text-primary);
+}
+
+.teams-inline-options span {
+  padding: 6px 9px;
+  background: #1d1b19;
+  border: 1px solid var(--border-chip);
+  border-radius: 2px;
+}
+
+.teams-template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.teams-template-card {
+  display: grid;
+  gap: 9px;
+  min-height: 150px;
+  padding: 18px !important;
+  text-align: left;
+}
+
+.teams-template-card strong {
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.teams-template-card span {
+  color: var(--text-tertiary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.teams-template-card small {
+  align-self: end;
+  color: #bca8ff;
+  font-weight: 700;
+}
+
+.teams-template-card.selected {
+  background: linear-gradient(145deg, rgb(83 45 144 / 34%), rgb(42 35 31 / 88%));
+  border-color: #8a5be5;
+  box-shadow: inset 0 0 0 1px rgb(174 125 255 / 20%);
+}
+
+.teams-fieldset {
+  padding: 16px;
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+}
+
+.teams-fieldset legend {
+  padding: 0 7px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.teams-fieldset legend small {
+  margin-left: 8px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.teams-check-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.teams-check-grid.tech {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.teams-check-grid label,
+.teams-inline-check {
+  display: flex !important;
+  align-items: center;
+  gap: 8px !important;
+  min-height: 38px;
+  padding: 8px 10px;
+  background: #1b1917;
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+}
+
+.teams-check-grid input,
+.teams-inline-check input {
+  width: 15px;
+  min-height: 15px;
+  margin: 0;
+  padding: 0;
+  accent-color: #8d5ee8;
+}
+
+.teams-role-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.teams-role-card {
+  padding: 18px;
+  background: var(--surface-tile);
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+}
+
+.teams-role-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.teams-role-card h4 {
+  font-size: 14px;
+}
+
+.teams-role-card p {
+  max-width: 760px;
+}
+
+.teams-appointment-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(210px, 1.2fr) minmax(160px, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-default);
+}
+
+.teams-remove {
+  min-height: 39px;
+  padding: 8px 10px;
+  color: var(--danger) !important;
+}
+
+.teams-error,
+.teams-message {
+  margin: 18px 0 0;
+  padding: 11px 13px;
+  border-radius: 2px;
+  font-size: 12px;
+}
+
+.teams-error {
+  color: #ffd0c2;
+  background: rgb(126 42 24 / 23%);
+  border: 1px solid rgb(233 160 138 / 32%);
+}
+
+.teams-message {
+  color: #ddd4ff;
+  background: rgb(87 59 161 / 22%);
+  border: 1px solid rgb(155 118 239 / 32%);
+}
+
+.teams-modal-footer {
+  border-top: 1px solid var(--border-bar);
+}
+
+.teams-modal-footer span {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.teams-settings {
+  width: min(1260px, 97vw);
+}
+
+.teams-settings-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  min-height: 640px;
+  overflow: hidden;
+}
+
+.teams-settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 18px 14px;
+  background: #141311;
+  border-right: 1px solid var(--border-bar);
+}
+
+.teams-settings-nav button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border-color: transparent;
+}
+
+.teams-settings-nav button.active {
+  color: white;
+  background: var(--surface-active-row);
+  border-color: var(--border-default);
+}
+
+.teams-settings-content {
+  padding: 26px;
+}
+
+.teams-permission-table-wrap {
+  margin-top: 20px;
+  overflow: auto;
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+}
+
+.teams-permission-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.teams-permission-table th,
+.teams-permission-table td {
+  padding: 12px;
+  border-right: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
+  text-align: center;
+}
+
+.teams-permission-table th:first-child {
+  width: 260px;
+  text-align: left;
+}
+
+.teams-permission-table thead th {
+  color: var(--text-secondary);
+  background: var(--surface-pagebar);
+}
+
+.teams-permission-table tbody th {
+  color: var(--text-tree);
+  background: #191715;
+}
+
+.teams-permission-table td.granted {
+  color: #c9f1d7;
+}
+
+.teams-permission-table td.denied {
+  color: var(--text-muted);
+}
+
+.teams-note {
+  padding: 12px 0;
+}
+
+.teams-user-form {
+  margin-top: 20px;
+  padding: 18px;
+  background: var(--surface-tile);
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+}
+
+.teams-form-wide {
+  grid-column: 1 / -1;
+}
+
+.teams-user-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.teams-member-list {
+  margin-top: 24px;
+}
+
+.teams-member-list h4 {
+  margin-bottom: 10px;
+}
+
+.teams-member-row {
+  display: grid;
+  grid-template-columns: minmax(190px, 1.4fr) 150px minmax(110px, 1fr) 90px minmax(120px, auto);
+  gap: 12px;
+  align-items: center;
+  padding: 12px 10px;
+  border-top: 1px solid var(--border-default);
+  color: var(--text-tree);
+  font-size: 12px;
+}
+
+.teams-member-row > div {
+  display: grid;
+  gap: 3px;
+}
+
+.teams-member-row strong {
+  color: var(--text-primary);
+}
+
+.teams-member-row span {
+  color: var(--text-tertiary);
+}
+
+.teams-status {
+  display: inline-flex;
+  justify-content: center;
+  padding: 4px 7px;
+  border: 1px solid var(--border-chip);
+  border-radius: 2px;
+  text-transform: capitalize;
+}
+
+.teams-status.active {
+  color: #c9f1d7;
+}
+
+.teams-status.pending {
+  color: #f3dcaa;
+}
+
+.teams-inline-check.compact {
+  min-height: auto;
+  padding: 6px 8px;
+  font-size: 11px;
+}
+
+.teams-request-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.teams-request-card {
+  display: grid;
+  grid-template-columns: minmax(190px, 1.5fr) 160px 150px 100px;
+  gap: 14px;
+  align-items: center;
+  padding: 15px;
+  background: var(--surface-tile);
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  font-size: 12px;
+}
+
+.teams-request-card > div:not(.teams-request-actions) {
+  display: grid;
+  gap: 4px;
+}
+
+.teams-request-card span {
+  color: var(--text-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.teams-request-card p,
+.teams-request-actions {
+  grid-column: 1 / -1;
+}
+
+.teams-request-card p {
+  margin: 0;
+  color: var(--text-tertiary);
+  line-height: 1.45;
+}
+
+.teams-request-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 860px) {
+  .teams-modal-backdrop {
+    padding: 10px;
+  }
+
+  .teams-modal {
+    width: 100%;
+    max-height: 96vh;
+  }
+
+  .teams-steps {
+    padding: 0 8px;
+  }
+
+  .teams-steps button {
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .teams-steps button span {
+    font-size: 11px;
+  }
+
+  .teams-form-grid,
+  .teams-user-form,
+  .teams-check-grid,
+  .teams-check-grid.tech {
+    grid-template-columns: 1fr;
+  }
+
+  .teams-appointment-row,
+  .teams-member-row,
+  .teams-request-card {
+    grid-template-columns: 1fr;
+  }
+
+  .teams-settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .teams-settings-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-bar);
+  }
+
+  .teams-settings-nav button {
+    width: auto;
+    white-space: nowrap;
+  }
+}
