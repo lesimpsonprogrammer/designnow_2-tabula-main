@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useAuth } from '../Auth/AuthGate';
-import { OrganizationBuilder } from './OrganizationBuilder';
-import { TeamsSettings } from './TeamsSettings';
 import { TeamsContext, type TeamsContextValue } from './TeamsContext';
 import type { OrganizationSetup, TeamMember, TeamsRole } from './teamsTypes';
 import './teams.css';
+
+export { useTeams } from './TeamsContext';
 
 export function TeamsProvider({ children }: { children: ReactNode }) {
   const { client, org, user } = useAuth();
@@ -120,11 +120,5 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
     refresh,
   }), [isTeamsEdition, loading, role, setup, members, canOpenBuilder, canOpenSettings, settingsReadOnly]);
 
-  return (
-    <TeamsContext.Provider value={value}>
-      {children}
-      {builderOpen && canOpenBuilder ? <OrganizationBuilder /> : null}
-      {settingsOpen && canOpenSettings ? <TeamsSettings /> : null}
-    </TeamsContext.Provider>
-  );
+  return <TeamsContext.Provider value={value}>{children}</TeamsContext.Provider>;
 }
