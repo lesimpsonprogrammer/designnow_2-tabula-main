@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "@supabase/supabase-js": "^2.116.0",
+    "monaco-editor": "^0.56.0",
     "nanoid": "^6.0.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

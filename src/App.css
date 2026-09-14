@@ -807,7 +807,9 @@ button.active, .rail-tab.active { background: var(--surface-active-row); color: 
 .drawer-tabs { display: flex; gap: 12px; padding: 0 14px 8px; }
 .drawer-tab { font-family: var(--font-mono); font-size: 11px; color: var(--text-meta); }
 .drawer-tab.active { color: var(--text-primary); }
-.drawer-code { flex: 1; margin: 0; padding: 0 14px 14px; font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary); overflow: auto; }
+.drawer-editor { flex: 1; min-height: 0; overflow: hidden; }
+.drawer-loading { display: grid; height: 100%; place-items: center; color: var(--text-meta); font: 11px var(--font-mono); }
+.drawer-status { display: flex; gap: 16px; justify-content: flex-end; padding: 3px 10px; background: var(--accent); color: #fff; font: 10px/1.4 var(--font-mono); }
 .inspector-format,
 .navigation-format {
   display: flex;

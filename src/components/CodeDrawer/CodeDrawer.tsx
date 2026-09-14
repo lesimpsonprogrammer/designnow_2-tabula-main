@@ -1,7 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTabulaStore } from '../../store/useTabulaStore';
 import { buildFiles } from '../../lib/codegen';
+
+const MonacoCodeEditor = lazy(() => import('./MonacoCodeEditor'));
+
+const languageIds: Record<string, string> = {
+  js: 'javascript',
+  py: 'python',
+  sh: 'shell',
+};
 
 export function CodeDrawer({ layout, onLayoutChange }: {
   layout: 'bottom' | 'side';
@@ -19,10 +27,18 @@ export function CodeDrawer({ layout, onLayoutChange }: {
     popup.current = win;
     win.document.title = 'Tabula — Code';
     document.querySelectorAll('style, link[rel="stylesheet"]').forEach((style) => win.document.head.appendChild(style.cloneNode(true)));
+    const styleObserver = new MutationObserver((changes) => {
+      changes.forEach((change) => change.addedNodes.forEach((node) => {
+        if (node instanceof HTMLStyleElement || node instanceof HTMLLinkElement) {
+          win.document.head.appendChild(node.cloneNode(true));
+        }
+      }));
+    });
+    styleObserver.observe(document.head, { childList: true });
     const root = win.document.createElement('div');
     root.className = 'code-window';
     win.document.body.appendChild(root);
-    win.addEventListener('pagehide', () => { popup.current = null; setPopupRoot(null); });
+    win.addEventListener('pagehide', () => { styleObserver.disconnect(); popup.current = null; setPopupRoot(null); });
     setPopupRoot(root);
   };
   const drawerOpen = useTabulaStore((s) => s.drawerOpen);
@@ -47,6 +63,7 @@ export function CodeDrawer({ layout, onLayoutChange }: {
 
   const files = storedFiles.length > 0 ? storedFiles : generatedFiles;
   const file = files.find((f) => f.name === activeFile) ?? files[0];
+  const language = file ? (languageIds[file.language] ?? file.language) : 'plaintext';
 
   const [draft, setDraft] = useState('');
 
@@ -78,14 +95,23 @@ export function CodeDrawer({ layout, onLayoutChange }: {
       <div className="drawer-editor-actions">
         <button type="button" onClick={applyChanges}>Apply changes</button>
       </div>
-      <textarea
-          key={file?.name}
-          className="drawer-code code-editor"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          spellCheck={false}
-          aria-label={`Edit ${file?.name ?? 'generated file'}`}
-        />
+      <div className="drawer-editor" aria-label={`Edit ${file?.name ?? 'generated file'}`}>
+        {file && (
+          <Suspense fallback={<div className="drawer-loading">Loading editor…</div>}>
+            <MonacoCodeEditor
+              path={file.name}
+              language={language}
+              value={draft}
+              onChange={setDraft}
+            />
+          </Suspense>
+        )}
+      </div>
+      <div className="drawer-status">
+        <span>{file?.language.toUpperCase()}</span>
+        <span>{draft !== (file?.content ?? '') ? 'Edited' : 'Saved in project'}</span>
+        <span>UTF-8</span>
+      </div>
     </div>
   );
   return (
