@@ -7,6 +7,8 @@ export type TeamsContextValue = {
   role: TeamsRole | null;
   setup: OrganizationSetup | null;
   members: TeamMember[];
+  builderOpen: boolean;
+  settingsOpen: boolean;
   canOpenBuilder: boolean;
   canOpenSettings: boolean;
   settingsReadOnly: boolean;
