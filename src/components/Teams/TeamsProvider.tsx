@@ -7,7 +7,7 @@ import './teams.css';
 export { useTeams } from './TeamsContext';
 
 export function TeamsProvider({ children }: { children: ReactNode }) {
-  const { client, org, user } = useAuth();
+  const { client, org, user, isPlatformAdmin } = useAuth();
   const [loading, setLoading] = useState(true);
   const [isTeamsEdition, setIsTeamsEdition] = useState(false);
   const [role, setRole] = useState<TeamsRole | null>(null);
@@ -35,7 +35,7 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
 
     setIsTeamsEdition(licenseActive);
 
-    if (!licenseActive) {
+    if (!licenseActive && !isPlatformAdmin) {
       setRole(null);
       setSetup(null);
       setMembers([]);
@@ -46,17 +46,19 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
     }
 
     let resolvedRole: TeamsRole | null = null;
-    if (org.role === 'owner') resolvedRole = 'org_admin';
+    if (isPlatformAdmin || org.role === 'owner') resolvedRole = 'org_admin';
     else if (org.role === 'admin') resolvedRole = 'site_admin';
     else {
-      const { data: memberRole } = await client
+      const { data: memberRoles } = await client
         .from('tabula_team_members')
         .select('role')
         .eq('org_id', org.id)
         .eq('user_id', user.id)
-        .eq('status', 'active')
-        .maybeSingle();
-      resolvedRole = (memberRole?.role as TeamsRole | undefined) ?? null;
+        .eq('status', 'active');
+
+      const roles = ((memberRoles ?? []) as { role: TeamsRole }[]).map((item) => item.role);
+      const priority: TeamsRole[] = ['section_leader', 'site_designer', 'logo_designer'];
+      resolvedRole = priority.find((candidate) => roles.includes(candidate)) ?? null;
     }
     setRole(resolvedRole);
 
@@ -81,12 +83,12 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [org.id, user.id]);
+  }, [org.id, user.id, isPlatformAdmin]);
 
   useEffect(() => {
     if (
       !loading
-      && isTeamsEdition
+      && (isTeamsEdition || isPlatformAdmin)
       && role === 'org_admin'
       && !setup?.setup_completed_at
       && autoOpenedForOrg !== org.id
@@ -94,11 +96,11 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
       setBuilderOpen(true);
       setAutoOpenedForOrg(org.id);
     }
-  }, [loading, isTeamsEdition, role, setup?.setup_completed_at, autoOpenedForOrg, org.id]);
+  }, [loading, isTeamsEdition, isPlatformAdmin, role, setup?.setup_completed_at, autoOpenedForOrg, org.id]);
 
-  const canOpenBuilder = isTeamsEdition && role === 'org_admin';
-  const canOpenSettings = isTeamsEdition && (role === 'org_admin' || role === 'site_admin');
-  const settingsReadOnly = role === 'site_admin';
+  const canOpenBuilder = isPlatformAdmin || (isTeamsEdition && role === 'org_admin');
+  const canOpenSettings = isPlatformAdmin || (isTeamsEdition && (role === 'org_admin' || role === 'site_admin'));
+  const settingsReadOnly = !isPlatformAdmin && role === 'site_admin';
 
   const value = useMemo<TeamsContextValue>(() => ({
     isTeamsEdition,
