@@ -59,7 +59,17 @@ export const TABULA_NARROW_TECH_PROFILE = {
   numerals: 'high-clarity-tabular-ready',
   letterSpacing: 'tight-neutral',
   wordSpacing: 'compact',
-  capitalT: 'slightly taller vertical stem/root than neighboring capitals',
+  signatureGlyphs: {
+    A: 'narrow apex, slightly flattened top point, medium-low crossbar',
+    G: 'open technical G with squared inner spur and compact aperture',
+    M: 'straight outer stems with a deep center vertex and narrow overall width',
+    R: 'compact bowl with a crisp diagonal leg that exits early',
+    T: 'slightly taller vertical stem/root than neighboring capitals; broad controlled top bar',
+    one: 'simple upright 1 with a short angled flag and stable foot',
+    four: 'open-top 4 with a crisp triangular counter and strong vertical',
+    seven: 'flat top 7 with a decisive diagonal; optional short crossbar for data use',
+    zero: 'narrow oval 0 with a subtle slash alternate for technical contexts',
+  },
   description: 'Tabula Narrow Tech is an original condensed neo-grotesk designed for dashboards, technical interfaces, data labels, navigation, and dense information. It uses narrow proportions, subtly squared curves, crisp terminals, strong numerals, controlled spacing, and a signature capital T with a slightly taller stem/root.',
 } as const;
 
