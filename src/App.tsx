@@ -8,6 +8,7 @@ import { Preview } from './components/Preview/Preview';
 import { StartScreen } from './components/StartScreen/StartScreen';
 import { TeamsProvider } from './components/Teams/TeamsProvider';
 import { TeamsOverlays } from './components/Teams/TeamsOverlays';
+import { TutorialProvider } from './components/Tutorial/Tutorial';
 import { useGlobalKeys } from './lib/useGlobalKeys';
 import { useTabulaStore } from './store/useTabulaStore';
 import './lib/tokens.css';
@@ -49,8 +50,10 @@ function TabulaWorkspace() {
 function App() {
   return (
     <TeamsProvider>
-      <TabulaWorkspace />
-      <TeamsOverlays />
+      <TutorialProvider>
+        <TabulaWorkspace />
+        <TeamsOverlays />
+      </TutorialProvider>
     </TeamsProvider>
   );
 }
