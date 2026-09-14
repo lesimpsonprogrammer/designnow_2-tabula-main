@@ -1,33 +1,10 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useAuth } from '../Auth/AuthGate';
 import { OrganizationBuilder } from './OrganizationBuilder';
 import { TeamsSettings } from './TeamsSettings';
+import { TeamsContext, type TeamsContextValue } from './TeamsContext';
 import type { OrganizationSetup, TeamMember, TeamsRole } from './teamsTypes';
 import './teams.css';
-
-type TeamsContextValue = {
-  isTeamsEdition: boolean;
-  loading: boolean;
-  role: TeamsRole | null;
-  setup: OrganizationSetup | null;
-  members: TeamMember[];
-  canOpenBuilder: boolean;
-  canOpenSettings: boolean;
-  settingsReadOnly: boolean;
-  openBuilder: () => void;
-  openSettings: () => void;
-  closeBuilder: () => void;
-  closeSettings: () => void;
-  refresh: () => Promise<void>;
-};
-
-const TeamsContext = createContext<TeamsContextValue | null>(null);
-
-export function useTeams() {
-  const value = useContext(TeamsContext);
-  if (!value) throw new Error('useTeams must be used inside TeamsProvider');
-  return value;
-}
 
 export function TeamsProvider({ children }: { children: ReactNode }) {
   const { client, org, user } = useAuth();
