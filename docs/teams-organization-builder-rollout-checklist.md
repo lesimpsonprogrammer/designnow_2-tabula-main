@@ -15,8 +15,10 @@
 - [x] Apply Teams migration to Tabula Supabase project
 - [x] Run Supabase security/performance advisors
 - [x] Apply Teams access-request RLS/index optimization
-- [ ] Activate a Teams license for a test organization
-- [ ] Test Org Admin onboarding flow against live schema
+- [x] Activate a Teams license for test organization (`Master Account`, 5 seats)
+- [x] Verify Teams license gate resolves active
+- [x] Verify Master Account owner resolves to Org Admin
+- [ ] Test Org Admin onboarding flow against deployed UI
 - [ ] Test Site Admin access request flow
 - [ ] Test non-admin role restrictions
 - [ ] Verify Individual Edition is unchanged
