@@ -1,10 +1,12 @@
 import { useRef, useState } from 'react';
 import { openProjectFile, useTabulaStore } from '../../store/useTabulaStore';
+import { useTeams } from '../Teams/TeamsProvider';
 
 export function StartScreen() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
   const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const { isTeamsEdition, canOpenBuilder, canOpenSettings, openBuilder, openSettings } = useTeams();
   const startNewProject = useTabulaStore((state) => state.startNewProject);
   const openMomentumTemplate = useTabulaStore((state) => state.openMomentumTemplate);
   const continueRecentProject = useTabulaStore((state) => state.continueRecentProject);
@@ -57,6 +59,14 @@ export function StartScreen() {
         <span className="start-brand">Tabula</span>
         <h1 id="start-title">What would you like to build?</h1>
         <p>Open or drag in a Tabula project file, or begin with a clear canvas.</p>
+
+        {isTeamsEdition && (canOpenBuilder || canOpenSettings) ? (
+          <div className="teams-start-tools">
+            <span>Teams Edition</span>
+            {canOpenBuilder ? <button type="button" onClick={openBuilder}>Organization Builder</button> : null}
+            {canOpenSettings ? <button type="button" onClick={openSettings}>Organization Settings</button> : null}
+          </div>
+        ) : null}
 
         <div className="start-actions">
           <button type="button" className="start-primary" onClick={openMomentumTemplate}>
