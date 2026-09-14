@@ -11,9 +11,11 @@
 - [x] Site Admin view-only Settings behavior
 - [x] User Access Change request and Org Admin approval workflow
 - [x] Automated lint and production build verification
-- [ ] Identify Tabula Design Now Supabase project
-- [ ] Apply Teams migration to Tabula Supabase project
-- [ ] Run Supabase security/performance advisors
+- [x] Identify Tabula Design Now Supabase project (`zkydfxtmzomypkaykhod`)
+- [x] Apply Teams migration to Tabula Supabase project
+- [x] Run Supabase security/performance advisors
+- [x] Apply Teams access-request RLS/index optimization
+- [ ] Activate a Teams license for a test organization
 - [ ] Test Org Admin onboarding flow against live schema
 - [ ] Test Site Admin access request flow
 - [ ] Test non-admin role restrictions
