@@ -265,6 +265,126 @@
     margin-bottom: 6px;
   }
   .split-meta { font-size: 13px; color: var(--ink-muted); margin-bottom: 14px; }
+
+  /* Fill & Sign */
+  .sign-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    width: min(760px, 94vw);
+  }
+  .sign-toolbar .spacer { flex: 1; }
+  .sign-toolbar button.tool-btn {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--deep);
+    cursor: pointer;
+  }
+  .sign-toolbar button.tool-btn:hover { background: var(--surface); }
+  .sign-toolbar button.tool-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .sign-toolbar .page-nav { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-muted); }
+  .sign-toolbar .page-nav button {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    width: 26px; height: 26px;
+    cursor: pointer;
+  }
+  .sign-toolbar .page-nav input {
+    width: 40px;
+    text-align: center;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px;
+  }
+
+  #signStage {
+    position: relative;
+    display: none;
+    box-shadow: 0 2px 18px rgba(20,20,30,0.14);
+    background: #fff;
+    touch-action: none;
+  }
+  #signStage.active { display: block; }
+  #signStage canvas { display: block; }
+
+  .overlay-item {
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    border: 1.5px dashed transparent;
+  }
+  .overlay-item:hover, .overlay-item.dragging { border-color: var(--accent); }
+  .overlay-item.dragging { cursor: grabbing; }
+  .overlay-text {
+    min-width: 40px;
+    min-height: 20px;
+    padding: 2px 4px;
+    color: #111;
+    font-family: 'Helvetica', Arial, sans-serif;
+    white-space: pre;
+    outline: none;
+  }
+  .overlay-image { display: block; }
+  .overlay-item { display: flex; align-items: center; }
+  .drag-handle {
+    cursor: grab;
+    color: #9aa2b8;
+    font-size: 13px;
+    padding: 0 4px 0 2px;
+    line-height: 1;
+    touch-action: none;
+  }
+  .overlay-remove {
+    position: absolute;
+    top: -10px; right: -10px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+    cursor: pointer;
+    display: none;
+  }
+  .overlay-item:hover .overlay-remove { display: block; }
+
+  /* Signature pad modal */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(20,20,30,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 50;
+  }
+  .modal-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    width: min(440px, 92vw);
+  }
+  .modal-card h3 { margin: 0 0 4px; font-family: 'Archivo', sans-serif; font-size: 16px; }
+  .modal-card .sub { margin: 0 0 14px; font-size: 12.5px; color: var(--ink-muted); }
+  #sigPad {
+    width: 100%;
+    height: 160px;
+    border: 1.5px dashed var(--border);
+    border-radius: 8px;
+    background: #fbfbfc;
+    touch-action: none;
+    cursor: crosshair;
+  }
 </style>
 </head>
 <body>
@@ -278,6 +398,7 @@
     <button data-tab="view" class="active">View</button>
     <button data-tab="merge">Merge</button>
     <button data-tab="split">Split</button>
+    <button data-tab="sign">Fill &amp; Sign</button>
   </div>
   <div class="toolbar" id="toolbar" hidden>
     <button id="prevBtn" title="Previous page">‹ Prev</button>
@@ -358,7 +479,49 @@
     <div class="error-box" id="splitError"></div>
   </section>
 
+  <!-- FILL & SIGN -->
+  <section class="panel" id="panel-sign">
+    <div class="dropzone" id="signDropzone" style="display:block;">
+      <h1>Open a PDF to fill &amp; sign</h1>
+      <p>Add typed text or a drawn signature anywhere on the page, then download the result.</p>
+      <label class="file-btn" for="signFileInput">Choose PDF file</label>
+      <div class="hint">Files stay on your device — nothing is uploaded.</div>
+    </div>
+    <input type="file" id="signFileInput" accept="application/pdf,.pdf" />
+
+    <div class="sign-toolbar" id="signToolbar" hidden>
+      <button class="tool-btn" id="addTextBtn">+ Text</button>
+      <button class="tool-btn" id="addSignBtn">+ Signature</button>
+      <span class="spacer"></span>
+      <div class="page-nav">
+        <button id="signPrevBtn">‹</button>
+        <input type="number" id="signPageInput" min="1" value="1" />
+        <span>/ <span id="signPageCount">1</span></span>
+        <button id="signNextBtn">›</button>
+      </div>
+      <span class="spacer"></span>
+      <button class="tool-btn" id="signResetBtn">Choose another file</button>
+      <button class="primary-btn" id="downloadSignedBtn">Download signed PDF</button>
+    </div>
+
+    <div id="signStage"></div>
+    <div class="error-box" id="signError"></div>
+  </section>
+
 </main>
+
+<div class="modal-backdrop" id="sigModal" hidden>
+  <div class="modal-card">
+    <h3>Draw your signature</h3>
+    <p class="sub">Use your mouse or finger. This stays on your device.</p>
+    <canvas id="sigPad" width="400" height="160"></canvas>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="primary-btn" id="sigUseBtn">Use this signature</button>
+      <button class="secondary-btn" id="sigClearBtn">Clear</button>
+      <button class="secondary-btn" id="sigCancelBtn">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <div id="status"></div>
 
@@ -411,10 +574,11 @@
     view: document.getElementById('panel-view'),
     merge: document.getElementById('panel-merge'),
     split: document.getElementById('panel-split'),
+    sign: document.getElementById('panel-sign'),
   };
   const brandSub = document.getElementById('brandSub');
   const toolbar = document.getElementById('toolbar');
-  const labels = { view: 'View', merge: 'Merge', split: 'Split' };
+  const labels = { view: 'View', merge: 'Merge', split: 'Split', sign: 'Fill & Sign' };
 
   function setTab(tab) {
     tabButtons.forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
@@ -804,6 +968,340 @@
       console.error(err);
       showErrorIn(splitError, 'Could not split this file: ' + (err && err.message ? err.message : 'unknown error'));
     }
+  });
+
+  /* ---------------- FILL & SIGN ---------------- */
+  const signDropzone = document.getElementById('signDropzone');
+  const signFileInput = document.getElementById('signFileInput');
+  const signToolbar = document.getElementById('signToolbar');
+  const signStage = document.getElementById('signStage');
+  const signError = document.getElementById('signError');
+  const addTextBtn = document.getElementById('addTextBtn');
+  const addSignBtn = document.getElementById('addSignBtn');
+  const signPrevBtn = document.getElementById('signPrevBtn');
+  const signNextBtn = document.getElementById('signNextBtn');
+  const signPageInput = document.getElementById('signPageInput');
+  const signPageCountEl = document.getElementById('signPageCount');
+  const signResetBtn = document.getElementById('signResetBtn');
+  const downloadSignedBtn = document.getElementById('downloadSignedBtn');
+
+  const sigModal = document.getElementById('sigModal');
+  const sigPad = document.getElementById('sigPad');
+  const sigUseBtn = document.getElementById('sigUseBtn');
+  const sigClearBtn = document.getElementById('sigClearBtn');
+  const sigCancelBtn = document.getElementById('sigCancelBtn');
+
+  let signFile = null;
+  let signPdfJsDoc = null;
+  let signPageNum = 1;
+  let signPageCountNum = 1;
+  let signScale = 1; // px per PDF point, for the currently rendered page
+  let signOverlays = new Map(); // pageNum -> [{id, type, xFrac, yFrac, wFrac?, hFrac?, text?, fontSize?, dataUrl?}]
+  let overlayIdSeq = 1;
+
+  async function loadSignFile(file) {
+    if (!file) return;
+    if (!isPdfFile(file)) {
+      showErrorIn(signError, 'That file doesn’t look like a PDF. Please choose a .pdf file.');
+      return;
+    }
+    clearErrorIn(signError);
+    try {
+      const buf = await file.arrayBuffer();
+      signPdfJsDoc = await pdfjsLib.getDocument({ data: buf }).promise;
+      signFile = file;
+      signPageNum = 1;
+      signPageCountNum = signPdfJsDoc.numPages;
+      signOverlays = new Map();
+      signPageInput.max = signPageCountNum;
+      signPageCountEl.textContent = signPageCountNum;
+      signDropzone.style.display = 'none';
+      signToolbar.hidden = false;
+      signStage.classList.add('active');
+      await renderSignPage(1);
+      showStatus(signPageCountNum + ' page' + (signPageCountNum === 1 ? '' : 's') + ' loaded');
+    } catch (err) {
+      console.error(err);
+      showErrorIn(signError, 'Could not open this PDF: ' + (err && err.message ? err.message : 'unknown error'));
+    }
+  }
+
+  async function renderSignPage(num) {
+    num = Math.min(Math.max(1, num), signPageCountNum);
+    signPageNum = num;
+    signPageInput.value = num;
+
+    const page = await signPdfJsDoc.getPage(num);
+    const unscaled = page.getViewport({ scale: 1 });
+    const targetWidth = Math.min(720, window.innerWidth - 40);
+    signScale = targetWidth / unscaled.width;
+    const viewport = page.getViewport({ scale: signScale });
+
+    signStage.innerHTML = '';
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    signStage.appendChild(canvas);
+    signStage.style.width = viewport.width + 'px';
+    signStage.style.height = viewport.height + 'px';
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
+    const overlays = signOverlays.get(signPageNum) || [];
+    overlays.forEach((o) => renderOverlayEl(o));
+  }
+
+  function makeDraggable(el, overlay, onDrag) {
+    let dragging = false;
+    let startX, startY, startLeft, startTop;
+    el.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.overlay-remove') || e.target.tagName === 'INPUT') return;
+      dragging = true;
+      el.classList.add('dragging');
+      el.setPointerCapture(e.pointerId);
+      startX = e.clientX; startY = e.clientY;
+      startLeft = el.offsetLeft; startTop = el.offsetTop;
+      e.preventDefault();
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const stageRect = signStage.getBoundingClientRect();
+      let newLeft = startLeft + (e.clientX - startX);
+      let newTop = startTop + (e.clientY - startY);
+      newLeft = Math.max(0, Math.min(newLeft, stageRect.width - el.offsetWidth));
+      newTop = Math.max(0, Math.min(newTop, stageRect.height - el.offsetHeight));
+      el.style.left = newLeft + 'px';
+      el.style.top = newTop + 'px';
+    });
+    el.addEventListener('pointerup', (e) => {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging');
+      const stageRect = signStage.getBoundingClientRect();
+      overlay.xFrac = el.offsetLeft / stageRect.width;
+      overlay.yFrac = el.offsetTop / stageRect.height;
+      if (onDrag) onDrag();
+    });
+  }
+
+  function removeOverlay(overlay) {
+    const list = signOverlays.get(signPageNum) || [];
+    const idx = list.findIndex((o) => o.id === overlay.id);
+    if (idx !== -1) list.splice(idx, 1);
+    renderSignPage(signPageNum);
+  }
+
+  function renderOverlayEl(overlay) {
+    const stageW = signStage.clientWidth;
+    const stageH = signStage.clientHeight;
+    const el = document.createElement('div');
+    el.className = 'overlay-item';
+    el.style.left = (overlay.xFrac * stageW) + 'px';
+    el.style.top = (overlay.yFrac * stageH) + 'px';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'overlay-remove';
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+    removeBtn.addEventListener('click', (e) => { e.stopPropagation(); removeOverlay(overlay); });
+
+    if (overlay.type === 'text') {
+      const handle = document.createElement('span');
+      handle.className = 'drag-handle';
+      handle.textContent = '⠿';
+      el.appendChild(handle);
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'overlay-text-input';
+      input.placeholder = 'Type here';
+      input.value = overlay.text || '';
+      input.style.font = (overlay.fontSize * signScale) + 'px Helvetica, Arial, sans-serif';
+      input.style.border = 'none';
+      input.style.background = 'transparent';
+      input.style.outline = 'none';
+      input.style.minWidth = '120px';
+      input.addEventListener('input', () => { overlay.text = input.value; });
+      input.addEventListener('pointerdown', (e) => e.stopPropagation());
+      el.appendChild(input);
+      setTimeout(() => input.focus(), 0);
+    } else if (overlay.type === 'image') {
+      const img = document.createElement('img');
+      img.className = 'overlay-image';
+      img.src = overlay.dataUrl;
+      img.style.width = (overlay.wFrac * stageW) + 'px';
+      img.style.height = (overlay.hFrac * stageH) + 'px';
+      img.draggable = false;
+      el.appendChild(img);
+    }
+
+    el.appendChild(removeBtn);
+    signStage.appendChild(el);
+    makeDraggable(el, overlay);
+  }
+
+  function addOverlayToCurrentPage(overlay) {
+    if (!signOverlays.has(signPageNum)) signOverlays.set(signPageNum, []);
+    signOverlays.get(signPageNum).push(overlay);
+    renderOverlayEl(overlay);
+  }
+
+  addTextBtn.addEventListener('click', () => {
+    if (!signPdfJsDoc) return;
+    addOverlayToCurrentPage({ id: overlayIdSeq++, type: 'text', xFrac: 0.1, yFrac: 0.1, text: '', fontSize: 16 });
+  });
+
+  addSignBtn.addEventListener('click', () => {
+    if (!signPdfJsDoc) return;
+    sigModal.hidden = false;
+    clearSigPad();
+  });
+
+  signFileInput.addEventListener('change', (e) => loadSignFile(e.target.files[0]));
+  ['dragenter', 'dragover'].forEach((evt) =>
+    signDropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); signDropzone.classList.add('dragging'); })
+  );
+  ['dragleave', 'drop'].forEach((evt) =>
+    signDropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); signDropzone.classList.remove('dragging'); })
+  );
+  signDropzone.addEventListener('drop', (e) => loadSignFile(e.dataTransfer.files[0]));
+
+  signPrevBtn.addEventListener('click', () => renderSignPage(signPageNum - 1));
+  signNextBtn.addEventListener('click', () => renderSignPage(signPageNum + 1));
+  signPageInput.addEventListener('change', () => renderSignPage(parseInt(signPageInput.value, 10) || 1));
+
+  signResetBtn.addEventListener('click', () => {
+    signFile = null;
+    signPdfJsDoc = null;
+    signOverlays = new Map();
+    signDropzone.style.display = 'block';
+    signToolbar.hidden = true;
+    signStage.classList.remove('active');
+    signStage.innerHTML = '';
+    clearErrorIn(signError);
+  });
+
+  function dataUrlToBytes(dataUrl) {
+    const base64 = dataUrl.split(',')[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  }
+
+  downloadSignedBtn.addEventListener('click', async () => {
+    if (!signFile) return;
+    clearErrorIn(signError);
+    let hasAny = false;
+    for (const list of signOverlays.values()) if (list.length) hasAny = true;
+    if (!hasAny) {
+      showErrorIn(signError, 'Add some text or a signature first.');
+      return;
+    }
+    try {
+      showStatus('Preparing signed PDF…', 4000);
+      const { PDFDocument, StandardFonts, rgb } = PDFLib;
+      const buf = await signFile.arrayBuffer();
+      const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
+      const font = await doc.embedFont(StandardFonts.Helvetica);
+      const imageCache = new Map();
+
+      for (const [pageNum, overlays] of signOverlays.entries()) {
+        if (!overlays.length) continue;
+        const page = doc.getPage(pageNum - 1);
+        const pw = page.getWidth();
+        const ph = page.getHeight();
+        for (const o of overlays) {
+          if (o.type === 'text') {
+            if (!o.text || !o.text.trim()) continue;
+            page.drawText(o.text, {
+              x: o.xFrac * pw,
+              y: ph - o.yFrac * ph - o.fontSize * 0.8,
+              size: o.fontSize,
+              font,
+              color: rgb(0, 0, 0),
+            });
+          } else if (o.type === 'image') {
+            let embedded = imageCache.get(o.dataUrl);
+            if (!embedded) {
+              embedded = await doc.embedPng(dataUrlToBytes(o.dataUrl));
+              imageCache.set(o.dataUrl, embedded);
+            }
+            page.drawImage(embedded, {
+              x: o.xFrac * pw,
+              y: ph - o.yFrac * ph - o.hFrac * ph,
+              width: o.wFrac * pw,
+              height: o.hFrac * ph,
+            });
+          }
+        }
+      }
+
+      const bytes = await doc.save();
+      downloadBytes(bytes, 'signed.pdf');
+      showStatus('Signed PDF downloaded');
+    } catch (err) {
+      console.error(err);
+      showErrorIn(signError, 'Could not build the signed PDF: ' + (err && err.message ? err.message : 'unknown error'));
+    }
+  });
+
+  /* ---- Signature pad ---- */
+  const sigCtx = sigPad.getContext('2d');
+  let sigDrawing = false;
+  let sigHasStroke = false;
+
+  function clearSigPad() {
+    sigCtx.clearRect(0, 0, sigPad.width, sigPad.height);
+    sigHasStroke = false;
+  }
+  function sigPos(e) {
+    const r = sigPad.getBoundingClientRect();
+    const scaleX = sigPad.width / r.width;
+    const scaleY = sigPad.height / r.height;
+    return { x: (e.clientX - r.left) * scaleX, y: (e.clientY - r.top) * scaleY };
+  }
+  sigPad.addEventListener('pointerdown', (e) => {
+    sigDrawing = true;
+    sigHasStroke = true;
+    sigPad.setPointerCapture(e.pointerId);
+    const p = sigPos(e);
+    sigCtx.beginPath();
+    sigCtx.moveTo(p.x, p.y);
+    sigCtx.lineWidth = 2.4;
+    sigCtx.lineCap = 'round';
+    sigCtx.strokeStyle = '#111';
+  });
+  sigPad.addEventListener('pointermove', (e) => {
+    if (!sigDrawing) return;
+    const p = sigPos(e);
+    sigCtx.lineTo(p.x, p.y);
+    sigCtx.stroke();
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach((evt) =>
+    sigPad.addEventListener(evt, () => { sigDrawing = false; })
+  );
+
+  sigClearBtn.addEventListener('click', clearSigPad);
+  sigCancelBtn.addEventListener('click', () => { sigModal.hidden = true; });
+  sigUseBtn.addEventListener('click', () => {
+    if (!sigHasStroke) {
+      sigModal.hidden = true;
+      return;
+    }
+    const dataUrl = sigPad.toDataURL('image/png');
+    const stageW = signStage.clientWidth || 720;
+    const stageH = signStage.clientHeight || 400;
+    const wFrac = Math.min(0.32, 220 / stageW);
+    const hFrac = wFrac * (sigPad.height / sigPad.width) * (stageW / stageH);
+    addOverlayToCurrentPage({
+      id: overlayIdSeq++,
+      type: 'image',
+      xFrac: 0.32,
+      yFrac: 0.42,
+      wFrac,
+      hFrac,
+      dataUrl,
+    });
+    sigModal.hidden = true;
   });
 </script>
 </body>
