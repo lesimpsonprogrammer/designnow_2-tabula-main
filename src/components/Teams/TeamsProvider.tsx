@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useAuth } from '../Auth/AuthGate';
-import { TeamsContext, type TeamsContextValue } from './TeamsContext';
+import { TeamsContext, type TabulaLicenseType, type TeamsContextValue } from './TeamsContext';
 import type { OrganizationSetup, TeamMember, TeamsRole } from './teamsTypes';
 import './teams.css';
 
@@ -9,6 +9,7 @@ export { useTeams } from './TeamsContext';
 export function TeamsProvider({ children }: { children: ReactNode }) {
   const { client, org, user, isPlatformAdmin } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [licenseType, setLicenseType] = useState<TabulaLicenseType>(null);
   const [isTeamsEdition, setIsTeamsEdition] = useState(false);
   const [role, setRole] = useState<TeamsRole | null>(null);
   const [setup, setSetup] = useState<OrganizationSetup | null>(null);
@@ -28,14 +29,19 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
 
     const licenseActive = Boolean(
       license
-      && license.license_type === 'teams'
       && license.status === 'active'
       && (!license.expires_at || new Date(license.expires_at).getTime() > Date.now()),
     );
+    const activeLicenseType: TabulaLicenseType = licenseActive
+      && (license?.license_type === 'individual' || license?.license_type === 'teams')
+      ? license.license_type
+      : null;
+    const teamsActive = activeLicenseType === 'teams';
 
-    setIsTeamsEdition(licenseActive);
+    setLicenseType(activeLicenseType);
+    setIsTeamsEdition(teamsActive);
 
-    if (!licenseActive && !isPlatformAdmin) {
+    if (!teamsActive && !isPlatformAdmin) {
       setRole(null);
       setSetup(null);
       setMembers([]);
@@ -103,6 +109,7 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
   const settingsReadOnly = !isPlatformAdmin && role === 'site_admin';
 
   const value = useMemo<TeamsContextValue>(() => ({
+    licenseType,
     isTeamsEdition,
     loading,
     role,
@@ -122,7 +129,7 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
     closeBuilder: () => setBuilderOpen(false),
     closeSettings: () => setSettingsOpen(false),
     refresh,
-  }), [isTeamsEdition, loading, role, setup, members, builderOpen, settingsOpen, canOpenBuilder, canOpenSettings, settingsReadOnly]);
+  }), [licenseType, isTeamsEdition, loading, role, setup, members, builderOpen, settingsOpen, canOpenBuilder, canOpenSettings, settingsReadOnly]);
 
   return <TeamsContext.Provider value={value}>{children}</TeamsContext.Provider>;
 }
