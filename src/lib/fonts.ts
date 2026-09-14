@@ -20,6 +20,26 @@ export const MOMENTUM_SCRIPT_PROFILE = {
   description: 'Tabula Momentum Script is a relaxed personal-note cursive with rounded connected strokes, soft right slant, close letter spacing, continuous joins, loose rhythm, and a slightly imperfect handwritten baseline.',
 } as const;
 
+export const TABULA_CALM_FAMILY = 'Tabula Calm';
+export const TABULA_CALM_FALLBACK = '"Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif';
+export const TABULA_CALM_FONT = `"${TABULA_CALM_FAMILY}", ${TABULA_CALM_FALLBACK}`;
+
+export const TABULA_CALM_PROFILE = {
+  family: TABULA_CALM_FAMILY,
+  label: 'Tabula Calm',
+  category: 'soft-humanist-sans',
+  status: 'draft',
+  fallback: TABULA_CALM_FALLBACK,
+  personality: 'calm, warm, clear, grounded',
+  rhythm: 'open-and-steady',
+  stroke: 'soft-low-contrast',
+  corners: 'gently-rounded',
+  counters: 'open',
+  letterSpacing: 'relaxed',
+  wordSpacing: 'natural',
+  description: 'Tabula Calm is a soft humanist sans with open counters, gently rounded forms, quiet proportions, regular visual weight, and relaxed spacing designed for calm, highly readable interfaces and body copy.',
+} as const;
+
 export const TYPOGRAPHY_PRESETS = [
   {
     name: 'Tabula Momentum Script',
@@ -27,12 +47,25 @@ export const TYPOGRAPHY_PRESETS = [
     body: 'DM Sans, sans-serif',
     description: 'Compact casual cursive headings paired with clean DM Sans body text.',
   },
+  {
+    name: 'Tabula Calm',
+    head: TABULA_CALM_FONT,
+    body: TABULA_CALM_FONT,
+    description: 'Soft, spacious humanist sans for a calm and highly readable interface.',
+  },
+  {
+    name: 'Momentum + Calm',
+    head: MOMENTUM_SCRIPT_FONT,
+    body: TABULA_CALM_FONT,
+    description: 'Expressive Tabula Momentum Script headings with calm Tabula Calm body text.',
+  },
 ] as const;
 
 export const FONT_OPTIONS = [
   { label: 'Archivo', value: 'Archivo, sans-serif' },
   { label: 'DM Sans', value: 'DM Sans, sans-serif' },
   { label: 'Tabula Momentum Script', value: MOMENTUM_SCRIPT_FONT },
+  { label: 'Tabula Calm', value: TABULA_CALM_FONT },
   { label: 'Instrument Serif', value: 'Instrument Serif, serif' },
   { label: 'Space Grotesk', value: 'Space Grotesk, sans-serif' },
   { label: 'Libre Baskerville', value: 'Libre Baskerville, serif' },
