@@ -3,6 +3,7 @@ import { useAuth } from '../Auth/AuthGate';
 import { OrganizationBuilder } from './OrganizationBuilder';
 import { TeamsSettings } from './TeamsSettings';
 import type { OrganizationSetup, TeamMember, TeamsRole } from './teamsTypes';
+import './teams.css';
 
 type TeamsContextValue = {
   isTeamsEdition: boolean;
