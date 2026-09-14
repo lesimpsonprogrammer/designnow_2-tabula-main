@@ -6,12 +6,13 @@ import { RightRail } from './components/RightRail/RightRail';
 import { CodeDrawer } from './components/CodeDrawer/CodeDrawer';
 import { Preview } from './components/Preview/Preview';
 import { StartScreen } from './components/StartScreen/StartScreen';
+import { TeamsProvider } from './components/Teams/TeamsProvider';
 import { useGlobalKeys } from './lib/useGlobalKeys';
 import { useTabulaStore } from './store/useTabulaStore';
 import './lib/tokens.css';
 import './App.css';
 
-function App() {
+function TabulaWorkspace() {
   const [codeLayout, setCodeLayout] = useState<'bottom' | 'side'>('bottom');
   useGlobalKeys();
 
@@ -33,14 +34,22 @@ function App() {
     <div className="tabula-app">
       <Header />
       <div className={`workspace-views ${codeLayout}`}>
-      <div className="tabula-body">
-        <LeftRail />
-        <CanvasArea />
-        {rightRailOpen ? <RightRail /> : null}
-      </div>
-      <CodeDrawer layout={codeLayout} onLayoutChange={setCodeLayout} />
+        <div className="tabula-body">
+          <LeftRail />
+          <CanvasArea />
+          {rightRailOpen ? <RightRail /> : null}
+        </div>
+        <CodeDrawer layout={codeLayout} onLayoutChange={setCodeLayout} />
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <TeamsProvider>
+      <TabulaWorkspace />
+    </TeamsProvider>
   );
 }
 
