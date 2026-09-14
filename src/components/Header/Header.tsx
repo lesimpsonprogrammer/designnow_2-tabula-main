@@ -4,10 +4,12 @@ import { CompletionIndicator } from '../Completion/CompletionIndicator';
 import { useAuth } from '../Auth/AuthGate';
 import { LicenseAdmin } from '../LicenseAdmin/LicenseAdmin';
 import { useTeams } from '../Teams/TeamsProvider';
+import { useTutorial } from '../Tutorial/Tutorial';
 
 export function Header() {
   const { user, org, isPlatformAdmin, signOut } = useAuth();
   const { isTeamsEdition, canOpenBuilder, canOpenSettings, openBuilder, openSettings } = useTeams();
+  const { completed: tutorialCompleted, openTutorial } = useTutorial();
   const projectInputRef = useRef<HTMLInputElement>(null);
   const [fileError, setFileError] = useState('');
   const [licenseAdminOpen, setLicenseAdminOpen] = useState(false);
@@ -70,6 +72,9 @@ export function Header() {
           {isTeamsEdition ? <span className="trial-pill">Teams</span> : null}
           {isPlatformAdmin ? <span className="trial-pill" title="Platform-wide developer visibility is active">Developer</span> : null}
           <span className="header-user" title={user.email}>{org.name} · {user.email}</span>
+          <button type="button" onClick={openTutorial} title={tutorialCompleted ? 'Tutorial completed — open it again anytime' : 'Learn how to use Tabula'}>
+            {tutorialCompleted ? 'Tutorial ✓' : 'Tutorial'}
+          </button>
           {canOpenBuilder ? <button type="button" onClick={openBuilder}>Organization</button> : null}
           {canOpenSettings ? <button type="button" onClick={openSettings}>Settings</button> : null}
           {isPlatformAdmin ? <button type="button" onClick={() => setLicenseAdminOpen(true)}>Licenses</button> : null}
