@@ -1,10 +1,10 @@
-export const MOMENTUM_SCRIPT_FAMILY = 'Momentum Script';
+export const MOMENTUM_SCRIPT_FAMILY = 'Tabula Momentum Script';
 export const MOMENTUM_SCRIPT_FALLBACK = '"Segoe Script", "Apple Chancery", "Brush Script MT", cursive';
 export const MOMENTUM_SCRIPT_FONT = `"${MOMENTUM_SCRIPT_FAMILY}", ${MOMENTUM_SCRIPT_FALLBACK}`;
 
 export const MOMENTUM_SCRIPT_PROFILE = {
   family: MOMENTUM_SCRIPT_FAMILY,
-  label: 'Momentum Script',
+  label: 'Tabula Momentum Script',
   category: 'casual-cursive',
   status: 'draft',
   fallback: MOMENTUM_SCRIPT_FALLBACK,
@@ -17,12 +17,12 @@ export const MOMENTUM_SCRIPT_PROFILE = {
   caps: 'simple-with-light-flourish',
   letterSpacing: 'close',
   wordSpacing: 'relaxed',
-  description: 'A relaxed personal-note cursive with rounded connected strokes, soft right slant, close letter spacing, continuous joins, loose rhythm, and a slightly imperfect handwritten baseline.',
+  description: 'Tabula Momentum Script is a relaxed personal-note cursive with rounded connected strokes, soft right slant, close letter spacing, continuous joins, loose rhythm, and a slightly imperfect handwritten baseline.',
 } as const;
 
 export const TYPOGRAPHY_PRESETS = [
   {
-    name: 'Momentum Script',
+    name: 'Tabula Momentum Script',
     head: MOMENTUM_SCRIPT_FONT,
     body: 'DM Sans, sans-serif',
     description: 'Compact casual cursive headings paired with clean DM Sans body text.',
@@ -32,7 +32,7 @@ export const TYPOGRAPHY_PRESETS = [
 export const FONT_OPTIONS = [
   { label: 'Archivo', value: 'Archivo, sans-serif' },
   { label: 'DM Sans', value: 'DM Sans, sans-serif' },
-  { label: 'Momentum Script', value: MOMENTUM_SCRIPT_FONT },
+  { label: 'Tabula Momentum Script', value: MOMENTUM_SCRIPT_FONT },
   { label: 'Instrument Serif', value: 'Instrument Serif, serif' },
   { label: 'Space Grotesk', value: 'Space Grotesk, sans-serif' },
   { label: 'Libre Baskerville', value: 'Libre Baskerville, serif' },
