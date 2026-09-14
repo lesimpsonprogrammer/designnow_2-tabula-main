@@ -1,7 +1,10 @@
 import { createContext, useContext } from 'react';
 import type { OrganizationSetup, TeamMember, TeamsRole } from './teamsTypes';
 
+export type TabulaLicenseType = 'individual' | 'teams' | null;
+
 export type TeamsContextValue = {
+  licenseType: TabulaLicenseType;
   isTeamsEdition: boolean;
   loading: boolean;
   role: TeamsRole | null;
