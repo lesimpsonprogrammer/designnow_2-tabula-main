@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { Obj, Section, Theme } from '../types';
 import { HEAD_KINDS } from '../types';
-import { MOMENTUM_SCRIPT_FAMILY } from './fonts';
+import { MOMENTUM_SCRIPT_FAMILY, TABULA_CALM_FAMILY } from './fonts';
 
 // Ported from reference/Tabula v2.dc.html (textStyle + objStyle).
 // Carries most of the visual fidelity — keep in sync with the prototype
@@ -16,19 +16,28 @@ export function textStyle(o: Obj, theme: Theme): CSSProperties {
   const tight = TIGHT_KINDS.includes(k);
   const fontFamily = o.fontFamily || (HEAD_KINDS.includes(k) ? theme.head : theme.body);
   const momentumScript = fontFamily.includes(MOMENTUM_SCRIPT_FAMILY);
+  const tabulaCalm = fontFamily.includes(TABULA_CALM_FAMILY);
   const s: CSSProperties = {
     fontFamily,
     fontSize: o.size + 'px',
     wordSpacing: `${o.wordSpacing ?? 0}px`,
     color: o.color,
-    lineHeight: momentumScript ? 1.12 : tight ? 1.14 : 1.55,
-    fontWeight: momentumScript ? 400 : k === 'heading' || k === 'subhead' || k === 'stat' ? 600 : k === 'button' || k === 'reminder' || k === 'accordion' ? 500 : 400,
-    letterSpacing: momentumScript ? '-0.035em' : tight ? '-0.02em' : '0',
+    lineHeight: momentumScript ? 1.12 : tabulaCalm ? (tight ? 1.22 : 1.6) : tight ? 1.14 : 1.55,
+    fontWeight: momentumScript
+      ? 400
+      : tabulaCalm
+        ? (k === 'heading' || k === 'subhead' || k === 'stat' ? 500 : 400)
+        : k === 'heading' || k === 'subhead' || k === 'stat'
+          ? 600
+          : k === 'button' || k === 'reminder' || k === 'accordion'
+            ? 500
+            : 400,
+    letterSpacing: momentumScript ? '-0.035em' : tabulaCalm ? (tight ? '-0.005em' : '0.005em') : tight ? '-0.02em' : '0',
     whiteSpace: 'pre-wrap',
   };
   if (k === 'eyebrow' || k === 'badge') {
     s.textTransform = 'uppercase';
-    s.letterSpacing = momentumScript ? '-0.02em' : '0.1em';
+    s.letterSpacing = momentumScript ? '-0.02em' : tabulaCalm ? '0.08em' : '0.1em';
     s.fontWeight = momentumScript ? 400 : 500;
   }
   if (k === 'quote' || o.italic) s.fontStyle = 'italic';
@@ -37,7 +46,7 @@ export function textStyle(o: Obj, theme: Theme): CSSProperties {
     s.letterSpacing = '0';
     s.lineHeight = 1.9;
   }
-  if (k === 'stat' && !momentumScript) s.letterSpacing = '-0.03em';
+  if (k === 'stat' && !momentumScript && !tabulaCalm) s.letterSpacing = '-0.03em';
   return s;
 }
 
