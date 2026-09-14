@@ -40,6 +40,29 @@ export const TABULA_CALM_PROFILE = {
   description: 'Tabula Calm is a soft humanist sans with open counters, gently rounded forms, quiet proportions, regular visual weight, and relaxed spacing designed for calm, highly readable interfaces and body copy.',
 } as const;
 
+export const TABULA_NARROW_TECH_FAMILY = 'Tabula Narrow Tech';
+export const TABULA_NARROW_TECH_FALLBACK = '"Arial Narrow", "Aptos Narrow", "Roboto Condensed", Arial, sans-serif';
+export const TABULA_NARROW_TECH_FONT = `"${TABULA_NARROW_TECH_FAMILY}", ${TABULA_NARROW_TECH_FALLBACK}`;
+
+export const TABULA_NARROW_TECH_PROFILE = {
+  family: TABULA_NARROW_TECH_FAMILY,
+  label: 'Tabula Narrow Tech',
+  category: 'condensed-neo-grotesk',
+  status: 'draft',
+  fallback: TABULA_NARROW_TECH_FALLBACK,
+  personality: 'precise, technical, efficient, modern',
+  width: 'narrow',
+  rhythm: 'tight-and-controlled',
+  stroke: 'clean-low-contrast',
+  corners: 'subtly-squared',
+  counters: 'open-medium',
+  numerals: 'high-clarity-tabular-ready',
+  letterSpacing: 'tight-neutral',
+  wordSpacing: 'compact',
+  capitalT: 'slightly taller vertical stem/root than neighboring capitals',
+  description: 'Tabula Narrow Tech is an original condensed neo-grotesk designed for dashboards, technical interfaces, data labels, navigation, and dense information. It uses narrow proportions, subtly squared curves, crisp terminals, strong numerals, controlled spacing, and a signature capital T with a slightly taller stem/root.',
+} as const;
+
 export const TYPOGRAPHY_PRESETS = [
   {
     name: 'Tabula Momentum Script',
@@ -59,6 +82,18 @@ export const TYPOGRAPHY_PRESETS = [
     body: TABULA_CALM_FONT,
     description: 'Expressive Tabula Momentum Script headings with calm Tabula Calm body text.',
   },
+  {
+    name: 'Tabula Narrow Tech',
+    head: TABULA_NARROW_TECH_FONT,
+    body: TABULA_NARROW_TECH_FONT,
+    description: 'Condensed technical typography for dashboards, data-heavy layouts, and modern product interfaces.',
+  },
+  {
+    name: 'Tech + Calm',
+    head: TABULA_NARROW_TECH_FONT,
+    body: TABULA_CALM_FONT,
+    description: 'Precise narrow technical headings paired with calm, readable body copy.',
+  },
 ] as const;
 
 export const FONT_OPTIONS = [
@@ -66,6 +101,7 @@ export const FONT_OPTIONS = [
   { label: 'DM Sans', value: 'DM Sans, sans-serif' },
   { label: 'Tabula Momentum Script', value: MOMENTUM_SCRIPT_FONT },
   { label: 'Tabula Calm', value: TABULA_CALM_FONT },
+  { label: 'Tabula Narrow Tech', value: TABULA_NARROW_TECH_FONT },
   { label: 'Instrument Serif', value: 'Instrument Serif, serif' },
   { label: 'Space Grotesk', value: 'Space Grotesk, sans-serif' },
   { label: 'Libre Baskerville', value: 'Libre Baskerville, serif' },
