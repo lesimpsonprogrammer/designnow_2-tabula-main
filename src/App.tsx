@@ -7,6 +7,7 @@ import { CodeDrawer } from './components/CodeDrawer/CodeDrawer';
 import { Preview } from './components/Preview/Preview';
 import { StartScreen } from './components/StartScreen/StartScreen';
 import { TeamsProvider } from './components/Teams/TeamsProvider';
+import { TeamsOverlays } from './components/Teams/TeamsOverlays';
 import { useGlobalKeys } from './lib/useGlobalKeys';
 import { useTabulaStore } from './store/useTabulaStore';
 import './lib/tokens.css';
@@ -49,6 +50,7 @@ function App() {
   return (
     <TeamsProvider>
       <TabulaWorkspace />
+      <TeamsOverlays />
     </TeamsProvider>
   );
 }
