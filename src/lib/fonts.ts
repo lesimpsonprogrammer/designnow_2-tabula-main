@@ -1,14 +1,23 @@
 export const MOMENTUM_SCRIPT_FAMILY = 'Momentum Script';
-export const MOMENTUM_SCRIPT_FALLBACK = '"Segoe Print", "Bradley Hand", "Brush Script MT", cursive';
+export const MOMENTUM_SCRIPT_FALLBACK = '"Segoe Script", "Apple Chancery", "Brush Script MT", cursive';
 export const MOMENTUM_SCRIPT_FONT = `"${MOMENTUM_SCRIPT_FAMILY}", ${MOMENTUM_SCRIPT_FALLBACK}`;
 
 export const MOMENTUM_SCRIPT_PROFILE = {
   family: MOMENTUM_SCRIPT_FAMILY,
   label: 'Momentum Script',
-  category: 'script',
+  category: 'casual-cursive',
   status: 'draft',
   fallback: MOMENTUM_SCRIPT_FALLBACK,
-  description: 'Momentum Script custom display typeface. Uses controlled handwriting fallbacks until the final font file is installed.',
+  personality: 'lazy, casual, warm, connected cursive',
+  slant: 'soft-right',
+  rhythm: 'compact-and-loose',
+  joins: 'mostly-connected',
+  stroke: 'rounded-monoline',
+  baseline: 'slightly-irregular',
+  caps: 'simple-with-light-flourish',
+  letterSpacing: 'close',
+  wordSpacing: 'relaxed',
+  description: 'A relaxed personal-note cursive with rounded connected strokes, soft right slant, close letter spacing, continuous joins, loose rhythm, and a slightly imperfect handwritten baseline.',
 } as const;
 
 export const TYPOGRAPHY_PRESETS = [
@@ -16,7 +25,7 @@ export const TYPOGRAPHY_PRESETS = [
     name: 'Momentum Script',
     head: MOMENTUM_SCRIPT_FONT,
     body: 'DM Sans, sans-serif',
-    description: 'Momentum Script headings paired with DM Sans body text.',
+    description: 'Compact casual cursive headings paired with clean DM Sans body text.',
   },
 ] as const;
 
