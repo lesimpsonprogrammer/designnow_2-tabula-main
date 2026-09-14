@@ -106,6 +106,8 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
     role,
     setup,
     members,
+    builderOpen,
+    settingsOpen,
     canOpenBuilder,
     canOpenSettings,
     settingsReadOnly,
@@ -118,7 +120,7 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
     closeBuilder: () => setBuilderOpen(false),
     closeSettings: () => setSettingsOpen(false),
     refresh,
-  }), [isTeamsEdition, loading, role, setup, members, canOpenBuilder, canOpenSettings, settingsReadOnly]);
+  }), [isTeamsEdition, loading, role, setup, members, builderOpen, settingsOpen, canOpenBuilder, canOpenSettings, settingsReadOnly]);
 
   return <TeamsContext.Provider value={value}>{children}</TeamsContext.Provider>;
 }
