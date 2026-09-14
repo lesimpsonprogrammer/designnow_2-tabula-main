@@ -68,6 +68,7 @@ export function Header() {
             </span>
           ) : null}
           {isTeamsEdition ? <span className="trial-pill">Teams</span> : null}
+          {isPlatformAdmin ? <span className="trial-pill" title="Platform-wide developer visibility is active">Developer</span> : null}
           <span className="header-user" title={user.email}>{org.name} · {user.email}</span>
           {canOpenBuilder ? <button type="button" onClick={openBuilder}>Organization</button> : null}
           {canOpenSettings ? <button type="button" onClick={openSettings}>Settings</button> : null}
