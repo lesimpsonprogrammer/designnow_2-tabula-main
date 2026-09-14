@@ -3,9 +3,11 @@ import { flushPendingSave, openProjectFile, prepareProjectDownload, useTabulaSto
 import { CompletionIndicator } from '../Completion/CompletionIndicator';
 import { useAuth } from '../Auth/AuthGate';
 import { LicenseAdmin } from '../LicenseAdmin/LicenseAdmin';
+import { useTeams } from '../Teams/TeamsProvider';
 
 export function Header() {
   const { user, org, isPlatformAdmin, signOut } = useAuth();
+  const { isTeamsEdition, canOpenBuilder, canOpenSettings, openBuilder, openSettings } = useTeams();
   const projectInputRef = useRef<HTMLInputElement>(null);
   const [fileError, setFileError] = useState('');
   const [licenseAdminOpen, setLicenseAdminOpen] = useState(false);
@@ -65,7 +67,10 @@ export function Header() {
               {trialExpired ? 'Trial ended' : `Trial · ${trialDaysLeft} day${trialDaysLeft === 1 ? '' : 's'} left`}
             </span>
           ) : null}
+          {isTeamsEdition ? <span className="trial-pill">Teams</span> : null}
           <span className="header-user" title={user.email}>{org.name} · {user.email}</span>
+          {canOpenBuilder ? <button type="button" onClick={openBuilder}>Organization</button> : null}
+          {canOpenSettings ? <button type="button" onClick={openSettings}>Settings</button> : null}
           {isPlatformAdmin ? <button type="button" onClick={() => setLicenseAdminOpen(true)}>Licenses</button> : null}
           <button type="button" className="header-link-btn" onClick={() => void signOut()}>Sign out</button>
         </div>
