@@ -29,7 +29,7 @@ type QuizQuestion = {
 
 const TutorialContext = createContext<TutorialContextValue | null>(null);
 
-const QUIZ: QuizQuestion[] = [
+const CORE_QUIZ: QuizQuestion[] = [
   {
     id: 'start',
     question: 'Which Start Screen action creates a brand-new Tabula project?',
@@ -40,7 +40,7 @@ const QUIZ: QuizQuestion[] = [
   {
     id: 'preview',
     question: 'What is Preview used for?',
-    options: ['Changing account permissions', 'Viewing the rendered project without editor controls', 'Deleting a project', 'Creating a Teams license'],
+    options: ['Changing account permissions', 'Viewing the rendered project without editor controls', 'Deleting a project', 'Creating a license'],
     correct: 1,
     explanation: 'Preview switches from the editing workspace to the rendered project view. Use Edit to return.',
   },
@@ -63,13 +63,6 @@ const QUIZ: QuizQuestion[] = [
     correct: 0,
     explanation: 'The Inspector opens the right rail for inspecting and adjusting the selected design.',
   },
-  {
-    id: 'teams',
-    question: 'In Teams Edition, which standard organization role can open and run the Organization Builder?',
-    options: ['Site Designer', 'Section Leader', 'Org Admin', 'Logo Designer'],
-    correct: 2,
-    explanation: 'Org Admin is the standard role responsible for the Organization Builder. Platform Developer Access can also override this for administration and support.',
-  },
 ];
 
 export function useTutorial() {
@@ -80,8 +73,9 @@ export function useTutorial() {
 
 export function TutorialProvider({ children }: { children: ReactNode }) {
   const { user, isPlatformAdmin } = useAuth();
-  const { isTeamsEdition } = useTeams();
-  const storageKey = `tabula:tutorial:${user.id}:v1`;
+  const { licenseType, isTeamsEdition } = useTeams();
+  const editionKey = licenseType ?? 'core';
+  const storageKey = `tabula:tutorial:${user.id}:${editionKey}:v1`;
   const [isOpen, setIsOpen] = useState(false);
   const [completed, setCompleted] = useState(() => localStorage.getItem(storageKey) === 'complete');
   const [step, setStep] = useState(0);
@@ -92,12 +86,13 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     const items: TutorialStep[] = [
       {
         key: 'welcome',
-        eyebrow: 'Getting started',
+        eyebrow: licenseType === 'teams' ? 'Teams Edition' : licenseType === 'individual' ? 'Individual Edition' : 'Getting started',
         title: 'Welcome to Tabula Design Now',
         intro: 'Tabula is a visual design and code workspace for opening an existing project, starting something new, editing visually, working in code, and previewing the result in one place.',
         items: [
+          { title: 'Sign in and enter your workspace', body: 'After signing in, Tabula loads the workspace connected to your account and license.' },
           { title: 'Start simple', body: 'Use the Start Screen to open a known project, create a blank project, or reopen a saved Tabula file.' },
-          { title: 'Work visually or in code', body: 'The canvas, Inspector, and Code Drawer are designed to work together instead of forcing you into one editing style.' },
+          { title: 'Work visually or in code', body: 'The canvas, Inspector, and Code Drawer work together so you can choose the level of control you need.' },
           { title: 'Keep control of your files', body: 'Autosave protects your local working state, while Save creates a portable Tabula project file.' },
         ],
         tip: 'You can reopen this tutorial at any time from the Tutorial button in the header or Start Screen.',
@@ -120,7 +115,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         title: 'Know the workspace',
         intro: 'Once a project is open, Tabula separates navigation, design, properties, and code so you can move quickly without losing context.',
         items: [
-          { title: 'Header', body: 'Shows the project identity, Undo/Redo, account tools, autosave state, Save/Open, Inspector, and Preview.' },
+          { title: 'Header', body: 'Shows the project identity, Undo/Redo, account tools, autosave state, Save/Open, Inspector, Preview, and Tutorial access.' },
           { title: 'Left rail', body: 'Use the left side for project structure and the tools that help you choose what you are working on.' },
           { title: 'Canvas', body: 'This is the visual working area where the current project is displayed and edited.' },
           { title: 'Inspector / right rail', body: 'Open Inspector to review and adjust the selected design and theme properties.' },
@@ -132,7 +127,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         key: 'editing',
         eyebrow: 'Step 3',
         title: 'Edit, preview, and protect your work',
-        intro: 'Tabula gives you a few different safety nets while you make changes.',
+        intro: 'Tabula gives you several safety nets while you make changes.',
         items: [
           { title: 'Undo and Redo', body: 'Use these for normal editing reversals while you work.' },
           { title: 'Autosave', body: 'The header shows whether the browser-local working copy is ready, saving, saved, or needs a retry.' },
@@ -142,6 +137,22 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         tip: 'Autosave is convenient, but a downloaded project file is still the clearest portable backup.',
       },
     ];
+
+    if (licenseType === 'individual') {
+      items.push({
+        key: 'individual',
+        eyebrow: 'Individual Edition',
+        title: 'Your single-user Tabula workspace',
+        intro: 'Individual Edition keeps the experience focused on one licensed user and the core design/development workflow.',
+        items: [
+          { title: 'One licensed seat', body: 'Individual Edition is configured for a single licensed user rather than a multi-role organization.' },
+          { title: 'Full project workflow', body: 'You can create, open, edit, inspect, work in code, preview, autosave, and save portable Tabula projects.' },
+          { title: 'No team administration clutter', body: 'Organization Builder, team role appointments, and User Access Change workflows are Teams Edition features and stay out of the standard Individual experience.' },
+          { title: 'Your projects stay central', body: 'The Start Screen and editor remain the primary places to work, so the interface stays focused on building rather than managing a team.' },
+        ],
+        tip: 'If collaboration and role-based administration become necessary, Teams Edition adds those controls without changing the core editor workflow.',
+      });
+    }
 
     if (isTeamsEdition) {
       items.push({
@@ -174,14 +185,47 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     }
 
     return items;
-  }, [isTeamsEdition, isPlatformAdmin]);
+  }, [licenseType, isTeamsEdition, isPlatformAdmin]);
+
+  const quiz = useMemo<QuizQuestion[]>(() => {
+    const editionQuestion: QuizQuestion = licenseType === 'teams'
+      ? {
+          id: 'edition',
+          question: 'In Teams Edition, which standard organization role can open and run the Organization Builder?',
+          options: ['Site Designer', 'Section Leader', 'Org Admin', 'Logo Designer'],
+          correct: 2,
+          explanation: 'Org Admin is the standard role responsible for the Organization Builder. Platform Developer Access can override this for support and administration.',
+        }
+      : licenseType === 'individual'
+        ? {
+            id: 'edition',
+            question: 'Which statement best describes Individual Edition?',
+            options: [
+              'It is a single-user license focused on the core Tabula project workflow',
+              'It requires a Site Admin and Section Leader before a project can open',
+              'It only supports Preview and does not include editing tools',
+              'It is the same as Teams Edition with all organization controls enabled',
+            ],
+            correct: 0,
+            explanation: 'Individual Edition uses one licensed seat and keeps the focus on the core project editing workflow rather than Teams organization administration.',
+          }
+        : {
+            id: 'edition',
+            question: 'Which Tabula area gives direct access to project source code?',
+            options: ['Code Drawer', 'Preview', 'License Admin', 'Sign-in screen'],
+            correct: 0,
+            explanation: 'The Code Drawer is the source-editing area and can be positioned below or beside the workspace.',
+          };
+
+    return [...CORE_QUIZ, editionQuestion];
+  }, [licenseType]);
 
   const quizStep = steps.length;
   const totalSteps = steps.length + 1;
   const onQuiz = step === quizStep;
-  const allAnswered = QUIZ.every((question) => answers[question.id] !== undefined);
+  const allAnswered = quiz.every((question) => answers[question.id] !== undefined);
   const score = submitted
-    ? QUIZ.reduce((total, question) => total + (answers[question.id] === question.correct ? 1 : 0), 0)
+    ? quiz.reduce((total, question) => total + (answers[question.id] === question.correct ? 1 : 0), 0)
     : 0;
   const passed = submitted && score >= 4;
 
@@ -212,6 +256,8 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     closeTutorial: () => setIsOpen(false),
   }), [isOpen, completed]);
 
+  const editionLabel = licenseType === 'teams' ? 'Teams Edition' : licenseType === 'individual' ? 'Individual Edition' : 'Tabula';
+
   return (
     <TutorialContext.Provider value={value}>
       {children}
@@ -220,7 +266,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
           <section className="tutorial-dialog" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
             <header className="tutorial-header">
               <div>
-                <span className="tutorial-kicker">Tabula Design Now · Interactive Tutorial</span>
+                <span className="tutorial-kicker">Tabula Design Now · {editionLabel} Tutorial</span>
                 <h2 id="tutorial-title">Getting started with Tabula</h2>
                 <p>{onQuiz ? 'Finish with a short knowledge check.' : `Part ${step + 1} of ${totalSteps}`}</p>
               </div>
@@ -262,11 +308,11 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
               <div className="tutorial-body tutorial-quiz">
                 <div className="tutorial-step-heading">
                   <span>Knowledge check</span>
-                  <h3>Quick Tabula quiz</h3>
+                  <h3>Quick {editionLabel} quiz</h3>
                   <p>Answer all five questions. A score of 4 out of 5 completes the tutorial.</p>
                 </div>
                 <div className="tutorial-question-list">
-                  {QUIZ.map((question, questionIndex) => (
+                  {quiz.map((question, questionIndex) => (
                     <fieldset className="tutorial-question" key={question.id}>
                       <legend>{questionIndex + 1}. {question.question}</legend>
                       <div className="tutorial-options">
