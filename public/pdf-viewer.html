@@ -374,6 +374,22 @@
   .lib-empty { font-size: 13px; color: var(--ink-muted); padding: 6px 2px 2px; }
   .privacy-note { font-size: 12.5px; line-height: 1.55; color: var(--ink-muted); }
 
+  /* Library v2: security, thumbnails, search */
+  .lib-security { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; background: var(--surface); font-size: 13px; }
+  .sec-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+  .sec-row .state { color: var(--ink-muted); }
+  .sec-row .state strong { color: var(--ink); }
+  .sec-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sec-form { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .sec-form input, .lib-search, .rename-input { padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; width: 100%; font-family: inherit; }
+  .sec-msg { font-size: 12.5px; color: #8c3b23; min-height: 16px; }
+  .small-btn { border: 1px solid var(--border); background: #fff; border-radius: 6px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; color: var(--deep); cursor: pointer; }
+  .small-btn:hover { background: var(--tint); }
+  .small-btn.danger { color: #8c3b23; }
+  .lib-search { margin: 14px 0 4px; }
+  .thumb { width: 44px; height: 58px; object-fit: cover; border: 1px solid var(--border); border-radius: 4px; background: #fff; flex: none; }
+  .thumb.ph { display: flex; align-items: center; justify-content: center; font-size: 10px; color: #9a9a9a; }
+
   /* Signature pad modal */
   .modal-backdrop {
     position: fixed; inset: 0;
@@ -531,23 +547,22 @@
       <div class="card">
         <h2>Documents Library</h2>
         <p class="sub">Keep PDFs here so they are one click away from any tool.</p>
-        <div id="libDropzone" class="dropzone" style="margin-top:0; padding: 28px 20px;">
-          <p style="margin-bottom:14px;">Drag PDFs here, or</p>
-          <label class="file-btn" for="libFileInput">Add PDF files</label>
-        </div>
-        <input type="file" id="libFileInput" accept="application/pdf,.pdf" multiple />
-        <div class="split-meta" id="libMeta" style="margin-top:14px;"></div>
-        <div id="libList"></div>
-        <div class="btn-row" style="margin-top:6px;">
-          <button class="secondary-btn" id="libClearBtn" disabled>Clear library</button>
+        <div class="lib-security" id="libSecurity"></div>
+        <div id="libBody">
+          <div id="libDropzone" class="dropzone" style="margin-top:0; padding: 28px 20px;">
+            <p style="margin-bottom:14px;">Drag PDFs here, or</p>
+            <label class="file-btn" for="libFileInput">Add PDF files</label>
+          </div>
+          <input type="file" id="libFileInput" accept="application/pdf,.pdf" multiple />
+          <input type="search" id="libSearch" class="lib-search" placeholder="Search your library by file name" hidden />
+          <div class="split-meta" id="libMeta" style="margin-top:12px;"></div>
+          <div id="libList"></div>
+          <div class="btn-row" style="margin-top:6px;">
+            <button class="secondary-btn" id="libClearBtn" disabled>Clear library</button>
+          </div>
         </div>
       </div>
-      <div class="card privacy-note">
-        <strong style="color:var(--ink);">Where your files are kept.</strong>
-        Library files are stored inside this browser, on this device only. They are never uploaded. They are not encrypted, so
-        avoid saving sensitive documents on a shared computer, and use "Clear library" when you are done. Clearing your browser's
-        site data also removes them.
-      </div>
+      <div class="card privacy-note" id="libNote"></div>
     </div>
     <div class="error-box" id="libError"></div>
   </section>
@@ -882,8 +897,9 @@
       }
       const bytes = await out.save();
       downloadBytes(bytes, 'merged.pdf');
-      if (document.getElementById('mergeSaveLib').checked) await libSave(new File([bytes], 'merged.pdf', { type: 'application/pdf' }));
-      showStatus('Merged PDF downloaded');
+      let savedOk = true;
+      if (document.getElementById('mergeSaveLib').checked) savedOk = await libSave(new File([bytes], 'merged.pdf', { type: 'application/pdf' }));
+      showStatus(savedOk ? 'Merged PDF downloaded' : 'Merged PDF downloaded, but not saved to the Library (see the Library tab)', 5000);
     } catch (err) {
       console.error(err);
       showErrorIn(mergeError, 'Could not merge these files: ' + (err && err.message ? err.message : 'unknown error'));
@@ -990,8 +1006,9 @@
       pages.forEach((p) => out.addPage(p));
       const bytes = await out.save();
       downloadBytes(bytes, 'extracted.pdf');
-      if (document.getElementById('splitSaveLib').checked) await libSave(new File([bytes], splitFile.name.replace(/\.pdf$/i, '') + '-extract.pdf', { type: 'application/pdf' }));
-      showStatus('Extracted PDF downloaded');
+      let savedOk = true;
+      if (document.getElementById('splitSaveLib').checked) savedOk = await libSave(new File([bytes], splitFile.name.replace(/\.pdf$/i, '') + '-extract.pdf', { type: 'application/pdf' }));
+      showStatus(savedOk ? 'Extracted PDF downloaded' : 'Extracted PDF downloaded, but not saved to the Library (see the Library tab)', 5000);
     } catch (err) {
       console.error(err);
       showErrorIn(splitError, 'Could not extract those pages: ' + (err && err.message ? err.message : 'unknown error'));
@@ -1289,8 +1306,9 @@
 
       const bytes = await doc.save();
       downloadBytes(bytes, 'signed.pdf');
-      if (document.getElementById('signSaveLib').checked) await libSave(new File([bytes], signFile.name.replace(/\.pdf$/i, '') + '-signed.pdf', { type: 'application/pdf' }));
-      showStatus('Signed PDF downloaded');
+      let savedOk = true;
+      if (document.getElementById('signSaveLib').checked) savedOk = await libSave(new File([bytes], signFile.name.replace(/\.pdf$/i, '') + '-signed.pdf', { type: 'application/pdf' }));
+      showStatus(savedOk ? 'Signed PDF downloaded' : 'Signed PDF downloaded, but not saved to the Library (see the Library tab)', 5000);
     } catch (err) {
       console.error(err);
       showErrorIn(signError, 'Could not build the signed PDF: ' + (err && err.message ? err.message : 'unknown error'));
@@ -1364,101 +1382,397 @@
   const libMeta = document.getElementById('libMeta');
   const libClearBtn = document.getElementById('libClearBtn');
   const libError = document.getElementById('libError');
+  const libSecurity = document.getElementById('libSecurity');
+  const libBody = document.getElementById('libBody');
+  const libSearch = document.getElementById('libSearch');
+  const libNote = document.getElementById('libNote');
 
   const LIB_DB = 'tabpdf-library';
-  const LIB_STORE = 'docs';
+  const DOCS = 'docs';
+  const META = 'meta';
+  const textEnc = new TextEncoder();
+  const textDec = new TextDecoder();
 
   function libOpen() {
     return new Promise((resolve, reject) => {
       if (!window.indexedDB) return reject(new Error('This browser does not support local storage for files.'));
-      const req = indexedDB.open(LIB_DB, 1);
-      req.onupgradeneeded = () => req.result.createObjectStore(LIB_STORE, { keyPath: 'id' });
+      const req = indexedDB.open(LIB_DB, 2);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(DOCS)) db.createObjectStore(DOCS, { keyPath: 'id' });
+        if (!db.objectStoreNames.contains(META)) db.createObjectStore(META, { keyPath: 'key' });
+      };
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(req.error || new Error('Could not open the library.'));
     });
   }
-  async function libTx(mode, fn) {
+  async function idb(store, mode, fn) {
     const db = await libOpen();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(LIB_STORE, mode);
+      const tx = db.transaction(store, mode);
       let result;
-      const req = fn(tx.objectStore(LIB_STORE));
+      const req = fn(tx.objectStore(store));
       if (req) req.onsuccess = () => { result = req.result; };
       tx.oncomplete = () => { db.close(); resolve(result); };
       tx.onerror = () => { db.close(); reject(tx.error); };
       tx.onabort = () => { db.close(); reject(tx.error || new Error('Storage was blocked or is full.')); };
     });
   }
-  const libAll = () => libTx('readonly', (st) => st.getAll());
-  const libGet = (id) => libTx('readonly', (st) => st.get(id));
-  const libPut = (rec) => libTx('readwrite', (st) => st.put(rec));
-  const libDelete = (id) => libTx('readwrite', (st) => st.delete(id));
-  const libClear = () => libTx('readwrite', (st) => st.clear());
+  const dbAll = () => idb(DOCS, 'readonly', (st) => st.getAll());
+  const dbGet = (id) => idb(DOCS, 'readonly', (st) => st.get(id));
+  const dbPut = (rec) => idb(DOCS, 'readwrite', (st) => st.put(rec));
+  const dbDelete = (id) => idb(DOCS, 'readwrite', (st) => st.delete(id));
+  const dbClear = () => idb(DOCS, 'readwrite', (st) => st.clear());
+  const metaGet = (key) => idb(META, 'readonly', (st) => st.get(key));
+  const metaPut = (rec) => idb(META, 'readwrite', (st) => st.put(rec));
+  const metaDelete = (key) => idb(META, 'readwrite', (st) => st.delete(key));
+
+  /* ---- Encryption at rest: AES-256-GCM, key derived from a passphrase (PBKDF2) ---- */
+  const cryptoOk = !!(window.crypto && crypto.subtle);
+  let cryptoMeta = null; // { key:'crypto', salt, iterations, verifier } when the Library is passphrase-locked
+  let libKey = null;     // CryptoKey, in memory only while unlocked
+  const KDF_ITERATIONS = 250000;
+
+  async function deriveKey(pass, salt, iterations) {
+    const base = await crypto.subtle.importKey('raw', textEnc.encode(pass), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
+      base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+    );
+  }
+  async function encBytes(key, bytes) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, bytes));
+    const out = new Uint8Array(12 + ct.length);
+    out.set(iv, 0);
+    out.set(ct, 12);
+    return out.buffer;
+  }
+  async function decBytes(key, buf) {
+    const u = new Uint8Array(buf);
+    return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: u.slice(0, 12) }, key, u.slice(12)));
+  }
+
+  async function libInit() { cryptoMeta = (await metaGet('crypto')) || null; }
+
+  /* ---- Thumbnails ---- */
+  async function makeThumb(file) {
+    const buf = await file.arrayBuffer();
+    const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+    try {
+      const page = await doc.getPage(1);
+      const base = page.getViewport({ scale: 1 });
+      const viewport = page.getViewport({ scale: 96 / base.width });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(viewport.width);
+      canvas.height = Math.round(viewport.height);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      return canvas.toDataURL('image/jpeg', 0.7);
+    } finally {
+      doc.destroy();
+    }
+  }
+
+  /* ---- Records ---- */
+  // Plain record:     { id, name, size, addedAt, thumb, blob }
+  // Encrypted record: { id, addedAt, enc:true, meta:<iv+ct of {name,size,thumb}>, data:<iv+ct of file bytes> }
+  async function toView(rec) {
+    if (!rec.enc) return { id: rec.id, name: rec.name, size: rec.size, addedAt: rec.addedAt, thumb: rec.thumb || null, enc: false };
+    try {
+      const m = JSON.parse(textDec.decode(await decBytes(libKey, rec.meta)));
+      return { id: rec.id, name: m.name, size: m.size, addedAt: rec.addedAt, thumb: m.thumb || null, enc: true };
+    } catch (e) {
+      return { id: rec.id, name: '(unreadable file)', size: 0, addedAt: rec.addedAt, thumb: null, enc: true, broken: true };
+    }
+  }
+  async function buildRecord(file, thumb, id, addedAt) {
+    id = id || crypto.randomUUID();
+    addedAt = addedAt || Date.now();
+    if (cryptoMeta) {
+      const data = await encBytes(libKey, await file.arrayBuffer());
+      const meta = await encBytes(libKey, textEnc.encode(JSON.stringify({ name: file.name, size: file.size, thumb })));
+      return { id, addedAt, enc: true, meta, data };
+    }
+    return { id, name: file.name, size: file.size, addedAt, thumb, blob: file };
+  }
 
   async function libSave(file) {
     try {
-      await libPut({ id: crypto.randomUUID(), name: file.name, size: file.size, addedAt: Date.now(), blob: file });
+      await libInit();
+      if (cryptoMeta && !libKey) {
+        showStatus('Unlock your Library first', 3500);
+        showErrorIn(libError, 'Your Library is locked. Open the Library tab and unlock it, then save again.');
+        return false;
+      }
+      let thumb = null;
+      try { thumb = await makeThumb(file); } catch (e) { /* thumbnail is optional */ }
+      await dbPut(await buildRecord(file, thumb));
       if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
       showStatus('Saved to Library');
       if (panels.library.classList.contains('active')) renderLibrary();
+      return true;
     } catch (err) {
       console.error(err);
       showErrorIn(libError, 'Could not save to the Library: ' + (err && err.message ? err.message : 'unknown error'));
       showStatus('Could not save to Library', 3000);
+      return false;
     }
   }
 
   async function libAsFile(id) {
-    const rec = await libGet(id);
+    const rec = await dbGet(id);
     if (!rec) throw new Error('That file is no longer in the Library.');
-    return new File([rec.blob], rec.name, { type: 'application/pdf' });
+    if (!rec.enc) return new File([rec.blob], rec.name, { type: 'application/pdf' });
+    if (!libKey) throw new Error('Unlock your Library first.');
+    const view = await toView(rec);
+    const bytes = await decBytes(libKey, rec.data);
+    return new File([bytes], view.name, { type: 'application/pdf' });
+  }
+
+  async function updateRecord(id, patch) {
+    const rec = await dbGet(id);
+    if (!rec) return;
+    if (!rec.enc) {
+      Object.assign(rec, patch);
+    } else {
+      const m = JSON.parse(textDec.decode(await decBytes(libKey, rec.meta)));
+      Object.assign(m, patch);
+      rec.meta = await encBytes(libKey, textEnc.encode(JSON.stringify(m)));
+    }
+    await dbPut(rec);
+  }
+
+  async function encryptPending() {
+    const all = await dbAll();
+    for (const rec of all) {
+      if (rec.enc) continue;
+      const file = new File([rec.blob], rec.name, { type: 'application/pdf' });
+      await dbPut(await buildRecord(file, rec.thumb || null, rec.id, rec.addedAt));
+    }
+  }
+
+  async function enableEncryption(pass) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const key = await deriveKey(pass, salt, KDF_ITERATIONS);
+    const verifier = await encBytes(key, textEnc.encode('tabpdf-ok'));
+    const rec = { key: 'crypto', salt: salt.buffer, iterations: KDF_ITERATIONS, verifier };
+    await metaPut(rec);
+    cryptoMeta = rec;
+    libKey = key;
+    await encryptPending();
+  }
+  async function unlockLibrary(pass) {
+    const key = await deriveKey(pass, new Uint8Array(cryptoMeta.salt), cryptoMeta.iterations);
+    let ok = false;
+    try { ok = textDec.decode(await decBytes(key, cryptoMeta.verifier)) === 'tabpdf-ok'; } catch (e) { ok = false; }
+    if (!ok) throw new Error('That passphrase is not right.');
+    libKey = key;
+    await encryptPending();
+  }
+  async function disableEncryption() {
+    const all = await dbAll();
+    for (const rec of all) {
+      if (!rec.enc) continue;
+      const v = await toView(rec);
+      const bytes = await decBytes(libKey, rec.data);
+      await dbPut({ id: rec.id, name: v.name, size: v.size, addedAt: rec.addedAt, thumb: v.thumb, blob: new Blob([bytes], { type: 'application/pdf' }) });
+    }
+    await metaDelete('crypto');
+    cryptoMeta = null;
+    libKey = null;
+  }
+
+  /* ---- UI ---- */
+  let libViews = [];
+  const thumbTried = new Set();
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function renderNote() {
+    libNote.innerHTML = '';
+    const strong = el('strong', null, 'Where your files are kept. ');
+    strong.style.color = 'var(--ink)';
+    libNote.appendChild(strong);
+    if (cryptoMeta) {
+      libNote.appendChild(document.createTextNode(
+        'Files are stored inside this browser, on this device only, and never uploaded. They are encrypted with AES-256 using a key derived from your passphrase; file names and previews are encrypted too. ' +
+        'Your passphrase is never stored or sent anywhere, so it cannot be recovered. If you forget it, the only option is to erase the Library. ' +
+        'Copies you download are not encrypted, and files are readable in memory while the Library is unlocked, so lock it when you are done.'));
+    } else {
+      libNote.appendChild(document.createTextNode(
+        'Files are stored inside this browser, on this device only, and never uploaded. Right now they are not encrypted: lock the Library with a passphrase to encrypt them, ' +
+        'and avoid saving sensitive documents on a shared computer. Clearing your browser\'s site data also removes them.'));
+    }
+  }
+
+  function renderSecurity() {
+    libSecurity.innerHTML = '';
+    renderNote();
+    if (!cryptoOk) {
+      libSecurity.appendChild(el('div', 'state', 'Encryption is not available in this browser (it needs a secure https page).'));
+      return;
+    }
+    const row = el('div', 'sec-row');
+    const state = el('div', 'state');
+    const actions = el('div', 'sec-actions');
+    const msg = el('div', 'sec-msg');
+
+    if (!cryptoMeta) {
+      const st = el('strong', null, 'Not encrypted');
+      state.appendChild(st);
+      state.appendChild(document.createTextNode(' · anyone using this browser profile can open these files'));
+      const btn = el('button', 'small-btn', 'Lock with a passphrase');
+      actions.appendChild(btn);
+      row.appendChild(state);
+      row.appendChild(actions);
+      libSecurity.appendChild(row);
+
+      const form = el('div', 'sec-form');
+      form.hidden = true;
+      const p1 = el('input'); p1.type = 'password'; p1.placeholder = 'Choose a passphrase (8+ characters)'; p1.autocomplete = 'new-password';
+      const p2 = el('input'); p2.type = 'password'; p2.placeholder = 'Type it again'; p2.autocomplete = 'new-password';
+      const go = el('button', 'small-btn', 'Encrypt my Library');
+      const cancel = el('button', 'small-btn', 'Cancel');
+      const fa = el('div', 'sec-actions'); fa.appendChild(go); fa.appendChild(cancel);
+      form.appendChild(p1); form.appendChild(p2); form.appendChild(fa); form.appendChild(msg);
+      libSecurity.appendChild(form);
+
+      btn.addEventListener('click', () => { form.hidden = false; btn.hidden = true; p1.focus(); });
+      cancel.addEventListener('click', () => { form.hidden = true; btn.hidden = false; msg.textContent = ''; p1.value = ''; p2.value = ''; });
+      go.addEventListener('click', async () => {
+        msg.textContent = '';
+        if (p1.value.length < 8) { msg.textContent = 'Use at least 8 characters.'; return; }
+        if (p1.value !== p2.value) { msg.textContent = 'The two passphrases do not match.'; return; }
+        go.disabled = true;
+        msg.style.color = 'var(--ink-muted)';
+        msg.textContent = 'Encrypting…';
+        try {
+          await enableEncryption(p1.value);
+          showStatus('Library encrypted');
+          renderLibrary();
+        } catch (err) {
+          console.error(err);
+          msg.style.color = '#8c3b23';
+          msg.textContent = 'Could not encrypt: ' + (err && err.message ? err.message : 'unknown error');
+          go.disabled = false;
+        }
+      });
+    } else if (!libKey) {
+      const st = el('strong', null, 'Locked');
+      state.appendChild(st);
+      state.appendChild(document.createTextNode(' · enter your passphrase to open the Library'));
+      row.appendChild(state);
+      libSecurity.appendChild(row);
+      const form = el('div', 'sec-form');
+      const p = el('input'); p.type = 'password'; p.placeholder = 'Passphrase'; p.autocomplete = 'current-password';
+      const go = el('button', 'small-btn', 'Unlock');
+      const erase = el('button', 'small-btn danger', 'Forgot it? Erase the Library');
+      const fa = el('div', 'sec-actions'); fa.appendChild(go); fa.appendChild(erase);
+      form.appendChild(p); form.appendChild(fa); form.appendChild(msg);
+      libSecurity.appendChild(form);
+      const attempt = async () => {
+        msg.textContent = '';
+        go.disabled = true;
+        try { await unlockLibrary(p.value); renderLibrary(); }
+        catch (err) { msg.textContent = err && err.message ? err.message : 'Could not unlock.'; go.disabled = false; }
+      };
+      go.addEventListener('click', attempt);
+      p.addEventListener('keydown', (e) => { if (e.key === 'Enter') attempt(); });
+      erase.addEventListener('click', async () => {
+        if (!confirm('Erase every file in the Library and remove the passphrase? This cannot be undone.')) return;
+        await dbClear(); await metaDelete('crypto'); cryptoMeta = null; libKey = null; libViews = [];
+        showStatus('Library erased');
+        renderLibrary();
+      });
+      setTimeout(() => p.focus(), 0);
+    } else {
+      const st = el('strong', null, 'Encrypted and unlocked');
+      state.appendChild(st);
+      state.appendChild(document.createTextNode(' · files are encrypted on disk'));
+      const lock = el('button', 'small-btn', 'Lock now');
+      const remove = el('button', 'small-btn', 'Remove passphrase');
+      actions.appendChild(lock); actions.appendChild(remove);
+      row.appendChild(state); row.appendChild(actions);
+      libSecurity.appendChild(row);
+      libSecurity.appendChild(msg);
+      lock.addEventListener('click', () => { libKey = null; libViews = []; thumbTried.clear(); renderLibrary(); showStatus('Library locked'); });
+      remove.addEventListener('click', async () => {
+        if (!confirm('Remove the passphrase? Your files will be stored unencrypted again.')) return;
+        try { await disableEncryption(); showStatus('Passphrase removed'); renderLibrary(); }
+        catch (err) { msg.textContent = 'Could not remove the passphrase: ' + (err && err.message ? err.message : 'unknown error'); }
+      });
+    }
   }
 
   async function renderLibrary() {
     clearErrorIn(libError);
-    let docs = [];
     try {
-      docs = await libAll();
+      await libInit();
     } catch (err) {
       console.error(err);
-      libList.innerHTML = '';
+      libSecurity.innerHTML = '';
+      libBody.hidden = true;
       showErrorIn(libError, 'The Library is not available here: ' + (err && err.message ? err.message : 'unknown error'));
       return;
     }
-    docs.sort((a, b) => b.addedAt - a.addedAt);
-    libList.innerHTML = '';
-    libClearBtn.disabled = docs.length === 0;
+    renderSecurity();
+    if (cryptoMeta && !libKey) { libBody.hidden = true; return; }
+    libBody.hidden = false;
+    try {
+      libViews = await Promise.all((await dbAll()).map(toView));
+    } catch (err) {
+      console.error(err);
+      showErrorIn(libError, 'Could not read the Library: ' + (err && err.message ? err.message : 'unknown error'));
+      return;
+    }
+    await drawList();
+    backfillThumbs();
+  }
 
-    if (!docs.length) {
-      const empty = document.createElement('div');
-      empty.className = 'lib-empty';
-      empty.textContent = 'Nothing saved yet. Add files above, or tick "save to Library" in Merge, Split, or Fill & Sign.';
-      libList.appendChild(empty);
+  async function drawList() {
+    const q = libSearch.value.trim().toLowerCase();
+    const all = libViews.slice().sort((a, b) => b.addedAt - a.addedAt);
+    const docs = q ? all.filter((d) => d.name.toLowerCase().includes(q)) : all;
+    libList.innerHTML = '';
+    libClearBtn.disabled = all.length === 0;
+    libSearch.hidden = all.length === 0;
+
+    if (!all.length) {
+      libList.appendChild(el('div', 'lib-empty', 'Nothing saved yet. Add files above, or tick "save to Library" in Merge, Split, or Fill & Sign.'));
+    } else if (!docs.length) {
+      libList.appendChild(el('div', 'lib-empty', 'No files match "' + libSearch.value.trim() + '".'));
     }
 
     docs.forEach((rec) => {
-      const row = document.createElement('div');
-      row.className = 'file-row lib';
+      const row = el('div', 'file-row lib');
 
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      const nameEl = document.createElement('span');
-      nameEl.className = 'name';
-      nameEl.textContent = rec.name;
+      if (rec.thumb) {
+        const img = el('img', 'thumb');
+        img.src = rec.thumb;
+        img.alt = '';
+        row.appendChild(img);
+      } else {
+        row.appendChild(el('div', 'thumb ph', 'PDF'));
+      }
+
+      const meta = el('div', 'meta');
+      const nameEl = el('span', 'name', rec.name);
       nameEl.title = rec.name;
-      const whenEl = document.createElement('span');
-      whenEl.className = 'when';
-      whenEl.textContent = formatSize(rec.size) + ' · added ' + new Date(rec.addedAt).toLocaleDateString();
       meta.appendChild(nameEl);
-      meta.appendChild(whenEl);
+      meta.appendChild(el('span', 'when', formatSize(rec.size) + ' · added ' + new Date(rec.addedAt).toLocaleDateString()));
       row.appendChild(meta);
 
-      const actions = document.createElement('div');
-      actions.className = 'row-actions';
+      const actions = el('div', 'row-actions');
       const mk = (label, title, onClick) => {
-        const b = document.createElement('button');
-        b.className = 'txt';
-        b.textContent = label;
+        const b = el('button', 'txt', label);
         b.title = title;
         b.addEventListener('click', async () => {
           try { await onClick(); } catch (err) {
@@ -1473,9 +1787,10 @@
       mk('Split', 'Open in Split', async () => { const f = await libAsFile(rec.id); setTab('split'); await loadSplitFile(f); });
       mk('Sign', 'Open in Fill & Sign', async () => { const f = await libAsFile(rec.id); setTab('sign'); await loadSignFile(f); });
       mk('Download', 'Download a copy', async () => { const f = await libAsFile(rec.id); downloadBlob(f, rec.name); });
+      mk('Rename', 'Rename this file', async () => startRename(rec, nameEl));
       mk('Delete', 'Remove from the Library', async () => {
         if (!confirm('Remove "' + rec.name + '" from your Library?')) return;
-        await libDelete(rec.id);
+        await dbDelete(rec.id);
         renderLibrary();
       });
       row.appendChild(actions);
@@ -1489,7 +1804,64 @@
         if (est && est.usage != null) usage = ' · browser storage in use: ' + formatSize(est.usage);
       } catch (e) { /* estimate is optional */ }
     }
-    libMeta.textContent = docs.length + ' file' + (docs.length === 1 ? '' : 's') + ' saved on this device' + usage;
+    const shown = q ? ' (' + docs.length + ' matching)' : '';
+    libMeta.textContent = all.length + ' file' + (all.length === 1 ? '' : 's') + ' saved on this device' + shown + usage;
+  }
+
+  function startRename(rec, nameEl) {
+    const input = el('input', 'rename-input');
+    input.value = rec.name;
+    nameEl.replaceWith(input);
+    input.focus();
+    input.select();
+    let done = false;
+    const finish = async (commit) => {
+      if (done) return;
+      done = true;
+      let name = input.value.trim();
+      if (commit && name && name !== rec.name) {
+        name = name.replace(/[\\/:*?"<>|]+/g, '-');
+        if (!/\.pdf$/i.test(name)) name += '.pdf';
+        try {
+          await updateRecord(rec.id, { name });
+          const v = libViews.find((x) => x.id === rec.id);
+          if (v) v.name = name;
+          showStatus('Renamed');
+        } catch (err) {
+          console.error(err);
+          showErrorIn(libError, 'Could not rename: ' + (err && err.message ? err.message : 'unknown error'));
+        }
+      }
+      drawList();
+    };
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') finish(true);
+      if (e.key === 'Escape') finish(false);
+    });
+    input.addEventListener('blur', () => finish(true));
+  }
+
+  let thumbJobRunning = false;
+  async function backfillThumbs() {
+    if (thumbJobRunning) return;
+    thumbJobRunning = true;
+    let changed = false;
+    try {
+      for (const v of libViews.slice()) {
+        if (v.thumb || v.broken || thumbTried.has(v.id)) continue;
+        thumbTried.add(v.id);
+        try {
+          const f = await libAsFile(v.id);
+          const t = await makeThumb(f);
+          await updateRecord(v.id, { thumb: t });
+          v.thumb = t;
+          changed = true;
+        } catch (e) { /* leave the placeholder */ }
+      }
+    } finally {
+      thumbJobRunning = false;
+    }
+    if (changed && panels.library.classList.contains('active')) drawList();
   }
 
   async function addLibraryFiles(fileList) {
@@ -1502,6 +1874,7 @@
     if (good.length) renderLibrary();
   }
 
+  libSearch.addEventListener('input', () => drawList());
   libFileInput.addEventListener('change', (e) => { addLibraryFiles(e.target.files); e.target.value = ''; });
   ['dragenter', 'dragover'].forEach((evt) =>
     libDropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); libDropzone.classList.add('dragging'); })
@@ -1513,7 +1886,7 @@
 
   libClearBtn.addEventListener('click', async () => {
     if (!confirm('Remove every file from your Library? This cannot be undone.')) return;
-    try { await libClear(); renderLibrary(); showStatus('Library cleared'); }
+    try { await dbClear(); libViews = []; renderLibrary(); showStatus('Library cleared'); }
     catch (err) { showErrorIn(libError, 'Could not clear the Library: ' + (err && err.message ? err.message : 'unknown error')); }
   });
 
