@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tab PDF — View, Merge, Split</title>
+<title>Tab PDF — View, Merge, Split, Fill &amp; Sign</title>
 <style>
   :root {
     --paper: #ffffff;
@@ -361,6 +361,19 @@
   }
   .overlay-item:hover .overlay-remove { display: block; }
 
+  /* Documents Library */
+  .file-row button.txt { width: auto; padding: 0 10px; font-size: 12.5px; font-weight: 600; color: var(--deep); }
+  .file-row .meta { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+  .file-row .meta .name { flex: none; }
+  .file-row .meta .when { font-size: 11.5px; color: var(--ink-muted); }
+  .row-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .file-row.lib { flex-wrap: wrap; }
+  .file-row.lib .meta { flex: 1 1 200px; }
+  .card .dropzone { width: 100%; }
+  .save-lib { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-muted); cursor: pointer; }
+  .lib-empty { font-size: 13px; color: var(--ink-muted); padding: 6px 2px 2px; }
+  .privacy-note { font-size: 12.5px; line-height: 1.55; color: var(--ink-muted); }
+
   /* Signature pad modal */
   .modal-backdrop {
     position: fixed; inset: 0;
@@ -399,6 +412,7 @@
     <button data-tab="merge">Merge</button>
     <button data-tab="split">Split</button>
     <button data-tab="sign">Fill &amp; Sign</button>
+    <button data-tab="library">Library</button>
   </div>
   <div class="toolbar" id="toolbar" hidden>
     <button id="prevBtn" title="Previous page">‹ Prev</button>
@@ -445,6 +459,7 @@
           <button class="primary-btn" id="mergeBtn" disabled>Merge &amp; Download</button>
           <button class="secondary-btn" id="mergeClearBtn" disabled>Clear all</button>
         </div>
+        <label class="save-lib" style="margin-top:12px;"><input type="checkbox" id="mergeSaveLib" /> Also save the merged PDF to my Library</label>
       </div>
     </div>
     <div class="error-box" id="mergeError"></div>
@@ -474,6 +489,7 @@
           <button class="secondary-btn" id="splitAllBtn">Split every page (ZIP)</button>
           <button class="secondary-btn" id="splitResetBtn">Choose another file</button>
         </div>
+        <label class="save-lib" style="margin-top:12px;"><input type="checkbox" id="splitSaveLib" /> Also save the extracted PDF to my Library</label>
       </div>
     </div>
     <div class="error-box" id="splitError"></div>
@@ -501,11 +517,39 @@
       </div>
       <span class="spacer"></span>
       <button class="tool-btn" id="signResetBtn">Choose another file</button>
+      <label class="save-lib"><input type="checkbox" id="signSaveLib" /> Save to Library</label>
       <button class="primary-btn" id="downloadSignedBtn">Download signed PDF</button>
     </div>
 
     <div id="signStage"></div>
     <div class="error-box" id="signError"></div>
+  </section>
+
+  <!-- LIBRARY -->
+  <section class="panel" id="panel-library">
+    <div class="work">
+      <div class="card">
+        <h2>Documents Library</h2>
+        <p class="sub">Keep PDFs here so they are one click away from any tool.</p>
+        <div id="libDropzone" class="dropzone" style="margin-top:0; padding: 28px 20px;">
+          <p style="margin-bottom:14px;">Drag PDFs here, or</p>
+          <label class="file-btn" for="libFileInput">Add PDF files</label>
+        </div>
+        <input type="file" id="libFileInput" accept="application/pdf,.pdf" multiple />
+        <div class="split-meta" id="libMeta" style="margin-top:14px;"></div>
+        <div id="libList"></div>
+        <div class="btn-row" style="margin-top:6px;">
+          <button class="secondary-btn" id="libClearBtn" disabled>Clear library</button>
+        </div>
+      </div>
+      <div class="card privacy-note">
+        <strong style="color:var(--ink);">Where your files are kept.</strong>
+        Library files are stored inside this browser, on this device only. They are never uploaded. They are not encrypted, so
+        avoid saving sensitive documents on a shared computer, and use "Clear library" when you are done. Clearing your browser's
+        site data also removes them.
+      </div>
+    </div>
+    <div class="error-box" id="libError"></div>
   </section>
 
 </main>
@@ -575,16 +619,18 @@
     merge: document.getElementById('panel-merge'),
     split: document.getElementById('panel-split'),
     sign: document.getElementById('panel-sign'),
+    library: document.getElementById('panel-library'),
   };
   const brandSub = document.getElementById('brandSub');
   const toolbar = document.getElementById('toolbar');
-  const labels = { view: 'View', merge: 'Merge', split: 'Split', sign: 'Fill & Sign' };
+  const labels = { view: 'View', merge: 'Merge', split: 'Split', sign: 'Fill & Sign', library: 'Library' };
 
   function setTab(tab) {
     tabButtons.forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
     Object.entries(panels).forEach(([k, el]) => el.classList.toggle('active', k === tab));
     brandSub.textContent = labels[tab];
     toolbar.hidden = !(tab === 'view' && pdfDoc);
+    if (tab === 'library') renderLibrary();
   }
   tabButtons.forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
 
@@ -748,10 +794,14 @@
     mergeFiles.forEach((file, i) => {
       const row = document.createElement('div');
       row.className = 'file-row';
-      row.innerHTML = `
-        <span class="name">${i + 1}. ${file.name}</span>
-        <span class="size">${formatSize(file.size)}</span>
-      `;
+      const nameEl = document.createElement('span');
+      nameEl.className = 'name';
+      nameEl.textContent = (i + 1) + '. ' + file.name;
+      const sizeEl = document.createElement('span');
+      sizeEl.className = 'size';
+      sizeEl.textContent = formatSize(file.size);
+      row.appendChild(nameEl);
+      row.appendChild(sizeEl);
       const upBtn = document.createElement('button');
       upBtn.textContent = '↑';
       upBtn.disabled = i === 0;
@@ -832,6 +882,7 @@
       }
       const bytes = await out.save();
       downloadBytes(bytes, 'merged.pdf');
+      if (document.getElementById('mergeSaveLib').checked) await libSave(new File([bytes], 'merged.pdf', { type: 'application/pdf' }));
       showStatus('Merged PDF downloaded');
     } catch (err) {
       console.error(err);
@@ -939,6 +990,7 @@
       pages.forEach((p) => out.addPage(p));
       const bytes = await out.save();
       downloadBytes(bytes, 'extracted.pdf');
+      if (document.getElementById('splitSaveLib').checked) await libSave(new File([bytes], splitFile.name.replace(/\.pdf$/i, '') + '-extract.pdf', { type: 'application/pdf' }));
       showStatus('Extracted PDF downloaded');
     } catch (err) {
       console.error(err);
@@ -1237,6 +1289,7 @@
 
       const bytes = await doc.save();
       downloadBytes(bytes, 'signed.pdf');
+      if (document.getElementById('signSaveLib').checked) await libSave(new File([bytes], signFile.name.replace(/\.pdf$/i, '') + '-signed.pdf', { type: 'application/pdf' }));
       showStatus('Signed PDF downloaded');
     } catch (err) {
       console.error(err);
@@ -1303,6 +1356,170 @@
     });
     sigModal.hidden = true;
   });
+
+  /* ---------------- LIBRARY (IndexedDB, this browser only) ---------------- */
+  const libDropzone = document.getElementById('libDropzone');
+  const libFileInput = document.getElementById('libFileInput');
+  const libList = document.getElementById('libList');
+  const libMeta = document.getElementById('libMeta');
+  const libClearBtn = document.getElementById('libClearBtn');
+  const libError = document.getElementById('libError');
+
+  const LIB_DB = 'tabpdf-library';
+  const LIB_STORE = 'docs';
+
+  function libOpen() {
+    return new Promise((resolve, reject) => {
+      if (!window.indexedDB) return reject(new Error('This browser does not support local storage for files.'));
+      const req = indexedDB.open(LIB_DB, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(LIB_STORE, { keyPath: 'id' });
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error || new Error('Could not open the library.'));
+    });
+  }
+  async function libTx(mode, fn) {
+    const db = await libOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(LIB_STORE, mode);
+      let result;
+      const req = fn(tx.objectStore(LIB_STORE));
+      if (req) req.onsuccess = () => { result = req.result; };
+      tx.oncomplete = () => { db.close(); resolve(result); };
+      tx.onerror = () => { db.close(); reject(tx.error); };
+      tx.onabort = () => { db.close(); reject(tx.error || new Error('Storage was blocked or is full.')); };
+    });
+  }
+  const libAll = () => libTx('readonly', (st) => st.getAll());
+  const libGet = (id) => libTx('readonly', (st) => st.get(id));
+  const libPut = (rec) => libTx('readwrite', (st) => st.put(rec));
+  const libDelete = (id) => libTx('readwrite', (st) => st.delete(id));
+  const libClear = () => libTx('readwrite', (st) => st.clear());
+
+  async function libSave(file) {
+    try {
+      await libPut({ id: crypto.randomUUID(), name: file.name, size: file.size, addedAt: Date.now(), blob: file });
+      if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+      showStatus('Saved to Library');
+      if (panels.library.classList.contains('active')) renderLibrary();
+    } catch (err) {
+      console.error(err);
+      showErrorIn(libError, 'Could not save to the Library: ' + (err && err.message ? err.message : 'unknown error'));
+      showStatus('Could not save to Library', 3000);
+    }
+  }
+
+  async function libAsFile(id) {
+    const rec = await libGet(id);
+    if (!rec) throw new Error('That file is no longer in the Library.');
+    return new File([rec.blob], rec.name, { type: 'application/pdf' });
+  }
+
+  async function renderLibrary() {
+    clearErrorIn(libError);
+    let docs = [];
+    try {
+      docs = await libAll();
+    } catch (err) {
+      console.error(err);
+      libList.innerHTML = '';
+      showErrorIn(libError, 'The Library is not available here: ' + (err && err.message ? err.message : 'unknown error'));
+      return;
+    }
+    docs.sort((a, b) => b.addedAt - a.addedAt);
+    libList.innerHTML = '';
+    libClearBtn.disabled = docs.length === 0;
+
+    if (!docs.length) {
+      const empty = document.createElement('div');
+      empty.className = 'lib-empty';
+      empty.textContent = 'Nothing saved yet. Add files above, or tick "save to Library" in Merge, Split, or Fill & Sign.';
+      libList.appendChild(empty);
+    }
+
+    docs.forEach((rec) => {
+      const row = document.createElement('div');
+      row.className = 'file-row lib';
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      const nameEl = document.createElement('span');
+      nameEl.className = 'name';
+      nameEl.textContent = rec.name;
+      nameEl.title = rec.name;
+      const whenEl = document.createElement('span');
+      whenEl.className = 'when';
+      whenEl.textContent = formatSize(rec.size) + ' · added ' + new Date(rec.addedAt).toLocaleDateString();
+      meta.appendChild(nameEl);
+      meta.appendChild(whenEl);
+      row.appendChild(meta);
+
+      const actions = document.createElement('div');
+      actions.className = 'row-actions';
+      const mk = (label, title, onClick) => {
+        const b = document.createElement('button');
+        b.className = 'txt';
+        b.textContent = label;
+        b.title = title;
+        b.addEventListener('click', async () => {
+          try { await onClick(); } catch (err) {
+            console.error(err);
+            showErrorIn(libError, err && err.message ? err.message : 'Something went wrong.');
+          }
+        });
+        actions.appendChild(b);
+      };
+      mk('View', 'Open in the viewer', async () => { const f = await libAsFile(rec.id); setTab('view'); await loadFile(f); });
+      mk('Merge', 'Add to the Merge list', async () => { const f = await libAsFile(rec.id); addMergeFiles([f]); setTab('merge'); showStatus('Added to Merge'); });
+      mk('Split', 'Open in Split', async () => { const f = await libAsFile(rec.id); setTab('split'); await loadSplitFile(f); });
+      mk('Sign', 'Open in Fill & Sign', async () => { const f = await libAsFile(rec.id); setTab('sign'); await loadSignFile(f); });
+      mk('Download', 'Download a copy', async () => { const f = await libAsFile(rec.id); downloadBlob(f, rec.name); });
+      mk('Delete', 'Remove from the Library', async () => {
+        if (!confirm('Remove "' + rec.name + '" from your Library?')) return;
+        await libDelete(rec.id);
+        renderLibrary();
+      });
+      row.appendChild(actions);
+      libList.appendChild(row);
+    });
+
+    let usage = '';
+    if (navigator.storage && navigator.storage.estimate) {
+      try {
+        const est = await navigator.storage.estimate();
+        if (est && est.usage != null) usage = ' · browser storage in use: ' + formatSize(est.usage);
+      } catch (e) { /* estimate is optional */ }
+    }
+    libMeta.textContent = docs.length + ' file' + (docs.length === 1 ? '' : 's') + ' saved on this device' + usage;
+  }
+
+  async function addLibraryFiles(fileList) {
+    clearErrorIn(libError);
+    const incoming = Array.from(fileList || []);
+    const good = incoming.filter(isPdfFile);
+    const bad = incoming.length - good.length;
+    for (const f of good) await libSave(f);
+    if (bad) showErrorIn(libError, bad + ' file(s) skipped — not PDFs.');
+    if (good.length) renderLibrary();
+  }
+
+  libFileInput.addEventListener('change', (e) => { addLibraryFiles(e.target.files); e.target.value = ''; });
+  ['dragenter', 'dragover'].forEach((evt) =>
+    libDropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); libDropzone.classList.add('dragging'); })
+  );
+  ['dragleave', 'drop'].forEach((evt) =>
+    libDropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); libDropzone.classList.remove('dragging'); })
+  );
+  libDropzone.addEventListener('drop', (e) => addLibraryFiles(e.dataTransfer.files));
+
+  libClearBtn.addEventListener('click', async () => {
+    if (!confirm('Remove every file from your Library? This cannot be undone.')) return;
+    try { await libClear(); renderLibrary(); showStatus('Library cleared'); }
+    catch (err) { showErrorIn(libError, 'Could not clear the Library: ' + (err && err.message ? err.message : 'unknown error')); }
+  });
+
+  /* Open on the tab named in the URL hash, e.g. pdf-viewer.html#merge */
+  const initialTab = location.hash.slice(1);
+  if (panels[initialTab]) setTab(initialTab);
 </script>
 </body>
 </html>

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tab PDF — All things PDF, in one place</title>
+<meta name="description" content="Tab PDF is a free hub for working with PDFs: view, merge, split, and sign in your browser. Nothing to install, files never leave your device." />
+<style>
+  :root {
+    --paper: #ffffff;
+    --ink: #191919;
+    --ink-muted: #5b5b5b;
+    --deep: #202a50;
+    --accent: #0e1cdf;
+    --card-a: #fdeeea;
+    --card-b: #ece8fb;
+    --card-c: #e6f1ea;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  body { padding-bottom: 84px; }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px max(24px, calc((100% - 1000px) / 2));
+  }
+  .brand { font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: var(--deep); }
+  header nav a { color: var(--ink-muted); text-decoration: none; font-size: 14px; margin-left: 28px; }
+  header nav a:hover { color: var(--ink); }
+
+  .hero { text-align: center; padding: 48px 24px 64px; max-width: 720px; margin: 0 auto; }
+  .hero .mark {
+    width: 64px; height: 64px; border-radius: 16px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+  }
+  .hero .mark svg { width: 32px; height: 32px; stroke: #fff; fill: none; stroke-width: 1.8; }
+  .hero h1 {
+    font-family: 'Archivo', sans-serif;
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+  }
+  .hero p { font-size: 17px; line-height: 1.6; color: var(--ink-muted); margin: 0 0 32px; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 26px;
+    border-radius: 999px;
+    font-size: 15px; font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #0b16b8; }
+  .btn-ghost { background: transparent; color: var(--deep); border-color: #d9dce6; }
+  .btn-ghost:hover { background: #f4f5fa; }
+  .fine-print { margin-top: 14px; font-size: 12.5px; color: #8a8a8a; }
+
+  section.feature { padding: 72px max(24px, calc((100% - 1000px) / 2)); }
+  .feature-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .feature.reverse .feature-inner { direction: rtl; }
+  .feature.reverse .feature-inner > * { direction: ltr; }
+  .art {
+    border-radius: 24px;
+    aspect-ratio: 4 / 3;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .art svg { width: 62%; height: 62%; }
+  .feature h2 { font-family: 'Archivo', sans-serif; font-size: 28px; letter-spacing: -0.01em; margin: 0 0 14px; }
+  .feature p { font-size: 15.5px; line-height: 1.65; color: var(--ink-muted); margin: 0 0 20px; max-width: 440px; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .soon { color: #8a6d00; }
+  .tool-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .feature .btn-ghost { padding: 10px 20px; font-size: 14px; }
+
+  @media (max-width: 720px) {
+    .feature-inner { grid-template-columns: 1fr; }
+    .feature.reverse .feature-inner { direction: ltr; }
+    section.feature { padding: 48px 20px; }
+  }
+
+  .sticky-cta {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    display: flex; justify-content: center;
+    padding: 16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 40%);
+    pointer-events: none;
+  }
+  .sticky-cta .btn { pointer-events: auto; box-shadow: 0 8px 24px rgba(14,28,223,0.28); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">TAB PDF</div>
+  <nav>
+    <a href="#tools">Free tools</a>
+    <a href="#create">Create</a>
+    <a href="#scrape">Scrape</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="mark">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm7 0v5h5"/></svg>
+  </div>
+  <h1>All things PDF, in one place.</h1>
+  <p>Tab PDF is a free hub for working with PDFs. View any file, merge and split documents, and fill and sign forms, right in your browser, with nothing to install.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="/pdf-viewer.html">Open the free PDF tools</a>
+    <a class="btn btn-ghost" href="#create">What's coming next</a>
+  </div>
+  <div class="fine-print">Files never leave your device.</div>
+</div>
+
+<section class="feature" id="tools">
+  <div class="feature-inner">
+    <div class="art" style="background:var(--card-a)">
+      <svg viewBox="0 0 200 160" fill="none">
+        <rect x="52" y="18" width="96" height="124" rx="10" fill="#ffffff" stroke="#e7c9bd" stroke-width="2"/>
+        <rect x="66" y="38" width="68" height="8" rx="4" fill="#f3d9cf"/>
+        <rect x="66" y="54" width="52" height="6" rx="3" fill="#f3d9cf"/>
+        <rect x="66" y="66" width="60" height="6" rx="3" fill="#f3d9cf"/>
+        <rect x="66" y="88" width="68" height="6" rx="3" fill="#f3d9cf"/>
+        <rect x="66" y="100" width="44" height="6" rx="3" fill="#f3d9cf"/>
+        <circle cx="150" cy="120" r="22" fill="var(--accent)"/>
+        <path d="M141 120h18M153 112l8 8-8 8" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <span class="eyebrow">Free · Live now</span>
+      <h2>View, merge, split, and sign.</h2>
+      <p>Drop in a file and it renders the same in Chrome, Firefox, or Safari. Combine PDFs in the order you want, pull out the pages you need, or add text and a drawn signature and download the result. No account, no upload.</p>
+      <div class="tool-links">
+        <a class="btn btn-ghost" href="/pdf-viewer.html">View →</a>
+        <a class="btn btn-ghost" href="/pdf-viewer.html#merge">Merge →</a>
+        <a class="btn btn-ghost" href="/pdf-viewer.html#split">Split →</a>
+        <a class="btn btn-ghost" href="/pdf-viewer.html#sign">Fill &amp; Sign →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="feature reverse" id="create">
+  <div class="feature-inner">
+    <div class="art" style="background:var(--card-b)">
+      <svg viewBox="0 0 200 160" fill="none">
+        <rect x="40" y="24" width="80" height="104" rx="8" fill="#ffffff" stroke="#c9c2ee" stroke-width="2"/>
+        <rect x="52" y="40" width="56" height="6" rx="3" fill="#dcd6f7"/>
+        <rect x="52" y="52" width="40" height="6" rx="3" fill="#dcd6f7"/>
+        <rect x="52" y="72" width="56" height="30" rx="4" fill="#eee9fc"/>
+        <rect x="52" y="112" width="30" height="6" rx="3" fill="#dcd6f7"/>
+        <rect x="112" y="60" width="66" height="86" rx="8" fill="var(--deep)"/>
+        <rect x="124" y="76" width="42" height="6" rx="3" fill="#8fa0e8"/>
+        <rect x="124" y="88" width="30" height="6" rx="3" fill="#8fa0e8"/>
+        <path d="M132 112h20M132 122h20M132 132h12" stroke="#c8d0f2" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <span class="eyebrow soon">Create PDF · Coming soon</span>
+      <h2>Generate polished documents from your data.</h2>
+      <p>Turn reports, invoices, and statements into branded, print-ready PDFs, one at a time or in bulk from a spreadsheet, API, or database query.</p>
+    </div>
+  </div>
+</section>
+
+<section class="feature" id="scrape">
+  <div class="feature-inner">
+    <div class="art" style="background:var(--card-c)">
+      <svg viewBox="0 0 200 160" fill="none">
+        <rect x="34" y="20" width="90" height="118" rx="8" fill="#ffffff" stroke="#bfe0cb" stroke-width="2"/>
+        <rect x="46" y="36" width="66" height="8" rx="4" fill="#d3ecdc"/>
+        <rect x="46" y="54" width="66" height="1.5" fill="#d3ecdc"/>
+        <rect x="46" y="66" width="66" height="1.5" fill="#d3ecdc"/>
+        <rect x="46" y="78" width="66" height="1.5" fill="#d3ecdc"/>
+        <rect x="46" y="90" width="66" height="1.5" fill="#d3ecdc"/>
+        <rect x="46" y="102" width="40" height="1.5" fill="#d3ecdc"/>
+        <rect x="118" y="52" width="58" height="70" rx="6" fill="#ffffff" stroke="#3f9d64" stroke-width="2"/>
+        <path d="M128 66h38M128 78h38M128 90h24M128 104h20" stroke="#3f9d64" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M112 88h14" stroke="#2e7a4a" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M124 82l6 6-6 6" stroke="#2e7a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <span class="eyebrow soon">Scrape PDF · Coming soon</span>
+      <h2>Pull structured data out of any PDF.</h2>
+      <p>Extract tables, line items, and key fields from invoices, statements, and scanned documents, including OCR for image-only pages, and get clean, structured output back.</p>
+    </div>
+  </div>
+</section>
+
+<div class="sticky-cta">
+  <a class="btn btn-primary" href="/pdf-viewer.html">Open the free PDF tools</a>
+</div>
+
+</body>
+</html>
