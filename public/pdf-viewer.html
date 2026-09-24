@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tab PDF — View, Merge, Split</title>
+<title>Tab PDF — View, Merge, Split, Fill &amp; Sign</title>
 <style>
   :root {
     --paper: #ffffff;
@@ -1303,6 +1303,10 @@
     });
     sigModal.hidden = true;
   });
+
+  /* Open on the tab named in the URL hash, e.g. pdf-viewer.html#merge */
+  const initialTab = location.hash.slice(1);
+  if (panels[initialTab]) setTab(initialTab);
 </script>
 </body>
 </html>
