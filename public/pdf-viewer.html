@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tab PDF — View, Merge, Split, Fill &amp; Sign</title>
+<title>Tab PDF — View, Merge, Split, Organize, Fill &amp; Sign</title>
 <style>
   :root {
     --paper: #ffffff;
@@ -361,6 +361,74 @@
   }
   .overlay-item:hover .overlay-remove { display: block; }
 
+  /* Organize */
+  .org-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    width: min(960px, 94vw);
+    margin-bottom: 18px;
+  }
+  .org-bar .org-title { display: flex; flex-direction: column; min-width: 0; flex: 1 1 200px; }
+  .org-bar .org-title strong { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .org-bar .org-title span { font-size: 12px; color: var(--ink-muted); }
+  .org-bar .primary-btn, .org-bar .secondary-btn { padding: 9px 14px; font-size: 13px; }
+  .org-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 16px;
+    width: min(960px, 94vw);
+  }
+  .org-card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: grab;
+  }
+  .org-card.dragging { opacity: 0.4; }
+  .org-card.drop-before { box-shadow: -4px 0 0 var(--accent); }
+  .org-card.drop-after { box-shadow: 4px 0 0 var(--accent); }
+  .org-thumb {
+    width: 148px;
+    height: 148px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border-radius: 6px;
+  }
+  .org-thumb canvas {
+    box-shadow: 0 1px 6px rgba(20,20,30,0.18);
+    background: #fff;
+    transition: transform .18s ease;
+  }
+  .org-label { font-size: 12px; color: var(--ink-muted); }
+  .org-label b { color: var(--ink); font-weight: 600; }
+  .org-actions { display: flex; gap: 4px; }
+  .org-actions button {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    width: 28px; height: 28px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--ink);
+    padding: 0;
+  }
+  .org-actions button:hover:not(:disabled) { background: var(--tint); }
+  .org-actions button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .org-actions button.del:hover:not(:disabled) { background: #fbeae4; color: #a1441f; }
+
   /* Documents Library */
   .file-row button.txt { width: auto; padding: 0 10px; font-size: 12.5px; font-weight: 600; color: var(--deep); }
   .file-row .meta { display: flex; flex-direction: column; flex: 1; min-width: 0; }
@@ -411,6 +479,7 @@
     <button data-tab="view" class="active">View</button>
     <button data-tab="merge">Merge</button>
     <button data-tab="split">Split</button>
+    <button data-tab="organize">Organize</button>
     <button data-tab="sign">Fill &amp; Sign</button>
     <button data-tab="library">Library</button>
   </div>
@@ -493,6 +562,35 @@
       </div>
     </div>
     <div class="error-box" id="splitError"></div>
+  </section>
+
+  <!-- ORGANIZE -->
+  <section class="panel" id="panel-organize">
+    <div class="work" id="orgDropCard">
+      <div class="card">
+        <h2>Organize pages</h2>
+        <p class="sub">Rotate, reorder, or delete pages, then download the result. Nothing leaves your device.</p>
+        <div id="orgDropzone" class="dropzone" style="margin-top:0; padding: 32px 20px;">
+          <p style="margin-bottom:14px;">Drag a PDF here, or</p>
+          <label class="file-btn" for="orgFileInput">Choose a PDF file</label>
+        </div>
+        <input type="file" id="orgFileInput" accept="application/pdf,.pdf" />
+      </div>
+    </div>
+
+    <div class="org-bar" id="orgBar" hidden>
+      <div class="org-title">
+        <strong id="orgFileName">document.pdf</strong>
+        <span id="orgMeta">0 pages</span>
+      </div>
+      <button class="secondary-btn" id="orgRotateAllBtn" title="Rotate every page 90° clockwise">Rotate all ↻</button>
+      <button class="secondary-btn" id="orgUndoBtn" title="Discard your changes">Reset changes</button>
+      <button class="secondary-btn" id="orgResetBtn">Choose another file</button>
+      <label class="save-lib"><input type="checkbox" id="orgSaveLib" /> Save to Library</label>
+      <button class="primary-btn" id="orgDownloadBtn">Download PDF</button>
+    </div>
+    <div class="org-grid" id="orgGrid"></div>
+    <div class="error-box" id="orgError"></div>
   </section>
 
   <!-- FILL & SIGN -->
@@ -618,12 +716,13 @@
     view: document.getElementById('panel-view'),
     merge: document.getElementById('panel-merge'),
     split: document.getElementById('panel-split'),
+    organize: document.getElementById('panel-organize'),
     sign: document.getElementById('panel-sign'),
     library: document.getElementById('panel-library'),
   };
   const brandSub = document.getElementById('brandSub');
   const toolbar = document.getElementById('toolbar');
-  const labels = { view: 'View', merge: 'Merge', split: 'Split', sign: 'Fill & Sign', library: 'Library' };
+  const labels = { view: 'View', merge: 'Merge', split: 'Split', organize: 'Organize', sign: 'Fill & Sign', library: 'Library' };
 
   function setTab(tab) {
     tabButtons.forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
@@ -1019,6 +1118,230 @@
     } catch (err) {
       console.error(err);
       showErrorIn(splitError, 'Could not split this file: ' + (err && err.message ? err.message : 'unknown error'));
+    }
+  });
+
+  /* ---------------- ORGANIZE ---------------- */
+  const orgDropCard = document.getElementById('orgDropCard');
+  const orgDropzone = document.getElementById('orgDropzone');
+  const orgFileInput = document.getElementById('orgFileInput');
+  const orgBar = document.getElementById('orgBar');
+  const orgGrid = document.getElementById('orgGrid');
+  const orgFileName = document.getElementById('orgFileName');
+  const orgMeta = document.getElementById('orgMeta');
+  const orgRotateAllBtn = document.getElementById('orgRotateAllBtn');
+  const orgUndoBtn = document.getElementById('orgUndoBtn');
+  const orgResetBtn = document.getElementById('orgResetBtn');
+  const orgDownloadBtn = document.getElementById('orgDownloadBtn');
+  const orgError = document.getElementById('orgError');
+
+  let orgFile = null;
+  let orgSourceCount = 0;
+  let orgThumbs = []; // source index -> rendered thumbnail canvas
+  let orgPages = []; // in output order: { src: source page index, rot: extra clockwise degrees }
+  let orgDragFrom = -1;
+  let orgLoadSeq = 0;
+
+  function orgInitialPages() {
+    return Array.from({ length: orgSourceCount }, (_, i) => ({ src: i, rot: 0 }));
+  }
+
+  async function loadOrganizeFile(file) {
+    if (!file) return;
+    if (!isPdfFile(file)) {
+      showErrorIn(orgError, 'That file doesn’t look like a PDF. Please choose a .pdf file.');
+      return;
+    }
+    clearErrorIn(orgError);
+    const seq = ++orgLoadSeq;
+    try {
+      showStatus('Loading ' + file.name + '…', 4000);
+      const buf = await file.arrayBuffer();
+      const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+      if (seq !== orgLoadSeq) return;
+      orgFile = file;
+      orgSourceCount = doc.numPages;
+      orgPages = orgInitialPages();
+      orgThumbs = [];
+      orgFileName.textContent = file.name;
+      orgDropCard.hidden = true;
+      orgBar.hidden = false;
+      renderOrganize();
+      // Thumbnails render one at a time so large files stay responsive.
+      for (let i = 0; i < doc.numPages; i++) {
+        const page = await doc.getPage(i + 1);
+        const base = page.getViewport({ scale: 1 });
+        const viewport = page.getViewport({ scale: 140 / Math.max(base.width, base.height) });
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(viewport.width);
+        canvas.height = Math.round(viewport.height);
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        if (seq !== orgLoadSeq) return;
+        orgThumbs[i] = canvas;
+        orgGrid.querySelectorAll('[data-src="' + i + '"]').forEach((slot) => placeThumb(slot, i));
+      }
+      doc.destroy();
+      showStatus(orgSourceCount + ' page' + (orgSourceCount === 1 ? '' : 's') + ' loaded');
+    } catch (err) {
+      console.error(err);
+      showErrorIn(orgError, 'Could not open this PDF: ' + (err && err.message ? err.message : 'unknown error'));
+    }
+  }
+
+  function placeThumb(slot, src) {
+    const thumb = orgThumbs[src];
+    if (!thumb) return;
+    const entry = orgPages[Number(slot.dataset.pos)];
+    // Each card needs its own canvas; copy the rendered thumbnail.
+    const c = document.createElement('canvas');
+    c.width = thumb.width;
+    c.height = thumb.height;
+    c.getContext('2d').drawImage(thumb, 0, 0);
+    c.style.transform = 'rotate(' + (entry ? entry.rot : 0) + 'deg)';
+    slot.innerHTML = '';
+    slot.appendChild(c);
+  }
+
+  function renderOrganize() {
+    orgGrid.innerHTML = '';
+    const changed = orgPages.length !== orgSourceCount || orgPages.some((p, i) => p.src !== i || p.rot !== 0);
+    orgMeta.textContent = orgPages.length + ' of ' + orgSourceCount + ' page' + (orgSourceCount === 1 ? '' : 's') +
+      (changed ? ' · unsaved changes' : '');
+    orgUndoBtn.disabled = !changed;
+
+    orgPages.forEach((entry, pos) => {
+      const card = document.createElement('div');
+      card.className = 'org-card';
+      card.draggable = true;
+      card.dataset.pos = String(pos);
+
+      const slot = document.createElement('div');
+      slot.className = 'org-thumb';
+      slot.dataset.src = String(entry.src);
+      slot.dataset.pos = String(pos);
+      card.appendChild(slot);
+      placeThumb(slot, entry.src);
+
+      const label = document.createElement('div');
+      label.className = 'org-label';
+      label.innerHTML = '<b>' + (pos + 1) + '</b>' + (entry.src !== pos ? ' · was page ' + (entry.src + 1) : '') +
+        (entry.rot ? ' · ' + entry.rot + '°' : '');
+      card.appendChild(label);
+
+      const actions = document.createElement('div');
+      actions.className = 'org-actions';
+      const mk = (text, title, disabled, onClick, cls) => {
+        const b = document.createElement('button');
+        b.textContent = text;
+        b.title = title;
+        b.disabled = disabled;
+        if (cls) b.className = cls;
+        b.addEventListener('click', onClick);
+        actions.appendChild(b);
+      };
+      mk('↺', 'Rotate left', false, () => { entry.rot = (entry.rot + 270) % 360; renderOrganize(); });
+      mk('↻', 'Rotate right', false, () => { entry.rot = (entry.rot + 90) % 360; renderOrganize(); });
+      mk('←', 'Move earlier', pos === 0, () => { orgMove(pos, pos - 1); });
+      mk('→', 'Move later', pos === orgPages.length - 1, () => { orgMove(pos, pos + 1); });
+      mk('✕', 'Delete page', orgPages.length === 1, () => { orgPages.splice(pos, 1); renderOrganize(); }, 'del');
+      card.appendChild(actions);
+
+      card.addEventListener('dragstart', (e) => {
+        orgDragFrom = pos;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(pos));
+      });
+      card.addEventListener('dragend', () => {
+        orgDragFrom = -1;
+        card.classList.remove('dragging');
+        orgGrid.querySelectorAll('.drop-before, .drop-after').forEach((el) => el.classList.remove('drop-before', 'drop-after'));
+      });
+      card.addEventListener('dragover', (e) => {
+        if (orgDragFrom < 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const r = card.getBoundingClientRect();
+        const after = e.clientX > r.left + r.width / 2;
+        card.classList.toggle('drop-after', after);
+        card.classList.toggle('drop-before', !after);
+      });
+      card.addEventListener('dragleave', () => card.classList.remove('drop-before', 'drop-after'));
+      card.addEventListener('drop', (e) => {
+        if (orgDragFrom < 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const after = card.classList.contains('drop-after');
+        let to = pos + (after ? 1 : 0);
+        if (orgDragFrom < to) to -= 1;
+        orgMove(orgDragFrom, to);
+      });
+
+      orgGrid.appendChild(card);
+    });
+  }
+
+  function orgMove(from, to) {
+    if (from === to || to < 0 || to >= orgPages.length) { renderOrganize(); return; }
+    const [entry] = orgPages.splice(from, 1);
+    orgPages.splice(to, 0, entry);
+    renderOrganize();
+  }
+
+  orgFileInput.addEventListener('change', (e) => { loadOrganizeFile(e.target.files[0]); e.target.value = ''; });
+  ['dragenter', 'dragover'].forEach((evt) =>
+    orgDropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); orgDropzone.classList.add('dragging'); })
+  );
+  ['dragleave', 'drop'].forEach((evt) =>
+    orgDropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); orgDropzone.classList.remove('dragging'); })
+  );
+  orgDropzone.addEventListener('drop', (e) => loadOrganizeFile(e.dataTransfer.files[0]));
+
+  orgRotateAllBtn.addEventListener('click', () => {
+    orgPages.forEach((p) => { p.rot = (p.rot + 90) % 360; });
+    renderOrganize();
+  });
+  orgUndoBtn.addEventListener('click', () => {
+    orgPages = orgInitialPages();
+    renderOrganize();
+  });
+  orgResetBtn.addEventListener('click', () => {
+    orgLoadSeq++;
+    orgFile = null;
+    orgPages = [];
+    orgThumbs = [];
+    orgSourceCount = 0;
+    orgGrid.innerHTML = '';
+    orgBar.hidden = true;
+    orgDropCard.hidden = false;
+    clearErrorIn(orgError);
+  });
+
+  orgDownloadBtn.addEventListener('click', async () => {
+    if (!orgFile || !orgPages.length) return;
+    clearErrorIn(orgError);
+    orgDownloadBtn.disabled = true;
+    try {
+      showStatus('Building PDF…', 4000);
+      const { PDFDocument, degrees } = PDFLib;
+      const src = await PDFDocument.load(await orgFile.arrayBuffer(), { ignoreEncryption: true });
+      const out = await PDFDocument.create();
+      const copied = await out.copyPages(src, orgPages.map((p) => p.src));
+      copied.forEach((page, i) => {
+        const extra = orgPages[i].rot;
+        if (extra) page.setRotation(degrees((page.getRotation().angle + extra) % 360));
+        out.addPage(page);
+      });
+      const bytes = await out.save();
+      const name = orgFile.name.replace(/\.pdf$/i, '') + '-organized.pdf';
+      downloadBytes(bytes, name);
+      if (document.getElementById('orgSaveLib').checked) await libSave(new File([bytes], name, { type: 'application/pdf' }));
+      showStatus('Organized PDF downloaded');
+    } catch (err) {
+      console.error(err);
+      showErrorIn(orgError, 'Could not build the PDF: ' + (err && err.message ? err.message : 'unknown error'));
+    } finally {
+      orgDownloadBtn.disabled = false;
     }
   });
 
@@ -1432,7 +1755,7 @@
     if (!docs.length) {
       const empty = document.createElement('div');
       empty.className = 'lib-empty';
-      empty.textContent = 'Nothing saved yet. Add files above, or tick "save to Library" in Merge, Split, or Fill & Sign.';
+      empty.textContent = 'Nothing saved yet. Add files above, or tick "save to Library" in Merge, Split, Organize, or Fill & Sign.';
       libList.appendChild(empty);
     }
 
@@ -1471,6 +1794,7 @@
       mk('View', 'Open in the viewer', async () => { const f = await libAsFile(rec.id); setTab('view'); await loadFile(f); });
       mk('Merge', 'Add to the Merge list', async () => { const f = await libAsFile(rec.id); addMergeFiles([f]); setTab('merge'); showStatus('Added to Merge'); });
       mk('Split', 'Open in Split', async () => { const f = await libAsFile(rec.id); setTab('split'); await loadSplitFile(f); });
+      mk('Organize', 'Open in Organize', async () => { const f = await libAsFile(rec.id); setTab('organize'); await loadOrganizeFile(f); });
       mk('Sign', 'Open in Fill & Sign', async () => { const f = await libAsFile(rec.id); setTab('sign'); await loadSignFile(f); });
       mk('Download', 'Download a copy', async () => { const f = await libAsFile(rec.id); downloadBlob(f, rec.name); });
       mk('Delete', 'Remove from the Library', async () => {
