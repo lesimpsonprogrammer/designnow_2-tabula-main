@@ -45,7 +45,7 @@ A new concept: **if an organization could be described in one color, based on it
 
 - **Current Color Brand:** TDN generates it from the organization's look, feel, voice, and presence, using:
   - **Answers to a questionnaire** (the starting point), and
-  - **Ongoing observation** (it keeps updating over time, so it is a living color, not a one-time result).
+  - **Ongoing observation of work inside TDN only** (pages, colors, typography, copy). It keeps updating over time, so it is a living color, not a one-time result. No outside sources such as websites or social media.
 - **Target Color Brand:** the client selects the Color Brand they want to reach.
 - **The goal:** the client understands **what it takes to get from their current Color Brand to their target.** TDN shows both:
   - **Specific moves for each element** (logo, colors, typography, voice).
@@ -53,7 +53,6 @@ A new concept: **if an organization could be described in one color, based on it
 
 ## Open questions
 
-- What does TDN observe on an ongoing basis: the work done inside TDN (pages, colors, typography, copy), outside sources (website, social), or both?
 - How do Teams roles take part in the kit (for example, who designs, who approves)? The Logo Designer role and Asset Design Module are already reserved in the code.
 - What does approval of Brand Kit V1 look like, and what happens at V2?
 - Brand look of TDN itself within the Momentum family: Tabula gradient, family blue (as on CPSM), or both?
