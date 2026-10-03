@@ -508,53 +508,7 @@ button.active, .rail-tab.active { background: var(--surface-active-row); color: 
 @keyframes cloud-float { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(5px); } }
 @media (prefers-reduced-motion: reduce) { .cloud-artwork-float, .cloud-outline { animation: none; } }
 
-/* Floating navigation editor */
-.navigation-menu-panel {
-  position: absolute;
-  z-index: 20;
-  top: 52px;
-  right: 14px;
-  width: min(350px, calc(100% - 28px));
-  border: 1px solid var(--border-hover);
-  border-radius: 9px;
-  background: color-mix(in srgb, var(--surface-rail) 96%, transparent);
-  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.46);
-  backdrop-filter: blur(12px);
-  overflow: hidden;
-}
-.navigation-menu-panel.collapsed { width: 190px; }
-.navigation-menu-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 9px 10px 9px 12px;
-  border-bottom: 1px solid var(--border-default);
-}
-.navigation-menu-panel.collapsed .navigation-menu-header { border-bottom: 0; }
-.navigation-menu-header > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.navigation-menu-header span {
-  color: var(--text-primary);
-  font-size: 12px;
-  font-weight: 600;
-}
-.navigation-menu-header small { color: var(--text-meta); font-size: 10px; }
-.navigation-menu-header button { flex: 0 0 auto; width: 27px; height: 27px; padding: 0; }
-.navigation-menu-body { display: flex; flex-direction: column; max-height: min(720px, calc(100vh - 118px)); overflow-y: auto; }
-.navigation-menu-tabs { position: sticky; z-index: 1; top: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 8px 10px; background: var(--surface-rail); border-bottom: 1px solid var(--border-default); }
-.navigation-menu-tabs button { padding: 5px; border: 0; background: transparent; }
-.navigation-menu-tabs button.active { background: var(--surface-active-row); color: var(--text-primary); }
-.navigation-menu-tab-panel { display: flex; flex-direction: column; gap: 7px; padding: 10px; }
-.navigation-menu-body label { display: flex; flex-direction: column; gap: 4px; color: var(--text-label); font-size: 10px; }
-.navigation-menu-body input, .navigation-menu-body select {
-  min-width: 0;
-  padding: 6px 7px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-input);
-  background: var(--surface-drawer);
-  color: var(--text-primary);
-  font: 11px var(--font-ui);
-}
+/* Navigation content editor (Inspector) */
 .navigation-menu-label { color: var(--text-label); font-size: 10px; }
 .navigation-menu-item-editor { display: flex; flex-direction: column; gap: 5px; }
 .navigation-menu-row { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr) 28px; gap: 4px; }
@@ -571,21 +525,9 @@ button.active, .rail-tab.active { background: var(--surface-active-row); color: 
 .navigation-logo-upload input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .navigation-logo-remove { padding: 5px; color: var(--text-muted); background: transparent; }
 .navigation-logo-error { color: var(--danger); font-size: 10px; }
-.navigation-style-control { display: flex; flex-direction: column; gap: 4px; color: var(--text-label); font-size: 10px; }
-.navigation-segmented { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-.navigation-segmented button { padding: 5px 4px; }
 .navigation-number-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
 .navigation-number-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .navigation-number-grid input { width: 100%; box-sizing: border-box; }
-.navigation-color-row { display: flex; gap: 5px; }
-.navigation-color-row input[type="color"] { width: 34px; flex: 0 0 auto; padding: 2px; }
-.navigation-color-row input:not([type="color"]) { flex: 1; }
-.navigation-color-row button { padding-inline: 7px; }
-.navigation-range > span { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
-.navigation-range output { color: var(--text-secondary); font-family: var(--font-mono); }
-.navigation-range input[type="range"] { flex: 1; min-width: 0; padding-inline: 0; }
-.navigation-range input[type="number"] { width: 58px; flex: 0 0 auto; text-align: right; font-family: var(--font-mono); }
-.button-panel-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 3px; }
 
 /* Preview */
 .preview-shell {
@@ -695,6 +637,13 @@ button.active, .rail-tab.active { background: var(--surface-active-row); color: 
 
 /* Inspector */
 .inspector { display: flex; flex-direction: column; gap: 10px; }
+.inspector-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.inspector-section { border-top: 1px solid var(--border-default); }
+.inspector-section-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 10px 2px; border: 0; background: transparent; color: var(--text-secondary); font: 600 11px var(--font-ui); letter-spacing: .04em; text-transform: uppercase; }
+.inspector-section-toggle:hover:not(:disabled) { background: transparent; color: var(--text-primary); }
+.inspector-section-toggle span:last-child { color: var(--text-meta); font-size: 14px; }
+.inspector-section-body { display: flex; flex-direction: column; gap: 10px; padding: 2px 0 14px; }
+.inspector-nav-content { display: flex; flex-direction: column; gap: 8px; }
 .inspector-heading {
   display: flex;
   align-items: center;
@@ -719,9 +668,7 @@ button.active, .rail-tab.active { background: var(--surface-active-row); color: 
   font-size: 12px;
 }
 .inspector textarea { resize: vertical; line-height: 1.45; }
-.inspector-button-editor { display: flex; flex-direction: column; gap: 8px; }
 .inspector-field-label { color: var(--text-label); font-size: 11px; }
-.inspector-nav-note { margin: 0; line-height: 1.45; }
 .inspector-cloud-hero { width: 100%; border-style: dashed; color: var(--text-secondary); }
 .inspector-align { display: flex; flex-direction: column; gap: 4px; color: var(--text-label); font-size: 11px; }
 .inspector-align > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
