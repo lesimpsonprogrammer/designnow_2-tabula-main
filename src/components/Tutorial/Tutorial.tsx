@@ -95,7 +95,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
           { title: 'Work visually or in code', body: 'The canvas, Inspector, and Code Drawer work together so you can choose the level of control you need.' },
           { title: 'Keep control of your files', body: 'Autosave protects your local working state, while Save creates a portable Tabula project file.' },
         ],
-        tip: 'You can reopen this tutorial at any time from the Tutorial button in the header or Start Screen.',
+        tip: 'You can reopen this tutorial at any time from the account menu in the header or the Start Screen.',
       },
       {
         key: 'start-screen',
@@ -115,7 +115,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         title: 'Know the workspace',
         intro: 'Once a project is open, Tabula separates navigation, design, properties, and code so you can move quickly without losing context.',
         items: [
-          { title: 'Header', body: 'Shows the project identity, Undo/Redo, account tools, autosave state, Save/Open, Inspector, Preview, and Tutorial access.' },
+          { title: 'Header', body: 'Left: project name and autosave state. Center: Undo/Redo and completion. Right: File (Open/Save), Inspector, Preview, and the account menu with Tutorial, Organization, Settings, and Sign out.' },
           { title: 'Left rail', body: 'Use the left side for project structure and the tools that help you choose what you are working on.' },
           { title: 'Canvas', body: 'This is the visual working area where the current project is displayed and edited.' },
           { title: 'Inspector / right rail', body: 'Open Inspector to review and adjust the selected design and theme properties.' },
