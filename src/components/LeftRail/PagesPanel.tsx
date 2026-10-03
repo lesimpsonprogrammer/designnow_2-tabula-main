@@ -1,3 +1,4 @@
+import { MenuButton } from '../Menu/MenuButton';
 import { useTabulaStore } from '../../store/useTabulaStore';
 import type { Page } from '../../types';
 
@@ -146,6 +147,19 @@ export function PagesPanel() {
 
   return (
     <div className="pages-panel">
+      <div className="pages-actions">
+        <button type="button" onClick={() => addPage(null)}>+ Page</button>
+        <button type="button" onClick={addFolder} title="Add a folder (directory) for grouping pages">+ Folder</button>
+        <MenuButton className="pages-tools-trigger" title="Page tools" label={<span aria-hidden="true">⋯</span>}>
+          {(close) => (
+            <>
+              <button type="button" role="menuitem" onClick={() => { close(); applyHomeChromeToAllPages(); }}>Refresh shared Home elements</button>
+              <button type="button" role="menuitem" onClick={() => { close(); addSolutionsNavigation(); }}>Add or refresh Solutions menu</button>
+              <p className="menu-note">Home header, navigation, and footer are shared with every page automatically.</p>
+            </>
+          )}
+        </MenuButton>
+      </div>
       <div className="page-status-group live" onDragOver={(event) => event.preventDefault()} onDrop={(event) => dropPage(event, 'published')}>
         <div className="page-status-heading"><strong>Live &amp; posted</strong><span>{pages.filter((page) => page.status === 'published').length}</span></div>
         <div className="pages-list">{renderRows(liveRows)}</div>
@@ -156,13 +170,6 @@ export function PagesPanel() {
         <div className="pages-list">{renderRows(hiddenRows)}</div>
         <p className="page-drop-hint">Drag pages here to hide</p>
       </div>
-      <div className="pages-actions">
-        <button onClick={() => addPage(null)}>+ Page</button>
-        <button onClick={addFolder}>DIR</button>
-      </div>
-      <p className="pages-shared-note">Home header, navigation, and footer are shared automatically.</p>
-      <button type="button" className="pages-shared-chrome" onClick={applyHomeChromeToAllPages}>Refresh shared Home elements now</button>
-      <button type="button" className="pages-shared-chrome" onClick={addSolutionsNavigation}>Add or refresh Solutions menu</button>
     </div>
   );
 }

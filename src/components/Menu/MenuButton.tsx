@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
-type HeaderMenuProps = {
+type MenuButtonProps = {
   label: ReactNode;
   title: string;
   className?: string;
@@ -8,7 +8,7 @@ type HeaderMenuProps = {
   children: (close: () => void) => ReactNode;
 };
 
-export function HeaderMenu({ label, title, className = '', align = 'end', children }: HeaderMenuProps) {
+export function MenuButton({ label, title, className = '', align = 'end', children }: MenuButtonProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -31,10 +31,10 @@ export function HeaderMenu({ label, title, className = '', align = 'end', childr
   const close = () => setOpen(false);
 
   return (
-    <div className="header-menu" ref={rootRef}>
+    <div className="menu" ref={rootRef}>
       <button
         type="button"
-        className={`header-menu-trigger ${className}${open ? ' active' : ''}`}
+        className={`menu-trigger ${className}${open ? ' active' : ''}`}
         title={title}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -43,7 +43,7 @@ export function HeaderMenu({ label, title, className = '', align = 'end', childr
         {label}
       </button>
       {open ? (
-        <div className={`header-menu-popover align-${align}`} role="menu">
+        <div className={`menu-popover align-${align}`} role="menu">
           {children(close)}
         </div>
       ) : null}
