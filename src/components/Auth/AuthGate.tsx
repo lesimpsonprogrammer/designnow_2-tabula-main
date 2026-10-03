@@ -32,7 +32,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [setupError, setSetupError] = useState('');
 
   const [showAuthForm, setShowAuthForm] = useState(false);
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
+  const [recovering, setRecovering] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -57,7 +58,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    const { data } = client.auth.onAuthStateChange((_event, nextSession) => {
+    const { data } = client.auth.onAuthStateChange((event, nextSession) => {
+      if (event === 'PASSWORD_RECOVERY') setRecovering(true);
       setSession(nextSession);
       setLoading(false);
     });
@@ -131,9 +133,23 @@ export function AuthGate({ children }: { children: ReactNode }) {
     };
   }, [session, client, orgs, activeOrgId, isPlatformAdmin]);
 
+  const switchMode = (next: typeof mode) => {
+    setMode(next);
+    setMessage('');
+  };
+
   const submitAuth = async (event: FormEvent) => {
     event.preventDefault();
-    if (!client || !email.trim() || !password) return;
+    if (!client || !email.trim()) return;
+    if (mode === 'forgot') {
+      setBusy(true);
+      setMessage('');
+      const { error } = await client.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin });
+      setMessage(error ? error.message : 'If an account exists for that email, a password reset link is on its way.');
+      setBusy(false);
+      return;
+    }
+    if (!password) return;
     setBusy(true);
     setMessage('');
     if (mode === 'signup') {
@@ -148,6 +164,21 @@ export function AuthGate({ children }: { children: ReactNode }) {
       if (error) setMessage(error.message);
     }
     setBusy(false);
+  };
+
+  const submitNewPassword = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!client || password.length < 8) return;
+    setBusy(true);
+    setMessage('');
+    const { error } = await client.auth.updateUser({ password });
+    setBusy(false);
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    setPassword('');
+    setRecovering(false);
   };
 
   const createOrg = async (event: FormEvent) => {
@@ -230,23 +261,57 @@ export function AuthGate({ children }: { children: ReactNode }) {
         />
       );
     }
+    const title = mode === 'signup' ? 'Create your Tabula account' : mode === 'forgot' ? 'Reset your password' : 'Log in to Tabula';
     return (
       <main className="auth-screen">
         <section className="auth-card" aria-labelledby="auth-title">
           <span className="auth-brand">Tabula</span>
-          <h1 id="auth-title">{mode === 'signup' ? 'Create your account' : 'Sign in to your workspace'}</h1>
+          <h1 id="auth-title">{title}</h1>
+          {mode === 'forgot' ? <p>Enter your email and we’ll send you a link to choose a new password.</p> : null}
           <form onSubmit={submitAuth}>
             <label htmlFor="auth-email">Email address</label>
             <input id="auth-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@company.com" />
-            <label htmlFor="auth-password">Password</label>
-            <input id="auth-password" type="password" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 8 characters" />
-            <button type="submit" disabled={busy}>{busy ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}</button>
+            {mode !== 'forgot' ? (
+              <>
+                <div className="auth-label-row">
+                  <label htmlFor="auth-password">Password</label>
+                  {mode === 'signin' ? <button type="button" className="auth-text-link" onClick={() => switchMode('forgot')}>Forgot password?</button> : null}
+                </div>
+                <input id="auth-password" type="password" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 8 characters" />
+              </>
+            ) : null}
+            <button type="submit" disabled={busy}>
+              {busy ? 'Please wait…' : mode === 'signup' ? 'Create account' : mode === 'forgot' ? 'Send reset link' : 'Continue'}
+            </button>
           </form>
-          <button type="button" className="auth-switch-mode" onClick={() => { setMode(mode === 'signup' ? 'signin' : 'signup'); setMessage(''); }}>
-            {mode === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Create one"}
-          </button>
           {message ? <p className="auth-message" role="status">{message}</p> : null}
-          <button type="button" className="auth-back-link" onClick={() => setShowAuthForm(false)}>← Back</button>
+          <div className="auth-divider" />
+          {mode === 'forgot' ? (
+            <button type="button" className="auth-switch-mode" onClick={() => switchMode('signin')}>Remembered it? <strong>Log in</strong></button>
+          ) : (
+            <button type="button" className="auth-switch-mode" onClick={() => switchMode(mode === 'signup' ? 'signin' : 'signup')}>
+              {mode === 'signup' ? <>Already have an account? <strong>Log in</strong></> : <>Don’t have an account? <strong>Sign up</strong></>}
+            </button>
+          )}
+          <button type="button" className="auth-text-link auth-back-link" onClick={() => setShowAuthForm(false)}>← Back to home</button>
+        </section>
+      </main>
+    );
+  }
+
+  if (recovering) {
+    return (
+      <main className="auth-screen">
+        <section className="auth-card" aria-labelledby="recovery-title">
+          <span className="auth-brand">Tabula</span>
+          <h1 id="recovery-title">Choose a new password</h1>
+          <p>Signed in as {session.user.email}.</p>
+          <form onSubmit={submitNewPassword}>
+            <label htmlFor="recovery-password">New password</label>
+            <input id="recovery-password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 8 characters" />
+            <button type="submit" disabled={busy}>{busy ? 'Please wait…' : 'Update password'}</button>
+          </form>
+          {message ? <p className="auth-message" role="alert">{message}</p> : null}
         </section>
       </main>
     );
