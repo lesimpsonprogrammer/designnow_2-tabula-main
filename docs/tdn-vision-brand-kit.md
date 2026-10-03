@@ -51,8 +51,23 @@ A new concept: **if an organization could be described in one color, based on it
   - **Specific moves for each element** (logo, colors, typography, voice).
   - **A distance meter** that moves closer to the target as moves are made.
 
+## Teams: who does what
+
+| Brand Kit work | Who |
+| --- | --- |
+| Color Brand questionnaire | Org Admin |
+| Target Color Brand | Org Admin |
+| Typography and voice | Designer |
+| Logo concept approval | Org Admin |
+| Brand Kit V1 final approval | Org Admin, or a Section Leader when assigned |
+
+- **Org Admin signs off on all work.**
+- **Planned:** a delegation feature so the Org Admin can hand off approvals.
+
 ## Open questions
 
-- How do Teams roles take part in the kit (for example, who designs, who approves)? The Logo Designer role and Asset Design Module are already reserved in the code.
+- "Designer" for typography and voice: Site Designer, Logo Designer, or both? Who designs the logo concept itself?
+- In the Individual edition, does the single user fill every role above?
+- Delegation: what can the Org Admin delegate, and to which roles?
 - What does approval of Brand Kit V1 look like, and what happens at V2?
 - Brand look of TDN itself within the Momentum family: Tabula gradient, family blue (as on CPSM), or both?
