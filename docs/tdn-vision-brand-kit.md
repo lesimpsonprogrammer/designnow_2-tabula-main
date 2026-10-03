@@ -43,6 +43,12 @@ These are the moments that should deliver the rush:
 | Voice | How the brand sounds |
 | Color Brand | See below |
 
+### After approval
+
+- An approved Brand Kit is **stored in the background** as the organization's brand reference.
+- TDN **communicates when work goes outside the brand kit** (for example, a color, font, or tone that isn't in the kit).
+- This is guidance, not enforcement: **the design team keeps full autonomy** to use other preferences.
+
 ### Color Brand
 
 A new concept: **if an organization could be described in one color, based on its look, feel, voice, and presence, what would it be?**
@@ -75,5 +81,5 @@ A new concept: **if an organization could be described in one color, based on it
 ## Open questions
 
 - Delegation: what can the Org Admin delegate, and to which roles?
-- What does approval of Brand Kit V1 look like, and what happens at V2?
+- What starts a Brand Kit V2, and who can start it?
 - Brand look of TDN itself within the Momentum family: Tabula gradient (current app), blueprint/brass/paper (Sept 14 artifact), family blue (as on CPSM), or a mix?
