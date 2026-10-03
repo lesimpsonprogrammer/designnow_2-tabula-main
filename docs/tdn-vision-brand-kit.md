@@ -8,6 +8,10 @@ Tabula Design Now (TDN) is the latest addition to the **Momentum Technology Rese
 
 TDN provides an **ultra user design experience** for **Individuals** and for **Teams**.
 
+> **tabula**, n.: a tablet or board for writing; the blank slate every organization starts from, before its structure is drafted onto it.
+
+Earlier direction (Sept 14) lives in the Claude artifact "Tabula Design Now" (https://claude.ai/artifact/QjJ8r8sQDhSp7eAbu5Yacz). It covers the Organization Builder wizard, the five roles, and the Asset Design Module. Its visual language was blueprint blue, brass, and paper, set in Fraunces and IBM Plex.
+
 ## How it should feel
 
 > "They should feel like they have just gotten off a roller coaster and had a great time."
@@ -57,17 +61,20 @@ A new concept: **if an organization could be described in one color, based on it
 | --- | --- |
 | Color Brand questionnaire | Org Admin |
 | Target Color Brand | Org Admin |
-| Typography and voice | Designer |
+| Typography and voice | Site Designer |
+| Logo concept design | Logo Designer (Asset Design Module) |
 | Logo concept approval | Org Admin |
 | Brand Kit V1 final approval | Org Admin, or a Section Leader when assigned |
 
 - **Org Admin signs off on all work.**
 - **Planned:** a delegation feature so the Org Admin can hand off approvals.
+- Site Admin can do everything an Org Admin can except delete a project or approve the final file.
+- Asset Design Module access on launch: Org Admin, Site Admin, and Logo Designer by default; a Site Designer once the Org Admin approves.
 
 ## Open questions
 
-- "Designer" for typography and voice: Site Designer, Logo Designer, or both? Who designs the logo concept itself?
+- Confirm: Site Designer handles typography and voice, and Logo Designer designs logo concepts (inferred from the Sept 14 artifact).
 - In the Individual edition, does the single user fill every role above?
 - Delegation: what can the Org Admin delegate, and to which roles?
 - What does approval of Brand Kit V1 look like, and what happens at V2?
-- Brand look of TDN itself within the Momentum family: Tabula gradient, family blue (as on CPSM), or both?
+- Brand look of TDN itself within the Momentum family: Tabula gradient (current app), blueprint/brass/paper (Sept 14 artifact), family blue (as on CPSM), or a mix?
