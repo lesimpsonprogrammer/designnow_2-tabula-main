@@ -73,7 +73,6 @@ A new concept: **if an organization could be described in one color, based on it
 
 ## Open questions
 
-- Confirm: Site Designer handles typography and voice, and Logo Designer designs logo concepts (inferred from the Sept 14 artifact).
 - In the Individual edition, does the single user fill every role above?
 - Delegation: what can the Org Admin delegate, and to which roles?
 - What does approval of Brand Kit V1 look like, and what happens at V2?
