@@ -12,6 +12,11 @@ TDN provides an **ultra user design experience** for **Individuals** and for **T
 
 Earlier direction (Sept 14) lives in the Claude artifact "Tabula Design Now" (https://claude.ai/artifact/QjJ8r8sQDhSp7eAbu5Yacz). It covers the Organization Builder wizard, the five roles, and the Asset Design Module. Its visual language was blueprint blue, brass, and paper, set in Fraunces and IBM Plex.
 
+## TDN's own look
+
+- **Type:** a relaxed **Caveat** cursive (Google Font).
+- **Color:** a **blue to light purple gradient**.
+
 ## How it should feel
 
 > "They should feel like they have just gotten off a roller coaster and had a great time."
@@ -82,4 +87,4 @@ A new concept: **if an organization could be described in one color, based on it
 ## Open questions
 
 - Delegation: what can the Org Admin delegate, and to which roles?
-- Brand look of TDN itself within the Momentum family: Tabula gradient (current app), blueprint/brass/paper (Sept 14 artifact), family blue (as on CPSM), or a mix?
+- Where Caveat is used (wordmark, headlines, big moments) and which font carries body and interface text.
