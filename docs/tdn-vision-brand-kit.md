@@ -14,7 +14,7 @@ Earlier direction (Sept 14) lives in the Claude artifact "Tabula Design Now" (ht
 
 ## TDN's own look
 
-- **Type:** a relaxed **Caveat** cursive (Google Font).
+- **Type:** a relaxed **Caveat** cursive (Google Font), used **only on the name "Tabula"** (the wordmark).
 - **Color:** a **blue to light purple gradient**.
 
 ## How it should feel
@@ -87,4 +87,3 @@ A new concept: **if an organization could be described in one color, based on it
 ## Open questions
 
 - Delegation: what can the Org Admin delegate, and to which roles?
-- Where Caveat is used (wordmark, headlines, big moments) and which font carries body and interface text.
