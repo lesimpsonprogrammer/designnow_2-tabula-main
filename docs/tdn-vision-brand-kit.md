@@ -67,13 +67,13 @@ A new concept: **if an organization could be described in one color, based on it
 | Brand Kit V1 final approval | Org Admin, or a Section Leader when assigned |
 
 - **Org Admin signs off on all work.**
+- **Individual edition:** the single user does all of the above themselves.
 - **Planned:** a delegation feature so the Org Admin can hand off approvals.
 - Site Admin can do everything an Org Admin can except delete a project or approve the final file.
 - Asset Design Module access on launch: Org Admin, Site Admin, and Logo Designer by default; a Site Designer once the Org Admin approves.
 
 ## Open questions
 
-- In the Individual edition, does the single user fill every role above?
 - Delegation: what can the Org Admin delegate, and to which roles?
 - What does approval of Brand Kit V1 look like, and what happens at V2?
 - Brand look of TDN itself within the Momentum family: Tabula gradient (current app), blueprint/brass/paper (Sept 14 artifact), family blue (as on CPSM), or a mix?
