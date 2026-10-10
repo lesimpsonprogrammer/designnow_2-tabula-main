@@ -27,6 +27,9 @@
 .auth-message, .auth-loading { margin: 16px 0 0; color: #a1a1a1; font-size: 13px; line-height: 1.5; }
 .auth-text-link, .auth-card form .auth-text-link { min-height: 0; margin: 0; padding: 0; border: 0; background: transparent; color: #a1a1a1; font: 13px var(--font-ui); cursor: pointer; }
 .auth-text-link:hover:not(:disabled), .auth-card form .auth-text-link:hover:not(:disabled) { background: transparent; color: #ededed; text-decoration: underline; text-underline-offset: 3px; }
+.auth-help-list { margin: 20px 0 0; padding-left: 18px; color: #a1a1a1; font-size: 14px; line-height: 1.55; text-align: left; }
+.auth-help-list li + li { margin-top: 10px; }
+.auth-help-list a { color: #ededed; text-underline-offset: 3px; }
 .auth-divider { height: 1px; margin: 32px 0 20px; background: #262626; }
 .auth-switch-mode { display: block; width: 100%; padding: 6px 0; border: none; background: transparent; color: #a1a1a1; font: 14px var(--font-ui); text-align: center; }
 .auth-switch-mode strong { color: #ededed; font-weight: 500; }

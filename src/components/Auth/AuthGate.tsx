@@ -32,7 +32,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [setupError, setSetupError] = useState('');
 
   const [showAuthForm, setShowAuthForm] = useState(false);
-  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot' | 'forgot-email'>('signin');
   const [recovering, setRecovering] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -261,15 +261,29 @@ export function AuthGate({ children }: { children: ReactNode }) {
         />
       );
     }
-    const title = mode === 'signup' ? 'Create your Tabula account' : mode === 'forgot' ? 'Reset your password' : 'Log in to Tabula';
+    const title = mode === 'signup' ? 'Create your Tabula account' : mode === 'forgot' ? 'Reset your password' : mode === 'forgot-email' ? 'Find your sign-in email' : 'Log in to Tabula';
     return (
       <main className="auth-screen">
         <section className="auth-card" aria-labelledby="auth-title">
           <span className="auth-brand">Tabula</span>
           <h1 id="auth-title">{title}</h1>
           {mode === 'forgot' ? <p>Enter your email and we’ll send you a link to choose a new password.</p> : null}
+          {mode === 'forgot-email' ? (
+            <>
+              <p>Your email address is your Tabula username. To find the one you used:</p>
+              <ul className="auth-help-list">
+                <li>Search your inbox for an email from Tabula. Your sign-up confirmation or team invite went to that address.</li>
+                <li>On a team? Ask your Org Admin which email your invite was sent to.</li>
+                <li>Still stuck? Email <a href="mailto:hello@momentumdatasolutions.com">hello@momentumdatasolutions.com</a>.</li>
+              </ul>
+            </>
+          ) : null}
+          {mode !== 'forgot-email' ? (
           <form onSubmit={submitAuth}>
-            <label htmlFor="auth-email">Email address</label>
+            <div className="auth-label-row">
+              <label htmlFor="auth-email">Email address</label>
+              {mode === 'signin' ? <button type="button" className="auth-text-link" onClick={() => switchMode('forgot-email')}>Forgot email?</button> : null}
+            </div>
             <input id="auth-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@company.com" />
             {mode !== 'forgot' ? (
               <>
@@ -284,9 +298,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
               {busy ? 'Please wait…' : mode === 'signup' ? 'Create account' : mode === 'forgot' ? 'Send reset link' : 'Continue'}
             </button>
           </form>
+          ) : null}
           {message ? <p className="auth-message" role="status">{message}</p> : null}
           <div className="auth-divider" />
-          {mode === 'forgot' ? (
+          {mode === 'forgot' || mode === 'forgot-email' ? (
             <button type="button" className="auth-switch-mode" onClick={() => switchMode('signin')}>Remembered it? <strong>Log in</strong></button>
           ) : (
             <button type="button" className="auth-switch-mode" onClick={() => switchMode(mode === 'signup' ? 'signin' : 'signup')}>
