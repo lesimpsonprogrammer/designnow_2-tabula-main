@@ -5,7 +5,7 @@ import { useAuth } from '../Auth/AuthGate';
 import { LicenseAdmin } from '../LicenseAdmin/LicenseAdmin';
 import { useTeams } from '../Teams/TeamsProvider';
 import { useTutorial } from '../Tutorial/Tutorial';
-import { HeaderMenu } from './HeaderMenu';
+import { MenuButton } from '../Menu/MenuButton';
 
 const SAVE_LABEL = { error: 'Autosave failed', pending: 'Saving…', saved: 'Saved', idle: 'Autosave on' } as const;
 
@@ -88,7 +88,7 @@ export function Header() {
         ) : null}
         {fileError ? <span className="header-file-error" role="alert">{fileError}</span> : null}
 
-        <HeaderMenu label={<>File <span aria-hidden="true">▾</span></>} title="Open or download the project file">
+        <MenuButton label={<>File <span aria-hidden="true">▾</span></>} title="Open or download the project file">
           {(close) => (
             <>
               <button type="button" role="menuitem" onClick={() => { close(); projectInputRef.current?.click(); }}>
@@ -102,7 +102,7 @@ export function Header() {
               ) : null}
             </>
           )}
-        </HeaderMenu>
+        </MenuButton>
         <input
           ref={projectInputRef}
           className="project-file-input"
@@ -128,25 +128,25 @@ export function Header() {
         </button>
         <button type="button" className="header-primary" onClick={togglePreview}>{preview ? 'Edit' : 'Preview'}</button>
 
-        <HeaderMenu
+        <MenuButton
           className="header-account"
           title={`${org.name} · ${user.email}`}
           label={<span className="header-avatar" aria-hidden="true">{initials}</span>}
         >
           {(close) => (
             <>
-              <div className="header-menu-identity">
+              <div className="menu-identity">
                 <strong>{org.name}</strong>
                 <span>{user.email}</span>
                 {isTeamsEdition || isPlatformAdmin ? (
-                  <div className="header-menu-badges">
+                  <div className="menu-badges">
                     {isTeamsEdition ? <span className="trial-pill">Teams</span> : null}
                     {isPlatformAdmin ? <span className="trial-pill" title="Platform-wide developer visibility is active">Developer</span> : null}
                   </div>
                 ) : null}
               </div>
               <button type="button" role="menuitem" onClick={() => { close(); openTutorial(); }}>
-                Tutorial{tutorialCompleted ? <span className="header-menu-meta">Completed ✓</span> : null}
+                Tutorial{tutorialCompleted ? <span className="menu-meta">Completed ✓</span> : null}
               </button>
               {canOpenBuilder ? <button type="button" role="menuitem" onClick={() => { close(); openBuilder(); }}>Organization</button> : null}
               {canOpenSettings ? <button type="button" role="menuitem" onClick={() => { close(); openSettings(); }}>Settings</button> : null}
@@ -155,7 +155,7 @@ export function Header() {
               <button type="button" role="menuitem" onClick={() => { close(); void signOut(); }}>Sign out</button>
             </>
           )}
-        </HeaderMenu>
+        </MenuButton>
       </div>
       {licenseAdminOpen ? <LicenseAdmin onClose={() => setLicenseAdminOpen(false)} /> : null}
     </header>

@@ -1,7 +1,5 @@
 import { PageBar } from './PageBar';
 import { Canvas } from './Canvas';
-import { NavigationMenuPanel } from './NavigationMenuPanel';
-import { ButtonPanel } from './ButtonPanel';
 
 export function CanvasArea() {
   return (
@@ -10,8 +8,6 @@ export function CanvasArea() {
       <div className="canvas-scroll">
         <Canvas />
       </div>
-      <NavigationMenuPanel />
-      <ButtonPanel />
     </div>
   );
 }

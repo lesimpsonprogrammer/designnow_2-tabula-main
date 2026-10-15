@@ -11,7 +11,6 @@ type TemplateRow = [
 
 const MOMENTUM_ROWS: TemplateRow[] = [
   ['nav', 0, 0, '', { text: 'Momentum        Home    About    Compliance    Resources    Contact us', w: 900, h: 68, size: 13, bg: 'transparent', color: '#ffffff' }],
-  ['button', 762, 16, '', { text: 'Contact us', w: 110, h: 36, bg: 'transparent', color: '#ffffff', radius: 4 }],
   ['heading', 48, 118, '', { text: 'Four Disciplines.\nOne Team behind your Data and your People.', w: 620, h: 150, size: 42, color: '#ffffff' }],
   ['text', 48, 296, '', { text: 'Momentum Data Solutions prepares organizations for what comes next — clean data, sound project delivery, and the HR and payroll expertise to carry it through.', w: 560, h: 76, size: 15, color: '#d6dbe6' }],
   ['button', 48, 392, '', { text: 'Contact Sales', w: 168, h: 46, radius: 4, bg: '#ffffff', color: '#202a50' }],
@@ -63,7 +62,6 @@ const MOMENTUM_SECTIONS: Array<Omit<Section, 'id'>> = [
 
 const ABOUT_ROWS: TemplateRow[] = [
   ['nav', 0, 0, '', { text: 'Momentum        Home    About    Compliance    Resources    Contact us', w: 900, h: 68, size: 13, bg: 'transparent', color: '#ffffff' }],
-  ['button', 762, 16, '', { text: 'Contact us', w: 110, h: 36, bg: 'transparent', color: '#ffffff', radius: 4 }],
 
   ['eyebrow', 48, 126, '', { text: 'About Momentum', color: '#d6dbe6', w: 300 }],
   ['heading', 48, 166, '', { text: 'Sometimes big things come in small packages.', color: '#ffffff', size: 42, w: 700, h: 112 }],
@@ -117,7 +115,6 @@ const ABOUT_SECTIONS: Array<Omit<Section, 'id'>> = [
 
 const CONTACT_ROWS: TemplateRow[] = [
   ['nav', 0, 0, '', { text: 'Momentum        Home    About    Compliance    Resources    Contact us', w: 900, h: 68, size: 13, bg: 'transparent', color: '#ffffff' }],
-  ['button', 762, 16, '', { text: 'Contact us', href: '/contact-us', w: 110, h: 36, bg: 'transparent', color: '#ffffff', radius: 4 }],
 
   ['eyebrow', 48, 126, '', { text: 'Start a conversation', color: '#8dbfff', w: 280 }],
   ['heading', 48, 166, '', { text: 'Bring us the next data challenge.', color: '#ffffff', size: 44, w: 650, h: 112 }],

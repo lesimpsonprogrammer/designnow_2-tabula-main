@@ -1,7 +1,39 @@
 import { useState } from 'react';
-import type { FocusEventHandler } from 'react';
+import type { FocusEventHandler, ReactNode } from 'react';
 import { useTabulaStore } from '../../store/useTabulaStore';
 import { FONT_OPTIONS, TYPOGRAPHY_PRESETS } from '../../lib/fonts';
+import { NavigationContent } from './NavigationContent';
+
+type SectionKey = 'content' | 'layout' | 'text' | 'appearance';
+const SECTIONS_KEY = 'tabula.inspector.sections';
+const DEFAULT_SECTIONS: Record<SectionKey, boolean> = { content: true, layout: true, text: false, appearance: false };
+
+function readOpenSections(): Record<SectionKey, boolean> {
+  try {
+    return { ...DEFAULT_SECTIONS, ...JSON.parse(window.localStorage.getItem(SECTIONS_KEY) ?? '{}') };
+  } catch {
+    return DEFAULT_SECTIONS;
+  }
+}
+
+type InspectorSectionProps = {
+  title: string;
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+};
+
+function InspectorSection({ title, open, onToggle, children }: InspectorSectionProps) {
+  return (
+    <section className={`inspector-section${open ? ' open' : ''}`}>
+      <button type="button" className="inspector-section-toggle" aria-expanded={open} onClick={onToggle}>
+        <span>{title}</span>
+        <span aria-hidden="true">{open ? '−' : '+'}</span>
+      </button>
+      {open ? <div className="inspector-section-body">{children}</div> : null}
+    </section>
+  );
+}
 
 type NumberFieldProps = {
   label: string;
@@ -164,6 +196,18 @@ export function Inspector() {
   const [liftStrength, setLiftStrength] = useState(50);
   const [backgroundTolerance, setBackgroundTolerance] = useState(34);
   const [backgroundBusy, setBackgroundBusy] = useState(false);
+  const [openSections, setOpenSections] = useState(readOpenSections);
+  const toggleSection = (key: SectionKey) => setOpenSections((current) => {
+    const next = { ...current, [key]: !current[key] };
+    try {
+      window.localStorage.setItem(SECTIONS_KEY, JSON.stringify(next));
+    } catch {
+      // Section state is a convenience; ignore storage failures.
+    }
+    return next;
+  });
+  const sectionProps = (key: SectionKey) => ({ open: openSections[key], onToggle: () => toggleSection(key) });
+  const setAllButtonSize = useTabulaStore((s) => s.setAllButtonSize);
   const objects = useTabulaStore((s) => s.objects);
   const sections = useTabulaStore((s) => s.sections);
   const selectedId = useTabulaStore((s) => s.selectedId);
@@ -205,6 +249,20 @@ export function Inspector() {
           <span>{obj.kind}</span>
           <span>{obj.id}</span>
         </div>
+        <div className="inspector-actions">
+          <button type="button" onClick={duplicateSelected}>Duplicate</button>
+          <button
+            type="button"
+            className="danger-button"
+            onClick={() => {
+              snapshot();
+              removeObject(obj.id);
+            }}
+          >
+            Delete
+          </button>
+        </div>
+
 
         {obj.groupId ? (
           <div className="inspector-group-status">
@@ -216,295 +274,308 @@ export function Inspector() {
           </div>
         ) : null}
 
-        {obj.kind === 'icon' ? (
-          <label>
-            Icon
-            <select value={obj.iconName} onFocus={beginEdit} onChange={(event) => patch({ iconName: event.target.value as typeof obj.iconName })}>
-              <option value="database">Database</option>
-              <option value="workflow">Workflow</option>
-              <option value="users">People</option>
-              <option value="calculator">Payroll</option>
-              <option value="linkedin">LinkedIn</option>
-              <option value="facebook">Facebook</option>
-              <option value="instagram">Instagram</option>
-              <option value="youtube">YouTube</option>
-              <option value="x">X</option>
-            </select>
-            <span>Destination URL</span>
-            <input value={obj.href} placeholder="https://" onFocus={beginEdit} onChange={(event) => patch({ href: event.target.value })} />
-          </label>
-        ) : null}
 
-        {obj.kind === 'nav' ? (
-          <p className="inspector-note inspector-nav-note">Menu content is available in the floating Navigation panel beside the canvas.</p>
-        ) : obj.kind === 'button' ? (
-          <p className="inspector-note inspector-nav-note">Button content and design are available in the floating Button panel beside the canvas.</p>
-        ) : obj.kind === 'icon' ? (
-          <p className="inspector-note">Choose the symbol below, then use Ink to recolor it.</p>
-        ) : obj.kind === 'image' || obj.kind === 'logo' ? (
-          <div className="inspector-image-upload">
+        <InspectorSection title="Content" {...sectionProps('content')}>
+            {obj.kind === 'icon' ? (
+              <label>
+                Icon
+                <select value={obj.iconName} onFocus={beginEdit} onChange={(event) => patch({ iconName: event.target.value as typeof obj.iconName })}>
+                  <option value="database">Database</option>
+                  <option value="workflow">Workflow</option>
+                  <option value="users">People</option>
+                  <option value="calculator">Payroll</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="youtube">YouTube</option>
+                  <option value="x">X</option>
+                </select>
+                <span>Destination URL</span>
+                <input value={obj.href} placeholder="https://" onFocus={beginEdit} onChange={(event) => patch({ href: event.target.value })} />
+              </label>
+            ) : null}
+
+            {obj.kind === 'nav' ? (
+              <NavigationContent navigationObject={obj} />
+            ) : obj.kind === 'button' ? (
+              <>
+                <label>Button label<input value={obj.text} onFocus={beginEdit} onChange={(event) => patch({ text: event.target.value })} /></label>
+                <label>Destination URL<input value={obj.href || '#'} placeholder="https:// or /page" onFocus={beginEdit} onChange={(event) => patch({ href: event.target.value })} /></label>
+                <button type="button" className="inspector-auto" onClick={() => setAllButtonSize(148, 42)}>Apply 148 × 42 to every site button</button>
+              </>
+            ) : obj.kind === 'icon' ? (
+              <p className="inspector-note">Choose the symbol below, then use Ink to recolor it.</p>
+            ) : obj.kind === 'image' || obj.kind === 'logo' ? (
+              <div className="inspector-image-upload">
+                <label>
+                  {obj.kind === 'logo' ? 'Logo file' : 'Image file'}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (!file) return;
+                      snapshot();
+                      const reader = new FileReader();
+                      reader.onload = () => patch({ imageSrc: String(reader.result), imageOriginalSrc: '', label: obj.label || file.name.replace(/\.[^.]+$/, '') });
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </label>
+                <label>{obj.kind === 'logo' ? 'Logo alt text' : 'Alt text'}<input value={obj.label} onFocus={beginEdit} onChange={(event) => patch({ label: event.target.value })} /></label>
+                {obj.imageSrc ? (
+                  <div className="inspector-background-removal">
+                    <label className="inspector-range">
+                      <span>Background tolerance <output>{backgroundTolerance}</output></span>
+                      <input type="range" min={8} max={80} value={backgroundTolerance} onChange={(event) => setBackgroundTolerance(Number(event.target.value))} />
+                    </label>
+                    <button
+                      type="button"
+                      disabled={backgroundBusy}
+                      onClick={async () => {
+                        setBackgroundBusy(true);
+                        try {
+                          const original = obj.imageOriginalSrc || obj.imageSrc;
+                          const imageSrc = await removeConnectedImageBackground(original, backgroundTolerance);
+                          snapshot();
+                          patch({ imageSrc, imageOriginalSrc: original });
+                        } finally {
+                          setBackgroundBusy(false);
+                        }
+                      }}
+                    >
+                      {backgroundBusy ? 'Removing background…' : 'Remove background'}
+                    </button>
+                    {obj.imageOriginalSrc ? <button type="button" onClick={() => { snapshot(); patch({ imageSrc: obj.imageOriginalSrc, imageOriginalSrc: '' }); }}>Restore original background</button> : null}
+                    <small>Best for solid or nearly solid backgrounds connected to the image edges.</small>
+                  </div>
+                ) : null}
+                {obj.imageSrc ? <button type="button" onClick={() => { snapshot(); patch({ imageSrc: '', imageOriginalSrc: '' }); }}>Remove {obj.kind}</button> : null}
+              </div>
+            ) : (
+              <label>
+                Text
+                <textarea
+                  value={obj.text}
+                  rows={4}
+                  onFocus={beginEdit}
+                  onSelect={(event) => setTextSelection({ start: event.currentTarget.selectionStart, end: event.currentTarget.selectionEnd })}
+                  onChange={(event) => patch({ text: event.target.value, textColors: [], textItalics: [] })}
+                />
+              </label>
+            )}
+        </InspectorSection>
+
+        <InspectorSection title="Layout" {...sectionProps('layout')}>
+            <div className="inspector-grid">
+              <NumberField label="X" value={obj.x} onFocus={beginEdit} onChange={(x) => patch({ x })} />
+              <NumberField label="Y" value={obj.y} onFocus={beginEdit} onChange={(y) => patch({ y })} />
+              <NumberField label="Width" value={obj.w} min={16} onFocus={beginEdit} onChange={(w) => patch({ w: Math.max(16, w) })} />
+              <NumberField label="Height" value={obj.h} min={1} onFocus={beginEdit} onChange={(h) => patch({ h: Math.max(1, h) })} />
+            </div>
+        </InspectorSection>
+
+        <InspectorSection title="Text" {...sectionProps('text')}>
             <label>
-              {obj.kind === 'logo' ? 'Logo file' : 'Image file'}
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (!file) return;
-                  snapshot();
-                  const reader = new FileReader();
-                  reader.onload = () => patch({ imageSrc: String(reader.result), imageOriginalSrc: '', label: obj.label || file.name.replace(/\.[^.]+$/, '') });
-                  reader.readAsDataURL(file);
-                }}
-              />
+              Font
+              <select value={obj.fontFamily} onFocus={beginEdit} onChange={(event) => patch({ fontFamily: event.target.value })}>
+                <option value="">Project theme font</option>
+                {FONT_OPTIONS.map((font) => <option key={font.label} value={font.value}>{font.label}</option>)}
+              </select>
             </label>
-            <label>{obj.kind === 'logo' ? 'Logo alt text' : 'Alt text'}<input value={obj.label} onFocus={beginEdit} onChange={(event) => patch({ label: event.target.value })} /></label>
-            {obj.imageSrc ? (
-              <div className="inspector-background-removal">
-                <label className="inspector-range">
-                  <span>Background tolerance <output>{backgroundTolerance}</output></span>
-                  <input type="range" min={8} max={80} value={backgroundTolerance} onChange={(event) => setBackgroundTolerance(Number(event.target.value))} />
+            <NumberField label="Size" value={obj.size} min={1} onFocus={beginEdit} onChange={(size) => patch({ size: Math.max(1, size) })} />
+            <div className="inspector-align">
+              <span>Text alignment</span>
+              <div role="group" aria-label="Text alignment">
+                {(['left', 'center', 'right'] as const).map((align) => (
+                  <button
+                    key={align}
+                    type="button"
+                    className={(obj.align ?? 'left') === align ? 'active' : ''}
+                    aria-pressed={(obj.align ?? 'left') === align}
+                    onClick={() => {
+                      snapshot();
+                      patch({ align });
+                    }}
+                  >
+                    {align === 'left' ? 'Left' : align === 'center' ? 'Center' : 'Right'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="inspector-align">
+              <span>Vertical alignment</span>
+              <div role="group" aria-label="Vertical alignment">
+                {(['top', 'middle', 'bottom'] as const).map((vAlign) => (
+                  <button
+                    key={vAlign}
+                    type="button"
+                    className={(obj.vAlign ?? 'top') === vAlign ? 'active' : ''}
+                    aria-pressed={(obj.vAlign ?? 'top') === vAlign}
+                    onClick={() => {
+                      snapshot();
+                      patch({ vAlign });
+                    }}
+                  >
+                    {vAlign === 'top' ? 'Top' : vAlign === 'middle' ? 'Middle' : 'Bottom'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {obj.kind === 'heading' || obj.kind === 'subhead' ? (
+              <label>
+                Typography preset
+                <select
+                  aria-label="Typography preset for selected heading"
+                  value={TYPOGRAPHY_PRESETS.find((preset) => preset.head === obj.fontFamily)?.name ?? ''}
+                  onFocus={beginEdit}
+                  onChange={(event) => {
+                    const preset = TYPOGRAPHY_PRESETS.find((candidate) => candidate.name === event.target.value);
+                    patch({ fontFamily: preset?.head ?? '' });
+                  }}
+                >
+                  <option value="">Project theme typography</option>
+                  {TYPOGRAPHY_PRESETS.map((preset) => (
+                    <option key={preset.name} value={preset.name}>{preset.name}</option>
+                  ))}
+                </select>
+                <small>Applies to this selected heading only. Momentum Hand Script pairs with DM Sans body text.</small>
+              </label>
+            ) : null}
+            {obj.text ? (
+              <div className="inspector-text-spacing">
+                <RangeField label="Word spacing" value={obj.wordSpacing ?? 0} min={-10} max={40} onFocus={beginEdit} onChange={(wordSpacing) => patch({ wordSpacing })} />
+                <RangeField label="Sentence spacing" value={obj.sentenceSpacing ?? 0} min={0} max={80} onFocus={beginEdit} onChange={(sentenceSpacing) => patch({ sentenceSpacing })} />
+                <small>Word spacing changes every gap. Sentence spacing adds room after periods, question marks, and exclamation marks.</small>
+              </div>
+            ) : null}
+            <div className="inspector-format" role="group" aria-label="Text formatting">
+              <button
+                type="button"
+                className={(hasTextSelection ? selectionIsItalic : obj.italic) ? 'active' : ''}
+                aria-pressed={hasTextSelection ? selectionIsItalic : obj.italic}
+                onClick={() => {
+                  snapshot();
+                  if (!hasTextSelection) {
+                    patch({ italic: !obj.italic });
+                    return;
+                  }
+                  const existing = obj.textItalics ?? [];
+                  if (selectionIsItalic) {
+                    const next = existing.flatMap((range) => {
+                      if (range.end <= textSelection.start || range.start >= textSelection.end) return [range];
+                      return [
+                        ...(range.start < textSelection.start ? [{ ...range, end: textSelection.start }] : []),
+                        ...(range.end > textSelection.end ? [{ ...range, start: textSelection.end }] : []),
+                      ];
+                    });
+                    patch({ textItalics: next });
+                    return;
+                  }
+                  patch({ textItalics: [...existing, { start: textSelection.start, end: textSelection.end }] });
+                }}
+              ><em>I</em> {hasTextSelection ? 'Italic selected text' : 'Italic entire object'}</button>
+            </div>
+            {!['nav', 'button', 'icon', 'image', 'logo'].includes(obj.kind) ? (
+              <div className="inspector-selection-color">
+                <label>
+                  Selection color
+                  <span className="inspector-color-row">
+                    <input className="inspector-color" type="color" value={selectionColor} onChange={(event) => setSelectionColor(event.target.value)} />
+                    <input className="inspector-hex" aria-label="Selection color hex value" value={selectionColor} onChange={(event) => setSelectionColor(event.target.value)} />
+                  </span>
                 </label>
                 <button
                   type="button"
-                  disabled={backgroundBusy}
-                  onClick={async () => {
-                    setBackgroundBusy(true);
-                    try {
-                      const original = obj.imageOriginalSrc || obj.imageSrc;
-                      const imageSrc = await removeConnectedImageBackground(original, backgroundTolerance);
-                      snapshot();
-                      patch({ imageSrc, imageOriginalSrc: original });
-                    } finally {
-                      setBackgroundBusy(false);
-                    }
+                  disabled={textSelection.start === textSelection.end || !/^#[0-9a-f]{6}$/i.test(selectionColor)}
+                  onClick={() => {
+                    snapshot();
+                    const nextRanges = (obj.textColors ?? []).flatMap((range) => {
+                      if (range.end <= textSelection.start || range.start >= textSelection.end) return [range];
+                      return [
+                        ...(range.start < textSelection.start ? [{ ...range, end: textSelection.start }] : []),
+                        ...(range.end > textSelection.end ? [{ ...range, start: textSelection.end }] : []),
+                      ];
+                    });
+                    patch({ textColors: [...nextRanges, { start: textSelection.start, end: textSelection.end, color: selectionColor }] });
                   }}
                 >
-                  {backgroundBusy ? 'Removing background…' : 'Remove background'}
+                  Apply to selected text
                 </button>
-                {obj.imageOriginalSrc ? <button type="button" onClick={() => { snapshot(); patch({ imageSrc: obj.imageOriginalSrc, imageOriginalSrc: '' }); }}>Restore original background</button> : null}
-                <small>Best for solid or nearly solid backgrounds connected to the image edges.</small>
+                <RangeField label="Lift strength" value={liftStrength} min={0} max={100} onFocus={() => undefined} onChange={setLiftStrength} />
+                <button
+                  type="button"
+                  disabled={textSelection.start === textSelection.end || !/^#[0-9a-f]{6}$/i.test(selectionColor)}
+                  onClick={() => {
+                    snapshot();
+                    const nextRanges = (obj.textColors ?? []).flatMap((range) => {
+                      if (range.end <= textSelection.start || range.start >= textSelection.end) return [range];
+                      return [
+                        ...(range.start < textSelection.start ? [{ ...range, end: textSelection.start }] : []),
+                        ...(range.end > textSelection.end ? [{ ...range, start: textSelection.end }] : []),
+                      ];
+                    });
+                    patch({ textColors: [...nextRanges, { start: textSelection.start, end: textSelection.end, color: selectionColor, shadow: liftStrength > 0, lift: liftStrength }] });
+                  }}
+                >
+                  Lift selected text
+                </button>
+                <small>{textSelection.start === textSelection.end ? 'Highlight text above to color only that part.' : `Applies to ${textSelection.end - textSelection.start} selected characters.`}</small>
               </div>
             ) : null}
-            {obj.imageSrc ? <button type="button" onClick={() => { snapshot(); patch({ imageSrc: '', imageOriginalSrc: '' }); }}>Remove {obj.kind}</button> : null}
-          </div>
-        ) : (
-          <label>
-            Text
-            <textarea
-              value={obj.text}
-              rows={4}
-              onFocus={beginEdit}
-              onSelect={(event) => setTextSelection({ start: event.currentTarget.selectionStart, end: event.currentTarget.selectionEnd })}
-              onChange={(event) => patch({ text: event.target.value, textColors: [], textItalics: [] })}
-            />
-          </label>
-        )}
+        </InspectorSection>
 
-        <div className="inspector-align">
-          <span>Text alignment</span>
-          <div role="group" aria-label="Text alignment">
-            {(['left', 'center', 'right'] as const).map((align) => (
-              <button
-                key={align}
-                type="button"
-                className={(obj.align ?? 'left') === align ? 'active' : ''}
-                aria-pressed={(obj.align ?? 'left') === align}
-                onClick={() => {
-                  snapshot();
-                  patch({ align });
-                }}
-              >
-                {align === 'left' ? 'Left' : align === 'center' ? 'Center' : 'Right'}
-              </button>
-            ))}
-          </div>
-        </div>
+        <InspectorSection title="Appearance" {...sectionProps('appearance')}>
+            <ColorField label="Fill" value={obj.bg} allowNone onFocus={beginEdit} onChange={(bg) => patch({ bg })} />
+            {obj.kind === 'divider' ? (
+              <label className="inspector-check"><input type="checkbox" checked={obj.dividerGradient} onChange={(event) => { snapshot(); patch({ dividerGradient: event.target.checked }); }} /> Fade divider ends</label>
+            ) : null}
+            <ColorField label="Ink" value={obj.color} onFocus={beginEdit} onChange={(color) => patch({ color })} />
+            <ColorField label="Edge" value={obj.bc} allowNone onFocus={beginEdit} onChange={(bc) => patch({ bc, bw: bc === 'transparent' ? 0 : obj.bw })} />
 
-        <div className="inspector-align">
-          <span>Vertical alignment</span>
-          <div role="group" aria-label="Vertical alignment">
-            {(['top', 'middle', 'bottom'] as const).map((vAlign) => (
-              <button
-                key={vAlign}
-                type="button"
-                className={(obj.vAlign ?? 'top') === vAlign ? 'active' : ''}
-                aria-pressed={(obj.vAlign ?? 'top') === vAlign}
-                onClick={() => {
-                  snapshot();
-                  patch({ vAlign });
-                }}
-              >
-                {vAlign === 'top' ? 'Top' : vAlign === 'middle' ? 'Middle' : 'Bottom'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="inspector-grid inspector-grid-3">
-          <NumberField label="X" value={obj.x} onFocus={beginEdit} onChange={(x) => patch({ x })} />
-          <NumberField label="Y" value={obj.y} onFocus={beginEdit} onChange={(y) => patch({ y })} />
-          <NumberField label="Size" value={obj.size} min={1} onFocus={beginEdit} onChange={(size) => patch({ size: Math.max(1, size) })} />
-        </div>
-        <label>
-          Font
-          <select value={obj.fontFamily} onFocus={beginEdit} onChange={(event) => patch({ fontFamily: event.target.value })}>
-            <option value="">Project theme font</option>
-            {FONT_OPTIONS.map((font) => <option key={font.label} value={font.value}>{font.label}</option>)}
-          </select>
-        </label>
-        {obj.kind === 'heading' || obj.kind === 'subhead' ? (
-          <label>
-            Typography preset
-            <select
-              aria-label="Typography preset for selected heading"
-              value={TYPOGRAPHY_PRESETS.find((preset) => preset.head === obj.fontFamily)?.name ?? ''}
-              onFocus={beginEdit}
-              onChange={(event) => {
-                const preset = TYPOGRAPHY_PRESETS.find((candidate) => candidate.name === event.target.value);
-                patch({ fontFamily: preset?.head ?? '' });
-              }}
-            >
-              <option value="">Project theme typography</option>
-              {TYPOGRAPHY_PRESETS.map((preset) => (
-                <option key={preset.name} value={preset.name}>{preset.name}</option>
-              ))}
-            </select>
-            <small>Applies to this selected heading only. Momentum Hand Script pairs with DM Sans body text.</small>
-          </label>
-        ) : null}
-        {obj.text ? (
-          <div className="inspector-text-spacing">
-            <RangeField label="Word spacing" value={obj.wordSpacing ?? 0} min={-10} max={40} onFocus={beginEdit} onChange={(wordSpacing) => patch({ wordSpacing })} />
-            <RangeField label="Sentence spacing" value={obj.sentenceSpacing ?? 0} min={0} max={80} onFocus={beginEdit} onChange={(sentenceSpacing) => patch({ sentenceSpacing })} />
-            <small>Word spacing changes every gap. Sentence spacing adds room after periods, question marks, and exclamation marks.</small>
-          </div>
-        ) : null}
-        <div className="inspector-format" role="group" aria-label="Text formatting">
-          <button
-            type="button"
-            className={(hasTextSelection ? selectionIsItalic : obj.italic) ? 'active' : ''}
-            aria-pressed={hasTextSelection ? selectionIsItalic : obj.italic}
-            onClick={() => {
-              snapshot();
-              if (!hasTextSelection) {
-                patch({ italic: !obj.italic });
-                return;
-              }
-              const existing = obj.textItalics ?? [];
-              if (selectionIsItalic) {
-                const next = existing.flatMap((range) => {
-                  if (range.end <= textSelection.start || range.start >= textSelection.end) return [range];
-                  return [
-                    ...(range.start < textSelection.start ? [{ ...range, end: textSelection.start }] : []),
-                    ...(range.end > textSelection.end ? [{ ...range, start: textSelection.end }] : []),
-                  ];
-                });
-                patch({ textItalics: next });
-                return;
-              }
-              patch({ textItalics: [...existing, { start: textSelection.start, end: textSelection.end }] });
-            }}
-          ><em>I</em> {hasTextSelection ? 'Italic selected text' : 'Italic entire object'}</button>
-        </div>
-        {!['nav', 'button', 'icon', 'image', 'logo'].includes(obj.kind) ? (
-          <div className="inspector-selection-color">
-            <label>
-              Selection color
-              <span className="inspector-color-row">
-                <input className="inspector-color" type="color" value={selectionColor} onChange={(event) => setSelectionColor(event.target.value)} />
-                <input className="inspector-hex" aria-label="Selection color hex value" value={selectionColor} onChange={(event) => setSelectionColor(event.target.value)} />
+            <RangeField label="Radius" value={obj.radius} min={0} max={60} onFocus={beginEdit} onChange={(radius) => patch({ radius })} />
+            <label className="inspector-range">
+              <span>Padding <output>{obj.pad === null ? 'auto' : obj.pad}</output></span>
+              <span className="inspector-range-controls">
+                <input
+                  type="range"
+                  min={0}
+                  max={64}
+                  value={obj.pad ?? 0}
+                  onFocus={beginEdit}
+                  onChange={(event) => patch({ pad: Number(event.target.value) })}
+                />
+                <input
+                  className="inspector-range-number"
+                  type="number"
+                  min={0}
+                  max={64}
+                  value={obj.pad ?? ''}
+                  placeholder="Auto"
+                  onFocus={beginEdit}
+                  onChange={(event) => patch({
+                    pad: event.target.value === '' ? null : clamp(Number(event.target.value), 0, 64),
+                  })}
+                  aria-label="Padding value"
+                />
               </span>
+              <button type="button" className="inspector-auto" onClick={() => patch({ pad: null })}>Use automatic padding</button>
             </label>
+            <RangeField label="Border" value={obj.bw} min={0} max={12} onFocus={beginEdit} onChange={(bw) => patch({ bw })} />
+            <RangeField label="Opacity" value={obj.opacity} min={10} max={100} onFocus={beginEdit} onChange={(opacity) => patch({ opacity })} />
+
             <button
               type="button"
-              disabled={textSelection.start === textSelection.end || !/^#[0-9a-f]{6}$/i.test(selectionColor)}
-              onClick={() => {
-                snapshot();
-                const nextRanges = (obj.textColors ?? []).flatMap((range) => {
-                  if (range.end <= textSelection.start || range.start >= textSelection.end) return [range];
-                  return [
-                    ...(range.start < textSelection.start ? [{ ...range, end: textSelection.start }] : []),
-                    ...(range.end > textSelection.end ? [{ ...range, start: textSelection.end }] : []),
-                  ];
-                });
-                patch({ textColors: [...nextRanges, { start: textSelection.start, end: textSelection.end, color: selectionColor }] });
-              }}
+              className="inspector-copy-style"
+              disabled={otherObjectsInSection === 0}
+              onClick={() => setCopyDialogOpen(true)}
             >
-              Apply to selected text
+              Copy design to section ({otherObjectsInSection})
             </button>
-            <RangeField label="Lift strength" value={liftStrength} min={0} max={100} onFocus={() => undefined} onChange={setLiftStrength} />
-            <button
-              type="button"
-              disabled={textSelection.start === textSelection.end || !/^#[0-9a-f]{6}$/i.test(selectionColor)}
-              onClick={() => {
-                snapshot();
-                const nextRanges = (obj.textColors ?? []).flatMap((range) => {
-                  if (range.end <= textSelection.start || range.start >= textSelection.end) return [range];
-                  return [
-                    ...(range.start < textSelection.start ? [{ ...range, end: textSelection.start }] : []),
-                    ...(range.end > textSelection.end ? [{ ...range, start: textSelection.end }] : []),
-                  ];
-                });
-                patch({ textColors: [...nextRanges, { start: textSelection.start, end: textSelection.end, color: selectionColor, shadow: liftStrength > 0, lift: liftStrength }] });
-              }}
-            >
-              Lift selected text
-            </button>
-            <small>{textSelection.start === textSelection.end ? 'Highlight text above to color only that part.' : `Applies to ${textSelection.end - textSelection.start} selected characters.`}</small>
-          </div>
-        ) : null}
-        <div className="inspector-grid">
-          <NumberField label="Width" value={obj.w} min={16} onFocus={beginEdit} onChange={(w) => patch({ w: Math.max(16, w) })} />
-          <NumberField label="Height" value={obj.h} min={1} onFocus={beginEdit} onChange={(h) => patch({ h: Math.max(1, h) })} />
-        </div>
 
-        <ColorField label="Fill" value={obj.bg} allowNone onFocus={beginEdit} onChange={(bg) => patch({ bg })} />
-        {obj.kind === 'divider' ? (
-          <label className="inspector-check"><input type="checkbox" checked={obj.dividerGradient} onChange={(event) => { snapshot(); patch({ dividerGradient: event.target.checked }); }} /> Fade divider ends</label>
-        ) : null}
-        <ColorField label="Ink" value={obj.color} onFocus={beginEdit} onChange={(color) => patch({ color })} />
-        <ColorField label="Edge" value={obj.bc} allowNone onFocus={beginEdit} onChange={(bc) => patch({ bc, bw: bc === 'transparent' ? 0 : obj.bw })} />
-
-        <RangeField label="Radius" value={obj.radius} min={0} max={60} onFocus={beginEdit} onChange={(radius) => patch({ radius })} />
-        <label className="inspector-range">
-          <span>Padding <output>{obj.pad === null ? 'auto' : obj.pad}</output></span>
-          <span className="inspector-range-controls">
-            <input
-              type="range"
-              min={0}
-              max={64}
-              value={obj.pad ?? 0}
-              onFocus={beginEdit}
-              onChange={(event) => patch({ pad: Number(event.target.value) })}
-            />
-            <input
-              className="inspector-range-number"
-              type="number"
-              min={0}
-              max={64}
-              value={obj.pad ?? ''}
-              placeholder="Auto"
-              onFocus={beginEdit}
-              onChange={(event) => patch({
-                pad: event.target.value === '' ? null : clamp(Number(event.target.value), 0, 64),
-              })}
-              aria-label="Padding value"
-            />
-          </span>
-          <button type="button" className="inspector-auto" onClick={() => patch({ pad: null })}>Use automatic padding</button>
-        </label>
-        <RangeField label="Border" value={obj.bw} min={0} max={12} onFocus={beginEdit} onChange={(bw) => patch({ bw })} />
-        <RangeField label="Opacity" value={obj.opacity} min={10} max={100} onFocus={beginEdit} onChange={(opacity) => patch({ opacity })} />
-
-        <button
-          type="button"
-          className="inspector-copy-style"
-          disabled={otherObjectsInSection === 0}
-          onClick={() => setCopyDialogOpen(true)}
-        >
-          Copy design to section ({otherObjectsInSection})
-        </button>
+        </InspectorSection>
 
         {copyDialogOpen ? (
           <div className="inspector-confirm-backdrop" role="presentation" onMouseDown={() => setCopyDialogOpen(false)}>
@@ -538,19 +609,6 @@ export function Inspector() {
           </div>
         ) : null}
 
-        <div className="inspector-row">
-          <button type="button" onClick={duplicateSelected}>Duplicate</button>
-          <button
-            type="button"
-            className="danger-button"
-            onClick={() => {
-              snapshot();
-              removeObject(obj.id);
-            }}
-          >
-            Delete
-          </button>
-        </div>
       </div>
     );
   }
