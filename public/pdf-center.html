@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tab PDF — All things PDF, in one place</title>
-<meta name="description" content="Tab PDF is a free hub for working with PDFs: view, merge, split, and sign in your browser. Nothing to install, files never leave your device." />
+<title>Incredible PDF — All things PDF, in one place</title>
+<meta name="description" content="Incredible PDF is a free hub for working with PDFs: view, merge, split, and sign in your browser. Nothing to install, files never leave your device." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
     --paper: #ffffff;
@@ -34,6 +37,11 @@
   .brand { font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: var(--deep); }
   header nav a { color: var(--ink-muted); text-decoration: none; font-size: 14px; margin-left: 28px; }
   header nav a:hover { color: var(--ink); }
+  @media (max-width: 560px) {
+    header { flex-wrap: wrap; gap: 8px 16px; padding: 16px; }
+    header nav a { margin: 0 20px 0 0; }
+  }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
   .hero { text-align: center; padding: 48px 24px 64px; max-width: 720px; margin: 0 auto; }
   .hero .mark {
@@ -117,7 +125,7 @@
 <body>
 
 <header>
-  <div class="brand">TAB PDF</div>
+  <div class="brand">INCREDIBLE PDF</div>
   <nav>
     <a href="#tools">Free tools</a>
     <a href="#create">Create</a>
@@ -130,7 +138,7 @@
     <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm7 0v5h5"/></svg>
   </div>
   <h1>All things PDF, in one place.</h1>
-  <p>Tab PDF is a free hub for working with PDFs. View any file, merge and split documents, and fill and sign forms, right in your browser, with nothing to install.</p>
+  <p>Incredible PDF is a free hub for working with PDFs. View any file, merge and split documents, and fill and sign forms, right in your browser, with nothing to install.</p>
   <div class="cta-row">
     <a class="btn btn-primary" href="/pdf-viewer.html">Open the free PDF tools</a>
     <a class="btn btn-ghost" href="#create">What's coming next</a>
