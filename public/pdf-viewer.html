@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tab PDF — View, Merge, Split, Organize, Fill &amp; Sign</title>
+<title>Incredible PDF — View, Merge, Split, Organize, Fill &amp; Sign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
     --paper: #ffffff;
@@ -44,7 +47,7 @@
   .brand strong { font-family: 'Archivo', sans-serif; font-size: 16px; letter-spacing: 0.02em; }
   .brand span { font-size: 12px; color: var(--tint); }
 
-  .tabs { display: flex; gap: 4px; }
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
   .tabs button {
     background: transparent;
     border: 1px solid transparent;
@@ -57,6 +60,17 @@
   }
   .tabs button:hover { background: rgba(255,255,255,0.08); color: #fff; }
   .tabs button.active { background: rgba(255,255,255,0.14); color: #fff; border-color: rgba(255,255,255,0.18); }
+  @media (max-width: 560px) {
+    header { padding: 10px 16px; }
+    .tabs { width: 100%; }
+    .tabs button { padding: 7px 10px; }
+  }
+
+  button:focus-visible, a:focus-visible, input:focus-visible, .file-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  header :focus-visible { outline-color: #fff; }
 
   .toolbar {
     display: flex;
@@ -142,6 +156,7 @@
     background: #fff;
     box-shadow: 0 2px 18px rgba(20, 20, 30, 0.14);
   }
+  .page-wrap canvas { width: 100%; height: 100%; }
   canvas { display: block; }
 
   #status {
@@ -214,14 +229,6 @@
   }
   .file-row button:hover:not(:disabled) { background: var(--tint); }
   .file-row button:disabled { opacity: 0.35; cursor: not-allowed; }
-
-  .add-more {
-    display: inline-block;
-    font-size: 13px;
-    color: var(--accent);
-    cursor: pointer;
-    margin-top: 4px;
-  }
 
   .primary-btn {
     display: inline-flex;
@@ -320,23 +327,15 @@
 
   .overlay-item {
     position: absolute;
+    display: flex;
+    align-items: center;
     cursor: grab;
     user-select: none;
     border: 1.5px dashed transparent;
   }
   .overlay-item:hover, .overlay-item.dragging { border-color: var(--accent); }
   .overlay-item.dragging { cursor: grabbing; }
-  .overlay-text {
-    min-width: 40px;
-    min-height: 20px;
-    padding: 2px 4px;
-    color: #111;
-    font-family: 'Helvetica', Arial, sans-serif;
-    white-space: pre;
-    outline: none;
-  }
   .overlay-image { display: block; }
-  .overlay-item { display: flex; align-items: center; }
   .drag-handle {
     cursor: grab;
     color: #9aa2b8;
@@ -472,7 +471,7 @@
 
 <header>
   <div class="brand">
-    <strong>TAB PDF</strong>
+    <strong>INCREDIBLE PDF</strong>
     <span id="brandSub">View</span>
   </div>
   <div class="tabs" id="tabs">
@@ -669,7 +668,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.min.mjs" type="module"></script>
 <script type="module">
   import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.min.mjs";
   pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.worker.min.mjs";
@@ -709,6 +707,23 @@
   function isPdfFile(file) {
     return file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'));
   }
+  // pdf-lib cannot decrypt, so copying pages out of an encrypted file produces a broken PDF.
+  async function loadEditable(file) {
+    const doc = await PDFLib.PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+    if (doc.isEncrypted) {
+      throw new Error('"' + file.name + '" is password-protected or encrypted. Remove the protection and try again.');
+    }
+    return doc;
+  }
+
+  // The file inputs are hidden, so make their labels reachable from the keyboard.
+  document.querySelectorAll('label.file-btn').forEach((label) => {
+    label.tabIndex = 0;
+    label.setAttribute('role', 'button');
+    label.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); label.click(); }
+    });
+  });
 
   /* ---------------- Tabs ---------------- */
   const tabButtons = document.querySelectorAll('#tabs button');
@@ -724,14 +739,19 @@
   const toolbar = document.getElementById('toolbar');
   const labels = { view: 'View', merge: 'Merge', split: 'Split', organize: 'Organize', sign: 'Fill & Sign', library: 'Library' };
 
-  function setTab(tab) {
+  function setTab(tab, push = true) {
     tabButtons.forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
     Object.entries(panels).forEach(([k, el]) => el.classList.toggle('active', k === tab));
     brandSub.textContent = labels[tab];
     toolbar.hidden = !(tab === 'view' && pdfDoc);
     if (tab === 'library') renderLibrary();
+    if (push && location.hash.slice(1) !== tab) history.pushState(null, '', '#' + tab);
   }
   tabButtons.forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  window.addEventListener('popstate', () => {
+    const tab = location.hash.slice(1);
+    setTab(panels[tab] ? tab : 'view', false);
+  });
 
   /* ---------------- VIEW ---------------- */
   const dropzone = document.getElementById('dropzone');
@@ -747,10 +767,14 @@
   const zoomLabel = document.getElementById('zoomLabel');
   const fitBtn = document.getElementById('fitBtn');
 
+  const scroller = document.querySelector('main');
+
   let pdfDoc = null;
   let currentPage = 1;
   let scale = 1.2;
   let pageCanvases = [];
+  let pageObserver = null;
+  let viewLoadSeq = 0;
 
   async function loadFile(file) {
     if (!file) return;
@@ -761,19 +785,22 @@
     clearErrorIn(viewError);
     dropzone.style.display = 'none';
     showStatus('Loading ' + file.name + '…', 4000);
+    const seq = ++viewLoadSeq;
 
     try {
       const buf = await file.arrayBuffer();
-      const loadingTask = pdfjsLib.getDocument({ data: buf });
-      pdfDoc = await loadingTask.promise;
+      const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+      if (seq !== viewLoadSeq) { doc.destroy(); return; }
+      if (pdfDoc) pdfDoc.destroy();
+      pdfDoc = doc;
       currentPage = 1;
       pageCountEl.textContent = pdfDoc.numPages;
       pageInput.max = pdfDoc.numPages;
       pageInput.value = 1;
       toolbar.hidden = false;
       viewer.classList.add('active');
-      buildPageShells();
-      await renderPage(currentPage);
+      await buildPageShells();
+      scroller.scrollTop = 0;
       showStatus(pdfDoc.numPages + ' page' + (pdfDoc.numPages === 1 ? '' : 's') + ' loaded');
     } catch (err) {
       console.error(err);
@@ -781,40 +808,88 @@
     }
   }
 
-  function buildPageShells() {
+  function sizeShell(entry, w, h) {
+    entry.w = w;
+    entry.h = h;
+    entry.wrap.style.width = w + 'px';
+    entry.wrap.style.height = h + 'px';
+  }
+
+  // Every page gets a correctly sized placeholder; pages are drawn only as they scroll near the view.
+  async function buildPageShells() {
+    if (pageObserver) pageObserver.disconnect();
     viewer.innerHTML = '';
     pageCanvases = [];
+    const first = (await pdfDoc.getPage(1)).getViewport({ scale });
     for (let i = 1; i <= pdfDoc.numPages; i++) {
       const wrap = document.createElement('div');
       wrap.className = 'page-wrap';
       wrap.dataset.page = String(i);
-      const canvas = document.createElement('canvas');
-      wrap.appendChild(canvas);
       viewer.appendChild(wrap);
-      pageCanvases.push({ wrap, canvas, rendered: false });
+      const entry = { num: i, wrap, task: null, renderedScale: 0, pendingScale: 0, visible: false };
+      sizeShell(entry, first.width, first.height);
+      pageCanvases.push(entry);
     }
+    pageObserver = new IntersectionObserver((items) => {
+      items.forEach((it) => {
+        const entry = pageCanvases[Number(it.target.dataset.page) - 1];
+        if (!entry) return;
+        entry.visible = it.isIntersecting;
+        if (it.isIntersecting) renderPage(entry.num);
+      });
+    }, { root: scroller, rootMargin: '800px 0px' });
+    pageCanvases.forEach((entry) => pageObserver.observe(entry.wrap));
   }
 
   async function renderPage(num) {
     const entry = pageCanvases[num - 1];
-    if (!entry) return;
-    const page = await pdfDoc.getPage(num);
-    const viewport = page.getViewport({ scale });
-    const canvas = entry.canvas;
-    const ctx = canvas.getContext('2d');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    await page.render({ canvasContext: ctx, viewport }).promise;
-    entry.rendered = true;
-  }
-
-  async function renderAllVisibleNear(num) {
-    await renderPage(num);
-    const neighbors = [num - 1, num + 1].filter((n) => n >= 1 && n <= pdfDoc.numPages);
-    for (const n of neighbors) {
-      if (!pageCanvases[n - 1].rendered) renderPage(n);
+    if (!entry || entry.renderedScale === scale || entry.pendingScale === scale) return;
+    const doc = pdfDoc;
+    const targetScale = scale;
+    if (entry.task) entry.task.cancel();
+    entry.task = null;
+    entry.pendingScale = targetScale;
+    try {
+      const page = await doc.getPage(num);
+      if (doc !== pdfDoc || entry.pendingScale !== targetScale) return;
+      const viewport = page.getViewport({ scale: targetScale });
+      // Draw into a fresh canvas and swap it in, so a page never goes blank mid-zoom
+      // and two renders never share one canvas.
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      const task = page.render({ canvasContext: canvas.getContext('2d'), viewport });
+      entry.task = task;
+      await task.promise;
+      if (entry.task !== task) return;
+      entry.task = null;
+      entry.pendingScale = 0;
+      entry.renderedScale = targetScale;
+      entry.wrap.replaceChildren(canvas);
+      sizeShell(entry, viewport.width, viewport.height);
+    } catch (err) {
+      if (err && err.name === 'RenderingCancelledException') return;
+      entry.pendingScale = 0;
+      console.error(err);
     }
   }
+
+  function updateCurrentFromScroll() {
+    if (!pdfDoc) return;
+    const line = scroller.getBoundingClientRect().top + scroller.clientHeight / 3;
+    let num = 1;
+    for (const entry of pageCanvases) {
+      if (entry.wrap.getBoundingClientRect().top <= line) num = entry.num;
+      else break;
+    }
+    currentPage = num;
+    if (document.activeElement !== pageInput) pageInput.value = num;
+  }
+  let scrollFrame = 0;
+  scroller.addEventListener('scroll', () => {
+    if (scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => { scrollFrame = 0; updateCurrentFromScroll(); });
+  });
 
   function goToPage(num) {
     if (!pdfDoc) return;
@@ -822,38 +897,36 @@
     currentPage = num;
     pageInput.value = num;
     const entry = pageCanvases[num - 1];
-    if (entry) entry.wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    renderAllVisibleNear(num);
+    if (entry) {
+      entry.wrap.scrollIntoView({ block: 'start' });
+      renderPage(num);
+    }
   }
 
-  async function rerenderAll() {
-    for (const entry of pageCanvases) entry.rendered = false;
-    await renderAllVisibleNear(currentPage);
+  function setScale(next) {
+    if (!pdfDoc || !pageCanvases.length) return;
+    const keep = currentPage;
+    const factor = next / scale;
+    scale = next;
+    zoomLabel.textContent = Math.round(scale / 1.2 * 100) + '%';
+    // Stretch the existing drawings right away, then redraw the pages in view at the new size.
+    pageCanvases.forEach((entry) => sizeShell(entry, entry.w * factor, entry.h * factor));
+    goToPage(keep);
+    pageCanvases.forEach((entry) => { if (entry.visible) renderPage(entry.num); });
   }
 
   prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
   nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
   pageInput.addEventListener('change', () => goToPage(parseInt(pageInput.value, 10) || 1));
-  zoomInBtn.addEventListener('click', () => {
-    scale = Math.min(scale + 0.2, 4);
-    zoomLabel.textContent = Math.round(scale / 1.2 * 100) + '%';
-    rerenderAll();
-  });
-  zoomOutBtn.addEventListener('click', () => {
-    scale = Math.max(scale - 0.2, 0.4);
-    zoomLabel.textContent = Math.round(scale / 1.2 * 100) + '%';
-    rerenderAll();
-  });
+  zoomInBtn.addEventListener('click', () => setScale(Math.min(scale + 0.2, 4)));
+  zoomOutBtn.addEventListener('click', () => setScale(Math.max(scale - 0.2, 0.4)));
   fitBtn.addEventListener('click', () => {
+    const entry = pageCanvases[currentPage - 1];
+    if (!entry) return;
     const targetWidth = Math.min(window.innerWidth - 64, 900);
-    if (pageCanvases[0]) {
-      const ratio = targetWidth / pageCanvases[0].canvas.width * scale;
-      scale = ratio;
-      zoomLabel.textContent = Math.round(scale / 1.2 * 100) + '%';
-      rerenderAll();
-    }
+    setScale(targetWidth / entry.w * scale);
   });
-  fileInput.addEventListener('change', (e) => loadFile(e.target.files[0]));
+  fileInput.addEventListener('change', (e) => { loadFile(e.target.files[0]); e.target.value = ''; });
 
   ['dragenter', 'dragover'].forEach((evt) =>
     window.addEventListener(evt, (e) => {
@@ -875,6 +948,7 @@
 
   document.addEventListener('keydown', (e) => {
     if (!pdfDoc || !panels.view.classList.contains('active')) return;
+    if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) return;
     if (e.key === 'ArrowRight' || e.key === 'PageDown') goToPage(currentPage + 1);
     if (e.key === 'ArrowLeft' || e.key === 'PageUp') goToPage(currentPage - 1);
   });
@@ -943,7 +1017,7 @@
     if (bad.length) showErrorIn(mergeError, bad.length + ' file(s) skipped — not PDFs.');
   }
 
-  mergeFileInput.addEventListener('change', (e) => addMergeFiles(e.target.files));
+  mergeFileInput.addEventListener('change', (e) => { addMergeFiles(e.target.files); e.target.value = ''; });
   mergeClearBtn.addEventListener('click', () => {
     mergeFiles = [];
     renderMergeList();
@@ -974,8 +1048,7 @@
       const { PDFDocument } = PDFLib;
       const out = await PDFDocument.create();
       for (const file of mergeFiles) {
-        const buf = await file.arrayBuffer();
-        const src = await PDFDocument.load(buf, { ignoreEncryption: true });
+        const src = await loadEditable(file);
         const pages = await out.copyPages(src, src.getPageIndices());
         pages.forEach((p) => out.addPage(p));
       }
@@ -1031,9 +1104,7 @@
     }
     clearErrorIn(splitError);
     try {
-      const buf = await file.arrayBuffer();
-      const { PDFDocument } = PDFLib;
-      const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
+      const doc = await loadEditable(file);
       splitFile = file;
       splitPageCount = doc.getPageCount();
       splitFileName.textContent = file.name;
@@ -1047,7 +1118,7 @@
     }
   }
 
-  splitFileInput.addEventListener('change', (e) => loadSplitFile(e.target.files[0]));
+  splitFileInput.addEventListener('change', (e) => { loadSplitFile(e.target.files[0]); e.target.value = ''; });
   ['dragenter', 'dragover'].forEach((evt) =>
     splitDropzone.addEventListener(evt, (e) => {
       e.preventDefault();
@@ -1082,8 +1153,7 @@
     try {
       showStatus('Extracting pages…', 3000);
       const { PDFDocument } = PDFLib;
-      const buf = await splitFile.arrayBuffer();
-      const src = await PDFDocument.load(buf, { ignoreEncryption: true });
+      const src = await loadEditable(splitFile);
       const out = await PDFDocument.create();
       const pages = await out.copyPages(src, indices);
       pages.forEach((p) => out.addPage(p));
@@ -1102,8 +1172,7 @@
     try {
       showStatus('Splitting ' + splitPageCount + ' pages…', 6000);
       const { PDFDocument } = PDFLib;
-      const buf = await splitFile.arrayBuffer();
-      const src = await PDFDocument.load(buf, { ignoreEncryption: true });
+      const src = await loadEditable(splitFile);
       const zip = new JSZip();
       for (let i = 0; i < splitPageCount; i++) {
         const out = await PDFDocument.create();
@@ -1156,6 +1225,7 @@
     const seq = ++orgLoadSeq;
     try {
       showStatus('Loading ' + file.name + '…', 4000);
+      await loadEditable(file);
       const buf = await file.arrayBuffer();
       const doc = await pdfjsLib.getDocument({ data: buf }).promise;
       if (seq !== orgLoadSeq) return;
@@ -1324,7 +1394,7 @@
     try {
       showStatus('Building PDF…', 4000);
       const { PDFDocument, degrees } = PDFLib;
-      const src = await PDFDocument.load(await orgFile.arrayBuffer(), { ignoreEncryption: true });
+      const src = await loadEditable(orgFile);
       const out = await PDFDocument.create();
       const copied = await out.copyPages(src, orgPages.map((p) => p.src));
       copied.forEach((page, i) => {
@@ -1382,6 +1452,7 @@
     }
     clearErrorIn(signError);
     try {
+      await loadEditable(file);
       const buf = await file.arrayBuffer();
       signPdfJsDoc = await pdfjsLib.getDocument({ data: buf }).promise;
       signFile = file;
@@ -1490,6 +1561,7 @@
       input.placeholder = 'Type here';
       input.value = overlay.text || '';
       input.style.font = (overlay.fontSize * signScale) + 'px Helvetica, Arial, sans-serif';
+      input.style.lineHeight = '1';
       input.style.border = 'none';
       input.style.background = 'transparent';
       input.style.outline = 'none';
@@ -1511,6 +1583,17 @@
     el.appendChild(removeBtn);
     signStage.appendChild(el);
     makeDraggable(el, overlay);
+
+    if (overlay.type === 'text') {
+      // The drag handle sits in front of the input; remember where the typed text begins
+      // relative to the overlay box so the exported text lands exactly where it was shown.
+      const input = el.querySelector('input');
+      const cs = getComputedStyle(input);
+      const elRect = el.getBoundingClientRect();
+      const inRect = input.getBoundingClientRect();
+      overlay.dxFrac = (inRect.left - elRect.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft)) / stageW;
+      overlay.dyFrac = (inRect.top - elRect.top + parseFloat(cs.borderTopWidth) + parseFloat(cs.paddingTop)) / stageH;
+    }
   }
 
   function addOverlayToCurrentPage(overlay) {
@@ -1530,7 +1613,7 @@
     clearSigPad();
   });
 
-  signFileInput.addEventListener('change', (e) => loadSignFile(e.target.files[0]));
+  signFileInput.addEventListener('change', (e) => { loadSignFile(e.target.files[0]); e.target.value = ''; });
   ['dragenter', 'dragover'].forEach((evt) =>
     signDropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); signDropzone.classList.add('dragging'); })
   );
@@ -1573,39 +1656,37 @@
     }
     try {
       showStatus('Preparing signed PDF…', 4000);
-      const { PDFDocument, StandardFonts, rgb } = PDFLib;
-      const buf = await signFile.arrayBuffer();
-      const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
+      const { StandardFonts, rgb, degrees } = PDFLib;
+      const doc = await loadEditable(signFile);
       const font = await doc.embedFont(StandardFonts.Helvetica);
       const imageCache = new Map();
 
       for (const [pageNum, overlays] of signOverlays.entries()) {
         if (!overlays.length) continue;
         const page = doc.getPage(pageNum - 1);
-        const pw = page.getWidth();
-        const ph = page.getHeight();
+        // Overlay positions are fractions of the page as displayed. pdf.js maps display points
+        // back to PDF space, which accounts for /Rotate and a crop box that doesn't start at 0,0.
+        const view = (await signPdfJsDoc.getPage(pageNum)).getViewport({ scale: 1 });
+        const toPdf = (x, y) => view.convertToPdfPoint(x, y);
+        const [ox, oy] = toPdf(0, 0);
+        const [rx, ry] = toPdf(1, 0);
+        const rotate = degrees(Math.atan2(ry - oy, rx - ox) * 180 / Math.PI);
         for (const o of overlays) {
           if (o.type === 'text') {
             if (!o.text || !o.text.trim()) continue;
-            page.drawText(o.text, {
-              x: o.xFrac * pw,
-              y: ph - o.yFrac * ph - o.fontSize * 0.8,
-              size: o.fontSize,
-              font,
-              color: rgb(0, 0, 0),
-            });
+            const [x, y] = toPdf(
+              (o.xFrac + (o.dxFrac || 0)) * view.width,
+              (o.yFrac + (o.dyFrac || 0)) * view.height + o.fontSize * 0.8
+            );
+            page.drawText(o.text, { x, y, size: o.fontSize, font, color: rgb(0, 0, 0), rotate });
           } else if (o.type === 'image') {
             let embedded = imageCache.get(o.dataUrl);
             if (!embedded) {
               embedded = await doc.embedPng(dataUrlToBytes(o.dataUrl));
               imageCache.set(o.dataUrl, embedded);
             }
-            page.drawImage(embedded, {
-              x: o.xFrac * pw,
-              y: ph - o.yFrac * ph - o.hFrac * ph,
-              width: o.wFrac * pw,
-              height: o.hFrac * ph,
-            });
+            const [x, y] = toPdf(o.xFrac * view.width, (o.yFrac + o.hFrac) * view.height);
+            page.drawImage(embedded, { x, y, width: o.wFrac * view.width, height: o.hFrac * view.height, rotate });
           }
         }
       }
@@ -1637,7 +1718,6 @@
   }
   sigPad.addEventListener('pointerdown', (e) => {
     sigDrawing = true;
-    sigHasStroke = true;
     sigPad.setPointerCapture(e.pointerId);
     const p = sigPos(e);
     sigCtx.beginPath();
@@ -1651,6 +1731,7 @@
     const p = sigPos(e);
     sigCtx.lineTo(p.x, p.y);
     sigCtx.stroke();
+    sigHasStroke = true;
   });
   ['pointerup', 'pointerleave', 'pointercancel'].forEach((evt) =>
     sigPad.addEventListener(evt, () => { sigDrawing = false; })
@@ -1688,6 +1769,7 @@
   const libClearBtn = document.getElementById('libClearBtn');
   const libError = document.getElementById('libError');
 
+  // Kept from the Tab PDF name so files people already saved stay in their Library.
   const LIB_DB = 'tabpdf-library';
   const LIB_STORE = 'docs';
 
@@ -1843,7 +1925,7 @@
 
   /* Open on the tab named in the URL hash, e.g. pdf-viewer.html#merge */
   const initialTab = location.hash.slice(1);
-  if (panels[initialTab]) setTab(initialTab);
+  if (panels[initialTab]) setTab(initialTab, false);
 </script>
 </body>
 </html>
