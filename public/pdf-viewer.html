@@ -427,6 +427,76 @@
   .org-actions button:hover:not(:disabled) { background: var(--tint); }
   .org-actions button:disabled { opacity: 0.35; cursor: not-allowed; }
   .org-actions button.del:hover:not(:disabled) { background: #fbeae4; color: #a1441f; }
+  .org-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px 16px;
+    flex-wrap: wrap;
+    width: min(960px, 94vw);
+    margin: -6px 0 18px;
+  }
+  .org-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 280px;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 12px;
+  }
+  .org-search:focus-within { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .org-search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 13.5px; padding: 10px 0; color: var(--ink); }
+  .org-search .meta { font-size: 12px; color: var(--ink-muted); white-space: nowrap; }
+  .org-select { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .org-select .meta { font-size: 12.5px; color: var(--ink-muted); }
+  .org-select .primary-btn, .org-select .secondary-btn { padding: 8px 12px; font-size: 13px; }
+  .org-card { position: relative; }
+  .org-card.selected { border-color: var(--accent); background: #eef0ff; }
+  .org-card.match { box-shadow: 0 0 0 2px var(--accent); }
+  .org-card.dim { opacity: 0.35; }
+  .org-card.flash { animation: org-flash 1s ease; }
+  @keyframes org-flash { 30% { box-shadow: 0 0 0 5px var(--accent); } }
+  .org-check { position: absolute; top: 8px; left: 8px; width: 18px; height: 18px; margin: 0; accent-color: var(--accent); cursor: pointer; z-index: 2; }
+  .org-thumb { position: relative; }
+  .org-hover {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    background: rgba(32,42,80,0.55);
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity .12s ease;
+    pointer-events: none;
+  }
+  .org-card:hover .org-hover, .org-hover:focus-within { opacity: 1; pointer-events: auto; }
+  .org-hover button {
+    min-width: 92px;
+    border: 0; border-radius: 6px;
+    background: #fff; color: var(--deep);
+    font: inherit; font-size: 12.5px; font-weight: 600;
+    padding: 7px 12px; cursor: pointer;
+  }
+  .org-hover button:hover { background: var(--tint); }
+  @media (hover: none) { .org-hover { display: none; } }
+  .org-label { display: flex; align-items: center; gap: 6px; }
+  .org-zoom {
+    border: 1px solid var(--border); background: #fff; border-radius: 6px;
+    width: 24px; height: 24px; padding: 0; cursor: pointer; font-size: 12px; line-height: 1;
+  }
+  .org-zoom:hover { background: var(--tint); }
+  .preview-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 16px 16px;
+    width: min(920px, 94vw);
+    max-height: 94vh;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .preview-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .preview-head h3 { margin: 0 auto 0 0; font-family: 'Archivo', sans-serif; font-size: 15px; }
+  .preview-head .secondary-btn, .preview-head .primary-btn { padding: 7px 12px; font-size: 13px; }
+  .preview-stage { flex: 1; min-height: 0; overflow: auto; display: flex; justify-content: center; background: var(--surface); border-radius: 8px; padding: 12px; }
+  .preview-stage canvas { box-shadow: 0 1px 8px rgba(20,20,30,0.2); background: #fff; max-width: 100%; height: auto; }
 
   /* Documents Library */
   .file-row button.txt { width: auto; padding: 0 10px; font-size: 12.5px; font-weight: 600; color: var(--deep); }
@@ -568,7 +638,7 @@
     <div class="work" id="orgDropCard">
       <div class="card">
         <h2>Organize pages</h2>
-        <p class="sub">Rotate, reorder, or delete pages, then download the result. Nothing leaves your device.</p>
+        <p class="sub">Rotate, reorder, or delete pages, find a page by number or text, and save selected pages as a new PDF. Nothing leaves your device.</p>
         <div id="orgDropzone" class="dropzone" style="margin-top:0; padding: 32px 20px;">
           <p style="margin-bottom:14px;">Drag a PDF here, or</p>
           <label class="file-btn" for="orgFileInput">Choose a PDF file</label>
@@ -587,6 +657,19 @@
       <button class="secondary-btn" id="orgResetBtn">Choose another file</button>
       <label class="save-lib"><input type="checkbox" id="orgSaveLib" /> Save to Library</label>
       <button class="primary-btn" id="orgDownloadBtn">Download PDF</button>
+    </div>
+    <div class="org-tools" id="orgTools" hidden>
+      <label class="org-search">
+        <span aria-hidden="true">🔍</span>
+        <input type="search" id="orgSearch" placeholder="Find a page by number or by words on it" aria-label="Find a page" autocomplete="off" />
+        <span class="meta" id="orgSearchMeta" aria-live="polite"></span>
+      </label>
+      <div class="org-select">
+        <span class="meta" id="orgSelMeta">No pages selected</span>
+        <button class="secondary-btn" id="orgSelAllBtn">Select all</button>
+        <button class="secondary-btn" id="orgSelClearBtn" disabled>Clear</button>
+        <button class="primary-btn" id="orgSaveSelBtn" disabled>Save selected as new PDF</button>
+      </div>
     </div>
     <div class="org-grid" id="orgGrid"></div>
     <div class="error-box" id="orgError"></div>
@@ -661,6 +744,19 @@
       <button class="secondary-btn" id="sigClearBtn">Clear</button>
       <button class="secondary-btn" id="sigCancelBtn">Cancel</button>
     </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="orgPreview" hidden>
+  <div class="preview-card" role="dialog" aria-modal="true" aria-labelledby="orgPreviewTitle">
+    <div class="preview-head">
+      <h3 id="orgPreviewTitle">Page 1</h3>
+      <button class="secondary-btn" id="orgPrevBtn" title="Previous page (←)">← Previous</button>
+      <button class="secondary-btn" id="orgNextBtn" title="Next page (→)">Next →</button>
+      <button class="primary-btn" id="orgPreviewEditBtn" title="Open this page in Fill &amp; Sign">Edit this page</button>
+      <button class="secondary-btn" id="orgPreviewCloseBtn" title="Close (Esc)">Close</button>
+    </div>
+    <div class="preview-stage" id="orgPreviewStage"></div>
   </div>
 </div>
 
@@ -1203,11 +1299,30 @@
   const orgResetBtn = document.getElementById('orgResetBtn');
   const orgDownloadBtn = document.getElementById('orgDownloadBtn');
   const orgError = document.getElementById('orgError');
+  const orgTools = document.getElementById('orgTools');
+  const orgSearch = document.getElementById('orgSearch');
+  const orgSearchMeta = document.getElementById('orgSearchMeta');
+  const orgSelMeta = document.getElementById('orgSelMeta');
+  const orgSelAllBtn = document.getElementById('orgSelAllBtn');
+  const orgSelClearBtn = document.getElementById('orgSelClearBtn');
+  const orgSaveSelBtn = document.getElementById('orgSaveSelBtn');
+  const orgPreview = document.getElementById('orgPreview');
+  const orgPreviewTitle = document.getElementById('orgPreviewTitle');
+  const orgPreviewStage = document.getElementById('orgPreviewStage');
+  const orgPrevBtn = document.getElementById('orgPrevBtn');
+  const orgNextBtn = document.getElementById('orgNextBtn');
 
   let orgFile = null;
+  let orgPdf = null; // pdf.js document, kept open for previews
   let orgSourceCount = 0;
   let orgThumbs = []; // source index -> rendered thumbnail canvas
+  let orgText = []; // source index -> lowercased page text, for search
   let orgPages = []; // in output order: { src: source page index, rot: extra clockwise degrees }
+  let orgSelected = new Set(); // entries of orgPages
+  let orgLastChecked = -1; // position of the last checkbox clicked, for shift-click ranges
+  let orgMatches = []; // positions matching the search, in order
+  let orgMatchCursor = -1;
+  let orgPreviewPos = -1;
   let orgDragFrom = -1;
   let orgLoadSeq = 0;
 
@@ -1228,14 +1343,21 @@
       await loadEditable(file);
       const buf = await file.arrayBuffer();
       const doc = await pdfjsLib.getDocument({ data: buf }).promise;
-      if (seq !== orgLoadSeq) return;
+      if (seq !== orgLoadSeq) { doc.destroy(); return; }
+      if (orgPdf) orgPdf.destroy();
+      orgPdf = doc;
       orgFile = file;
       orgSourceCount = doc.numPages;
       orgPages = orgInitialPages();
       orgThumbs = [];
+      orgText = [];
+      orgSelected = new Set();
+      orgLastChecked = -1;
+      orgSearch.value = '';
       orgFileName.textContent = file.name;
       orgDropCard.hidden = true;
       orgBar.hidden = false;
+      orgTools.hidden = false;
       renderOrganize();
       // Thumbnails render one at a time so large files stay responsive.
       for (let i = 0; i < doc.numPages; i++) {
@@ -1249,10 +1371,15 @@
         if (seq !== orgLoadSeq) return;
         orgThumbs[i] = canvas;
         orgGrid.querySelectorAll('[data-src="' + i + '"]').forEach((slot) => placeThumb(slot, i));
+        const content = await page.getTextContent();
+        if (seq !== orgLoadSeq) return;
+        orgText[i] = content.items.map((t) => t.str).join(' ').replace(/\s+/g, ' ').toLowerCase();
+        if (orgSearch.value.trim()) applyOrgSearch(false);
       }
-      doc.destroy();
+      if (orgSearch.value.trim()) applyOrgSearch(false);
       showStatus(orgSourceCount + ' page' + (orgSourceCount === 1 ? '' : 's') + ' loaded');
     } catch (err) {
+      if (seq !== orgLoadSeq) return; // a newer file replaced this one mid-load
       console.error(err);
       showErrorIn(orgError, 'Could not open this PDF: ' + (err && err.message ? err.message : 'unknown error'));
     }
@@ -1268,8 +1395,8 @@
     c.height = thumb.height;
     c.getContext('2d').drawImage(thumb, 0, 0);
     c.style.transform = 'rotate(' + (entry ? entry.rot : 0) + 'deg)';
-    slot.innerHTML = '';
-    slot.appendChild(c);
+    const old = slot.querySelector('canvas');
+    if (old) old.replaceWith(c); else slot.prepend(c);
   }
 
   function renderOrganize() {
@@ -1284,18 +1411,50 @@
       card.className = 'org-card';
       card.draggable = true;
       card.dataset.pos = String(pos);
+      card.classList.toggle('selected', orgSelected.has(entry));
+
+      const check = document.createElement('input');
+      check.type = 'checkbox';
+      check.className = 'org-check';
+      check.checked = orgSelected.has(entry);
+      check.title = 'Select page ' + (pos + 1) + ' (Shift-click to select a range)';
+      check.setAttribute('aria-label', 'Select page ' + (pos + 1));
+      check.addEventListener('click', (e) => orgToggleSelect(pos, check.checked, e.shiftKey));
+      card.appendChild(check);
 
       const slot = document.createElement('div');
       slot.className = 'org-thumb';
       slot.dataset.src = String(entry.src);
       slot.dataset.pos = String(pos);
+      const hover = document.createElement('div');
+      hover.className = 'org-hover';
+      const hoverBtn = (text, title, onClick) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = text;
+        b.title = title;
+        b.addEventListener('click', onClick);
+        hover.appendChild(b);
+      };
+      hoverBtn('🔍 View', 'View page ' + (pos + 1) + ' larger', () => openOrgPreview(pos));
+      hoverBtn('✎ Edit', 'Open page ' + (pos + 1) + ' in Fill & Sign', () => editOrgPage(pos));
+      slot.appendChild(hover);
       card.appendChild(slot);
       placeThumb(slot, entry.src);
 
       const label = document.createElement('div');
       label.className = 'org-label';
-      label.innerHTML = '<b>' + (pos + 1) + '</b>' + (entry.src !== pos ? ' · was page ' + (entry.src + 1) : '') +
+      const num = document.createElement('span');
+      num.innerHTML = '<b>' + (pos + 1) + '</b>' + (entry.src !== pos ? ' · was page ' + (entry.src + 1) : '') +
         (entry.rot ? ' · ' + entry.rot + '°' : '');
+      const zoom = document.createElement('button');
+      zoom.type = 'button';
+      zoom.className = 'org-zoom';
+      zoom.textContent = '🔍';
+      zoom.title = 'View page ' + (pos + 1) + ' larger';
+      zoom.setAttribute('aria-label', 'View page ' + (pos + 1) + ' larger');
+      zoom.addEventListener('click', () => openOrgPreview(pos));
+      label.append(num, zoom);
       card.appendChild(label);
 
       const actions = document.createElement('div');
@@ -1313,7 +1472,7 @@
       mk('↻', 'Rotate right', false, () => { entry.rot = (entry.rot + 90) % 360; renderOrganize(); });
       mk('←', 'Move earlier', pos === 0, () => { orgMove(pos, pos - 1); });
       mk('→', 'Move later', pos === orgPages.length - 1, () => { orgMove(pos, pos + 1); });
-      mk('✕', 'Delete page', orgPages.length === 1, () => { orgPages.splice(pos, 1); renderOrganize(); }, 'del');
+      mk('✕', 'Delete page', orgPages.length === 1, () => { orgSelected.delete(entry); orgPages.splice(pos, 1); renderOrganize(); }, 'del');
       card.appendChild(actions);
 
       card.addEventListener('dragstart', (e) => {
@@ -1349,7 +1508,190 @@
 
       orgGrid.appendChild(card);
     });
+    updateOrgSelection();
+    applyOrgSearch(false);
   }
+
+  /* Selection */
+  function orgToggleSelect(pos, on, range) {
+    const from = range && orgLastChecked >= 0 ? Math.min(orgLastChecked, pos) : pos;
+    const to = range && orgLastChecked >= 0 ? Math.max(orgLastChecked, pos) : pos;
+    for (let i = from; i <= to; i++) {
+      if (on) orgSelected.add(orgPages[i]); else orgSelected.delete(orgPages[i]);
+    }
+    orgLastChecked = pos;
+    orgGrid.querySelectorAll('.org-card').forEach((card) => {
+      const sel = orgSelected.has(orgPages[Number(card.dataset.pos)]);
+      card.classList.toggle('selected', sel);
+      card.querySelector('.org-check').checked = sel;
+    });
+    updateOrgSelection();
+  }
+
+  function updateOrgSelection() {
+    const n = orgSelected.size;
+    orgSelMeta.textContent = n ? n + ' page' + (n === 1 ? '' : 's') + ' selected' : 'No pages selected';
+    orgSelClearBtn.disabled = !n;
+    orgSaveSelBtn.disabled = !n;
+    orgSelAllBtn.textContent = orgSearch.value.trim() ? 'Select matches' : 'Select all';
+    orgSelAllBtn.disabled = orgSearch.value.trim() ? !orgMatches.length : !orgPages.length;
+  }
+
+  orgSelAllBtn.addEventListener('click', () => {
+    const positions = orgSearch.value.trim() ? orgMatches : orgPages.map((_, i) => i);
+    positions.forEach((pos) => orgSelected.add(orgPages[pos]));
+    renderOrganize();
+  });
+  orgSelClearBtn.addEventListener('click', () => {
+    orgSelected = new Set();
+    orgLastChecked = -1;
+    renderOrganize();
+  });
+
+  /* Search: a page number ("7", "page 7", "p7") or words on the page */
+  function applyOrgSearch(jump) {
+    const q = orgSearch.value.trim().toLowerCase().replace(/\s+/g, ' ');
+    const cards = orgGrid.querySelectorAll('.org-card');
+    if (!q) {
+      orgMatches = [];
+      cards.forEach((c) => c.classList.remove('match', 'dim'));
+      orgSearchMeta.textContent = '';
+      updateOrgSelection();
+      return;
+    }
+    const num = q.match(/^(?:p(?:age)?\.?\s*)?(\d+)$/);
+    orgMatches = [];
+    orgPages.forEach((entry, pos) => {
+      if ((num && Number(num[1]) === pos + 1) || (orgText[entry.src] || '').includes(q)) orgMatches.push(pos);
+    });
+    const hits = new Set(orgMatches);
+    cards.forEach((c) => {
+      const hit = hits.has(Number(c.dataset.pos));
+      c.classList.toggle('match', hit);
+      c.classList.toggle('dim', !hit);
+    });
+    const textLoaded = orgText.filter((t) => t !== undefined).length;
+    const anyText = orgText.some((t) => t && t.trim());
+    if (orgMatches.length) {
+      orgSearchMeta.textContent = orgMatches.length + ' page' + (orgMatches.length === 1 ? '' : 's') + ' · Enter for next';
+    } else if (textLoaded < orgSourceCount) {
+      orgSearchMeta.textContent = 'Reading pages…';
+    } else {
+      orgSearchMeta.textContent = anyText ? 'No pages match' : 'No text found (scanned PDF?) · search by page number';
+    }
+    updateOrgSelection();
+    if (jump && orgMatches.length) {
+      orgMatchCursor = (orgMatchCursor + 1) % orgMatches.length;
+      const card = orgGrid.querySelector('.org-card[data-pos="' + orgMatches[orgMatchCursor] + '"]');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.remove('flash');
+      void card.offsetWidth;
+      card.classList.add('flash');
+    }
+  }
+  orgSearch.addEventListener('input', () => { orgMatchCursor = -1; applyOrgSearch(false); });
+  orgSearch.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); applyOrgSearch(true); }
+    if (e.key === 'Escape') { orgSearch.value = ''; applyOrgSearch(false); }
+  });
+
+  /* Preview */
+  async function openOrgPreview(pos) {
+    if (!orgPdf || pos < 0 || pos >= orgPages.length) return;
+    orgPreviewPos = pos;
+    const entry = orgPages[pos];
+    orgPreviewTitle.textContent = 'Page ' + (pos + 1) + ' of ' + orgPages.length +
+      (entry.src !== pos ? ' · was page ' + (entry.src + 1) : '');
+    orgPrevBtn.disabled = pos === 0;
+    orgNextBtn.disabled = pos === orgPages.length - 1;
+    orgPreview.hidden = false;
+    try {
+      const page = await orgPdf.getPage(entry.src + 1);
+      if (orgPreviewPos !== pos) return;
+      const rotation = (page.rotate + entry.rot) % 360;
+      const base = page.getViewport({ scale: 1, rotation });
+      const fit = Math.min((orgPreviewStage.clientWidth - 24) / base.width, (window.innerHeight * 0.94 - 110) / base.height);
+      const ratio = window.devicePixelRatio || 1;
+      const viewport = page.getViewport({ scale: fit * ratio, rotation });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(viewport.width);
+      canvas.height = Math.round(viewport.height);
+      canvas.style.width = Math.round(viewport.width / ratio) + 'px';
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+      if (orgPreviewPos !== pos) return;
+      orgPreviewStage.innerHTML = '';
+      orgPreviewStage.appendChild(canvas);
+    } catch (err) {
+      console.error(err);
+      orgPreviewStage.textContent = 'Could not show this page.';
+    }
+  }
+  function closeOrgPreview() {
+    orgPreview.hidden = true;
+    orgPreviewPos = -1;
+    orgPreviewStage.innerHTML = '';
+  }
+  orgPrevBtn.addEventListener('click', () => openOrgPreview(orgPreviewPos - 1));
+  orgNextBtn.addEventListener('click', () => openOrgPreview(orgPreviewPos + 1));
+  document.getElementById('orgPreviewCloseBtn').addEventListener('click', closeOrgPreview);
+  document.getElementById('orgPreviewEditBtn').addEventListener('click', () => { const pos = orgPreviewPos; closeOrgPreview(); editOrgPage(pos); });
+  orgPreview.addEventListener('click', (e) => { if (e.target === orgPreview) closeOrgPreview(); });
+  document.addEventListener('keydown', (e) => {
+    if (orgPreview.hidden) return;
+    if (e.key === 'Escape') closeOrgPreview();
+    if (e.key === 'ArrowLeft' && orgPreviewPos > 0) openOrgPreview(orgPreviewPos - 1);
+    if (e.key === 'ArrowRight' && orgPreviewPos < orgPages.length - 1) openOrgPreview(orgPreviewPos + 1);
+  });
+
+  /* Build a PDF from some of orgPages, in their current order and rotation */
+  async function buildOrgPdf(entries) {
+    const { PDFDocument, degrees } = PDFLib;
+    const src = await loadEditable(orgFile);
+    const out = await PDFDocument.create();
+    const copied = await out.copyPages(src, entries.map((p) => p.src));
+    copied.forEach((page, i) => {
+      const extra = entries[i].rot;
+      if (extra) page.setRotation(degrees((page.getRotation().angle + extra) % 360));
+      out.addPage(page);
+    });
+    return out.save();
+  }
+
+  // Edit opens the document as currently organized in Fill & Sign, at this page.
+  async function editOrgPage(pos) {
+    if (!orgFile || pos < 0) return;
+    try {
+      showStatus('Opening page ' + (pos + 1) + ' in Fill & Sign…', 4000);
+      const bytes = await buildOrgPdf(orgPages);
+      const name = orgFile.name.replace(/\.pdf$/i, '') + '-organized.pdf';
+      setTab('sign');
+      await loadSignFile(new File([bytes], name, { type: 'application/pdf' }));
+      await renderSignPage(pos + 1);
+    } catch (err) {
+      console.error(err);
+      showErrorIn(orgError, 'Could not open the page for editing: ' + (err && err.message ? err.message : 'unknown error'));
+    }
+  }
+
+  orgSaveSelBtn.addEventListener('click', async () => {
+    const entries = orgPages.filter((p) => orgSelected.has(p));
+    if (!orgFile || !entries.length) return;
+    clearErrorIn(orgError);
+    orgSaveSelBtn.disabled = true;
+    try {
+      showStatus('Building PDF…', 4000);
+      const bytes = await buildOrgPdf(entries);
+      const name = orgFile.name.replace(/\.pdf$/i, '') + '-selected.pdf';
+      downloadBytes(bytes, name);
+      if (document.getElementById('orgSaveLib').checked) await libSave(new File([bytes], name, { type: 'application/pdf' }));
+      showStatus(entries.length + ' page' + (entries.length === 1 ? '' : 's') + ' saved as ' + name);
+    } catch (err) {
+      console.error(err);
+      showErrorIn(orgError, 'Could not build the PDF: ' + (err && err.message ? err.message : 'unknown error'));
+    } finally {
+      updateOrgSelection();
+    }
+  });
 
   function orgMove(from, to) {
     if (from === to || to < 0 || to >= orgPages.length) { renderOrganize(); return; }
@@ -1373,16 +1715,26 @@
   });
   orgUndoBtn.addEventListener('click', () => {
     orgPages = orgInitialPages();
+    orgSelected = new Set();
+    orgLastChecked = -1;
     renderOrganize();
   });
   orgResetBtn.addEventListener('click', () => {
     orgLoadSeq++;
+    closeOrgPreview();
+    if (orgPdf) orgPdf.destroy();
+    orgPdf = null;
     orgFile = null;
     orgPages = [];
     orgThumbs = [];
+    orgText = [];
+    orgSelected = new Set();
+    orgLastChecked = -1;
+    orgSearch.value = '';
     orgSourceCount = 0;
     orgGrid.innerHTML = '';
     orgBar.hidden = true;
+    orgTools.hidden = true;
     orgDropCard.hidden = false;
     clearErrorIn(orgError);
   });
@@ -1393,16 +1745,7 @@
     orgDownloadBtn.disabled = true;
     try {
       showStatus('Building PDF…', 4000);
-      const { PDFDocument, degrees } = PDFLib;
-      const src = await loadEditable(orgFile);
-      const out = await PDFDocument.create();
-      const copied = await out.copyPages(src, orgPages.map((p) => p.src));
-      copied.forEach((page, i) => {
-        const extra = orgPages[i].rot;
-        if (extra) page.setRotation(degrees((page.getRotation().angle + extra) % 360));
-        out.addPage(page);
-      });
-      const bytes = await out.save();
+      const bytes = await buildOrgPdf(orgPages);
       const name = orgFile.name.replace(/\.pdf$/i, '') + '-organized.pdf';
       downloadBytes(bytes, name);
       if (document.getElementById('orgSaveLib').checked) await libSave(new File([bytes], name, { type: 'application/pdf' }));
