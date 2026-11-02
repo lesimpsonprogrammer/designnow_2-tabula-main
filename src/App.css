@@ -146,16 +146,16 @@
 @media (max-width: 1100px) { .completion-incomplete, .completion-copy small { display: none; } .completion-trigger { min-width: 120px; } }
 
 /* Project start */
-.start-screen { position: relative; display: grid; place-items: center; min-height: 100vh; overflow: hidden; padding: 28px; background: #12110f; color: var(--text-primary); font-family: var(--font-ui); }
+.start-screen { position: relative; display: grid; place-items: center; min-height: 100vh; overflow: hidden; padding: 28px; background: #f5f7fc; color: var(--text-primary); font-family: var(--font-ui); }
 .start-screen.is-file-dragging { cursor: copy; }
-.start-drop-overlay { position: fixed; inset: 18px; z-index: 20; display: grid; place-items: center; border: 2px dashed #6c63ff; border-radius: 18px; background: rgba(18,17,15,.9); pointer-events: none; }
-.start-drop-overlay > div { display: grid; gap: 8px; padding: 30px 40px; text-align: center; border-radius: 12px; background: rgba(108,99,255,.14); box-shadow: 0 18px 60px rgba(0,0,0,.4); }
+.start-drop-overlay { position: fixed; inset: 18px; z-index: 20; display: grid; place-items: center; border: 2px dashed #2255c7; border-radius: 18px; background: rgba(245,247,252,.94); pointer-events: none; }
+.start-drop-overlay > div { display: grid; gap: 8px; padding: 30px 40px; text-align: center; border-radius: 12px; background: #edf2fb; box-shadow: 0 18px 60px rgba(35,66,115,.12); }
 .start-drop-overlay strong { font-size: 22px; }
 .start-drop-overlay span { color: var(--text-tertiary); }
-.start-background { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-around; padding: 5vh 4vw; color: rgba(255,255,255,.035); font-size: clamp(46px, 8vw, 118px); font-weight: 600; line-height: .95; letter-spacing: -.055em; user-select: none; animation: start-fade 1400ms ease both; }
+.start-background { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-around; padding: 5vh 4vw; color: rgba(34,85,199,.09); font-size: clamp(46px, 8vw, 118px); font-weight: 600; line-height: .95; letter-spacing: -.055em; user-select: none; animation: start-fade 1400ms ease both; }
 .start-background span:nth-child(2) { align-self: flex-end; text-align: right; }
 @keyframes start-fade { from { opacity: 0; transform: scale(1.025); } to { opacity: 1; transform: scale(1); } }
-.start-card { position: relative; z-index: 1; width: min(520px, 100%); padding: 34px; border: 1px solid rgba(255,255,255,.1); border-radius: 14px; background: rgba(28,26,24,.86); box-shadow: 0 30px 90px rgba(0,0,0,.45); backdrop-filter: blur(18px); }
+.start-card { position: relative; z-index: 1; width: min(520px, 100%); padding: 34px; border: 1px solid #dbe3ee; border-radius: 14px; background: rgba(255,255,255,.96); box-shadow: 0 24px 70px rgba(33,61,104,.12); backdrop-filter: blur(18px); }
 .start-brand { background: var(--brand-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; font: 700 11px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
 .start-card h1 { margin: 18px 0 8px; font-size: 30px; letter-spacing: -.035em; }
 .start-card > p { margin: 0; color: var(--text-tertiary); line-height: 1.55; }
@@ -164,8 +164,8 @@
 .start-actions button strong { color: var(--text-primary); font-size: 13px; }
 .start-actions button span { color: var(--text-muted); font-size: 10px; line-height: 1.4; }
 .start-actions .start-primary { border: none; background: var(--brand-gradient); }
-.start-actions .start-primary strong, .start-actions .start-primary span { color: #1a0b3d; }
-.start-actions .start-primary:hover:not(:disabled) { background: #ffffff; border-color: #ffffff; }
+.start-actions .start-primary strong, .start-actions .start-primary span { color: #ffffff; }
+.start-actions .start-primary:hover:not(:disabled) { background: linear-gradient(110deg, #1946a9, #a9492d); border-color: #1946a9; }
 .start-recent { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 10px; padding: 10px 12px; background: transparent; }
 .start-recent small { color: var(--text-meta); font: 9px var(--font-mono); }
 .start-error { color: var(--danger) !important; font-size: 11px; margin-top: 10px !important; }
@@ -332,7 +332,7 @@ button.active, .rail-tab.active { background: var(--surface-active-row); color: 
   overflow: auto;
   display: block;
   padding: 32px;
-  background: #12110f;
+  background: #eef2f8;
 }
 .canvas-page {
   margin: 0 auto;
