@@ -29,3 +29,6 @@ Status: **development only; not connected to production**.
 - Add full organization/team/ license schema migration and reconciliation.
 - Integrate Cloudflare R2 for large assets; ensure project JSON excludes secrets and large binary blobs.
 - Test server endpoints and build, configure deployment secrets, then staged rollout.
+
+## CI verification
+The dependency lockfile was regenerated and validated with `npm ci` and `npm run build`. GitHub's standard `Verify Tabula` workflow must run against the updated commit and pass all install, lint and build steps before merging.
