@@ -10,6 +10,7 @@ import { TeamsProvider } from './components/Teams/TeamsProvider';
 import { TeamsOverlays } from './components/Teams/TeamsOverlays';
 import { TutorialProvider } from './components/Tutorial/Tutorial';
 import { useGlobalKeys } from './lib/useGlobalKeys';
+import { CloudProjectBar } from './components/Cloud/CloudProjectBar';
 import { useTabulaStore } from './store/useTabulaStore';
 import './lib/tokens.css';
 import './App.css';
@@ -51,6 +52,7 @@ function App() {
   return (
     <TeamsProvider>
       <TutorialProvider>
+        <CloudProjectBar />
         <TabulaWorkspace />
         <TeamsOverlays />
       </TutorialProvider>
