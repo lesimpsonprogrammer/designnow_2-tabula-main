@@ -66,10 +66,10 @@ export function StartScreen() {
 
         <div className="tutorial-start-card">
           <div>
-            <strong>{editionLabel} tutorial</strong>
+            <strong>{editionLabel} Tutorial</strong>
             <span>{tutorialCompleted ? 'Completed — reopen it anytime for a refresher.' : 'Take the guided tour and finish with a five-question knowledge check.'}</span>
           </div>
-          <button type="button" onClick={openTutorial}>{tutorialCompleted ? 'Review tutorial' : 'Start tutorial'}</button>
+          <button type="button" onClick={openTutorial}>{tutorialCompleted ? 'Review Tutorial' : 'Start Tutorial'}</button>
         </div>
 
         {isTeamsEdition && (canOpenBuilder || canOpenSettings) ? (
@@ -80,17 +80,19 @@ export function StartScreen() {
           </div>
         ) : null}
 
+        <div className="start-category-intro"><strong>Choose What to Design</strong><span>Website projects are available now. More creative workspaces are planned.</span></div>
+        <div className="start-categories" aria-label="Design categories"><span className="is-available">Website</span><span>Logo · Coming Soon</span><span>Typography · Coming Soon</span><span>Social Media Design · Coming Soon</span><span>Presentation · Coming Soon</span><span>Print Design · Coming Soon</span></div>
         <div className="start-actions">
           <button type="button" className="start-primary" onClick={openMomentumTemplate}>
             <strong>Open Momentum Data Solutions</strong>
             <span>The site's real pages, ready to edit — no file needed</span>
           </button>
           <button type="button" onClick={startNewProject}>
-            <strong>Start from scratch</strong>
+            <strong>Start From Scratch</strong>
             <span>Creates a new project ID and number</span>
           </button>
           <button type="button" onClick={() => inputRef.current?.click()}>
-            <strong>Open project file</strong>
+            <strong>Open Project File</strong>
             <span>Choose a saved .tabula file</span>
           </button>
         </div>
@@ -109,7 +111,7 @@ export function StartScreen() {
 
         {hasRecentProject ? (
           <button type="button" className="start-recent" onClick={continueRecentProject}>
-            <span>Continue recent project</span>
+            <span>Continue Recent Project</span>
             <small>{projectName} · #{String(projectNumber).padStart(4, '0')}</small>
           </button>
         ) : null}

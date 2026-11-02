@@ -1172,3 +1172,43 @@ body { background: #f5f6f7; color: #17232b; }
 .menu-popover, .completion-popover { box-shadow: 0 14px 38px rgba(35,60,53,.13); }
 .license-admin-backdrop { background: rgba(28,46,43,.36); }
 .license-admin { box-shadow: 0 22px 60px rgba(25,51,43,.18); }
+
+/* Tabula opening experience: squared cards and an animated, border-only selection. */
+.start-card { border-radius: 7px; width: min(720px, 100%); }
+.start-actions button, .start-recent, .tutorial-start-card, .teams-start-tools button { border-radius: 4px; }
+.start-actions .start-primary {
+  position: relative; isolation: isolate; border: 2px solid transparent;
+  background: linear-gradient(#fff,#fff) padding-box,
+              conic-gradient(from var(--outline-angle), #2255c7, #bb5a39, #2255c7) border-box;
+  animation: tabula-outline-orbit 5s linear infinite;
+}
+.start-actions .start-primary strong { color: #17232b; }
+.start-actions .start-primary span { color: #53646a; }
+.start-actions .start-primary:hover:not(:disabled),
+.start-actions .start-primary:focus-visible {
+  background: linear-gradient(#edf2fb,#edf2fb) padding-box,
+              conic-gradient(from var(--outline-angle), #2255c7, #bb5a39, #2255c7) border-box;
+  border-color: transparent;
+}
+@property --outline-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+@keyframes tabula-outline-orbit { to { --outline-angle: 360deg; } }
+.teams-start-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.teams-start-tools > span { margin-right: auto; }
+.teams-start-tools button { margin: 0; }
+.start-category-intro { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 20px; font-size: 12px; }
+.start-category-intro span { font-size: 10px; color: var(--text-muted); text-align: right; }
+.start-categories { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+.start-categories span { padding: 7px 10px; border: 1px solid #dae2ed; border-radius: 4px; background: #f7f9fc; font-size: 10px; color: #5e6e82; }
+.start-categories .is-available { color: #2255c7; border-color: #9eb7ee; background: #edf2fb; }
+.auth-screen-split { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(360px, .9fr); padding: 0; }
+.auth-screen-split .auth-card { justify-self: center; align-self: center; width: min(420px, calc(100% - 56px)); }
+.auth-art { position: relative; align-self: stretch; min-height: 100vh; overflow: hidden; background: linear-gradient(145deg, #10276d, #1c4ab3 48%, #bd5938); }
+.auth-art::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 28% 30%, #ffffff36, transparent 48%); pointer-events: none; }
+.auth-art-orbit { position: absolute; width: 85%; aspect-ratio: 1; left: 8%; top: 9%; border: clamp(22px,6vw,90px) solid #ffffff26; border-radius: 38% 62% 48% 52%; transform-origin: center; animation: tabula-art-flow 22s ease-in-out infinite alternate; }
+.auth-art-orbit.orbit-two { width: 63%; left: 27%; top: 26%; border-color: #f3ae7966; animation-duration: 17s; animation-direction: alternate-reverse; }
+.auth-art-orbit.orbit-three { width: 49%; left: -8%; top: 41%; border-color: #9dbaf777; animation-duration: 25s; }
+@keyframes tabula-art-flow { to { transform: rotate(160deg) scale(1.16) translate(3%, -3%); } }
+.auth-art-caption { position: absolute; left: 7%; bottom: 8%; z-index: 2; color: white; font-size: clamp(28px, 4vw, 58px); font-weight: 700; letter-spacing: -.045em; }
+.auth-art-caption span { display: block; margin-top: 10px; font-size: 16px; font-weight: 400; letter-spacing: 0; }
+@media (max-width: 780px) { .auth-screen-split { display: flex; flex-direction: column; padding: 24px 16px; }.auth-screen-split .auth-art { display: none; }.auth-screen-split .auth-card { width: min(420px, 100%); } .start-category-intro { flex-direction: column; gap: 4px; }.start-category-intro span { text-align: left; } }
+@media (prefers-reduced-motion: reduce) { .start-actions .start-primary, .auth-art-orbit { animation: none; } }
