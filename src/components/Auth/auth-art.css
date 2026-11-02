@@ -34,3 +34,45 @@ main.auth-screen.auth-screen-split > .auth-art .auth-art-orbit { will-change: tr
   main.auth-screen.auth-screen-split > section.auth-card { grid-column: 1; grid-row: 2; width: min(430px, calc(100% - 32px)); margin: 20px 0 32px; }
 }
 @media (prefers-reduced-motion: reduce) { main.auth-screen.auth-screen-split .auth-art-orbit { animation: none; } }
+
+/* Artwork must live in this stylesheet: the editor's App.css is not loaded on sign-in. */
+main.auth-screen.auth-screen-split .auth-art::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle at 28% 30%, rgba(255,255,255,.21), transparent 48%);
+  pointer-events: none;
+}
+main.auth-screen.auth-screen-split .auth-art-orbit {
+  position: absolute; width: 85%; aspect-ratio: 1;
+  left: 8%; top: 9%; border: clamp(22px, 6vw, 90px) solid rgba(255,255,255,.2);
+  border-radius: 38% 62% 48% 52%; transform-origin: center;
+  animation: tabula-auth-art-flow 22s ease-in-out infinite alternate;
+}
+main.auth-screen.auth-screen-split .auth-art-orbit.orbit-two {
+  width: 63%; left: 27%; top: 26%; border-color: rgba(243,174,121,.55);
+  animation-duration: 17s; animation-direction: alternate-reverse;
+}
+main.auth-screen.auth-screen-split .auth-art-orbit.orbit-three {
+  width: 49%; left: -8%; top: 41%; border-color: rgba(157,186,247,.65);
+  animation-duration: 25s;
+}
+@keyframes tabula-auth-art-flow {
+  to { transform: rotate(160deg) scale(1.16) translate(3%, -3%); }
+}
+main.auth-screen.auth-screen-split .auth-art-caption {
+  position: absolute; left: 7%; bottom: 8%; z-index: 2;
+  color: #fff; font: 700 clamp(28px, 4vw, 58px)/1.1 'DM Sans', Arial, sans-serif;
+  letter-spacing: -.045em;
+}
+main.auth-screen.auth-screen-split .auth-art-caption span {
+  display: block; margin-top: 10px; font-size: 16px; font-weight: 400; letter-spacing: 0;
+}
+@media (max-width: 640px) {
+  main.auth-screen.auth-screen-split .auth-art-orbit { width: 38%; top: -36%; }
+  main.auth-screen.auth-screen-split .auth-art-orbit.orbit-two { width: 28%; top: -20%; }
+  main.auth-screen.auth-screen-split .auth-art-orbit.orbit-three { width: 25%; top: 10%; }
+  main.auth-screen.auth-screen-split .auth-art-caption { bottom: 18px; font-size: 27px; }
+  main.auth-screen.auth-screen-split .auth-art-caption span { font-size: 12px; margin-top: 2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  main.auth-screen.auth-screen-split .auth-art-orbit { animation: none; }
+}
