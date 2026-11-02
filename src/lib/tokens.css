@@ -5,8 +5,8 @@
   --surface-pagebar: #ffffff;
   --surface-rail: #f5f6f7;
   --surface-tile: #ffffff;
-  --surface-tile-hover: #edf4f1;
-  --surface-active-row: #e4f2ed;
+  --surface-tile-hover: #edf2fb;
+  --surface-active-row: #e8eefb;
   --border-bar: #e4e7e9;
   --border-default: #dde2e5;
   --border-button: #cbd3d7;
@@ -22,8 +22,8 @@
   --text-meta: #647179;
   --text-group-label: #66747b;
   --danger: #b42318;
-  --accent: #087b62;
-  --brand-gradient: linear-gradient(90deg, #06785e, #21a58a 65%, #7cc7ac);
+  --accent: #2255c7;
+  --brand-gradient: linear-gradient(110deg, #2255c7 0%, #2457c7 60%, #bb5a39 100%);
   --radius-chip: 5px;
   --radius-input: 6px;
   --radius-button: 7px;
