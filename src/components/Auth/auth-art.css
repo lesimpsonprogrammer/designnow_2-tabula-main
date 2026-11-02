@@ -1,0 +1,36 @@
+/* Explicit login layout, independent of the editor and landing page stylesheet. */
+main.auth-screen.auth-screen-split {
+  display: grid;
+  grid-template-columns: minmax(0, 52%) minmax(0, 48%);
+  width: 100%;
+  min-height: 100dvh;
+  padding: 0;
+  align-items: stretch;
+  background: #f7f9fc;
+}
+main.auth-screen.auth-screen-split > aside.auth-art {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  min-width: 0;
+  min-height: 100dvh;
+  background: linear-gradient(135deg, #12358d 0%, #2b5ed0 45%, #b75336 100%);
+  overflow: hidden;
+}
+main.auth-screen.auth-screen-split > section.auth-card {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  align-self: center;
+  width: min(430px, calc(100% - 48px));
+}
+main.auth-screen.auth-screen-split > .auth-art .auth-art-orbit { will-change: transform; }
+@media (max-width: 640px) {
+  main.auth-screen.auth-screen-split { grid-template-columns: minmax(0, 1fr); grid-template-rows: 180px auto; }
+  main.auth-screen.auth-screen-split > aside.auth-art { grid-column: 1; grid-row: 1; min-height: 180px; height: 180px; display: block; }
+  main.auth-screen.auth-screen-split > section.auth-card { grid-column: 1; grid-row: 2; width: min(430px, calc(100% - 32px)); margin: 20px 0 32px; }
+}
+@media (prefers-reduced-motion: reduce) { main.auth-screen.auth-screen-split .auth-art-orbit { animation: none; } }
