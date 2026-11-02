@@ -1304,6 +1304,10 @@ function projectDocument(state: State): ProjectDocument {
   };
 }
 
+export function snapshotProjectDocument(): Record<string, unknown> {
+  return projectDocument(useTabulaStore.getState()) as unknown as Record<string, unknown>;
+}
+
 export function prepareProjectDownload(anchor: HTMLAnchorElement) {
   const state = useTabulaStore.getState();
   const documentData = projectDocument(state);
