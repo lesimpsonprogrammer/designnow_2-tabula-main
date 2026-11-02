@@ -1,39 +1,34 @@
-/* Editor chrome tokens — warm dark UI, deliberately distinct from the canvas.
-   Ported from the handoff README's "Design tokens — editor chrome" table. */
+/* Tabula editor chrome defaults to a light, Neon-inspired workspace. */
 :root {
-  --surface-drawer: #191817;
-  --surface-pagebar: #1c1b19;
-  --surface-rail: #201e1c;
-  --surface-tile: #262321;
-  --surface-tile-hover: #2b2825;
-  --surface-active-row: #2f2b28;
-
-  --border-bar: #282523;
-  --border-default: #322e2b;
-  --border-button: #3d3835;
-  --border-chip: #4a453f;
-  --border-hover: #55504a;
-
-  --text-primary: #e9e5df;
-  --text-secondary: #d5d0c9;
-  --text-tree: #b8b1a9;
-  --text-tertiary: #a49d96;
-  --text-muted: #99928b;
-  --text-label: #8d8680;
-  --text-section-label: #7d766f;
-  --text-meta: #6f6a64;
-  --text-group-label: #5f5952;
-
-  --danger: #e9a08a;
-  --accent: #0e1cdf; /* overridden by the active theme's accent */
-  --brand-gradient: linear-gradient(90deg, #7b2ff7, #ff5ea8 55%, #ffb84d);
-
+  color-scheme: light;
+  --surface-drawer: #ffffff;
+  --surface-pagebar: #ffffff;
+  --surface-rail: #f5f6f7;
+  --surface-tile: #ffffff;
+  --surface-tile-hover: #edf4f1;
+  --surface-active-row: #e4f2ed;
+  --border-bar: #e4e7e9;
+  --border-default: #dde2e5;
+  --border-button: #cbd3d7;
+  --border-chip: #d5dddf;
+  --border-hover: #aebdc0;
+  --text-primary: #17232b;
+  --text-secondary: #34464e;
+  --text-tree: #43545b;
+  --text-tertiary: #4a5a62;
+  --text-muted: #54646a;
+  --text-label: #53636a;
+  --text-section-label: #607078;
+  --text-meta: #647179;
+  --text-group-label: #66747b;
+  --danger: #b42318;
+  --accent: #087b62;
+  --brand-gradient: linear-gradient(90deg, #06785e, #21a58a 65%, #7cc7ac);
   --radius-chip: 5px;
   --radius-input: 6px;
   --radius-button: 7px;
   --radius-tile: 8px;
   --radius-panel: 10px;
-
   --font-ui: 'DM Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
