@@ -23,8 +23,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const sql = neon(databaseUrl);
     const orgId = String(req.method === 'GET' ? req.query.orgId ?? '' : req.body?.orgId ?? '');
     if (!/^[0-9a-f-]{36}$/i.test(orgId)) return jsonError(res, 400, 'Valid organization ID required');
-    const membership = await sql`SELECT role FROM memberships WHERE organization_id = ${orgId}::uuid AND user_id = ${userId}::uuid LIMIT 1`;
-    if (membership.length === 0) return jsonError(res, 403, 'No access to this organization');
+    // Supabase membership is authoritative while Auth remains in Supabase.
+    // Do not grant access on the strength of a stale Neon membership alone.
+    const scopedAuth = createClient(supabaseUrl, supabaseKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: member, error: memberError } = await scopedAuth
+      .from('tabula_memberships')
+      .select('role, tabula_organizations(id, name, slug, plan, trial_ends_at)')
+      .eq('org_id', orgId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (memberError) return jsonError(res, 503, 'Unable to verify organization membership');
+    if (!member) return jsonError(res, 403, 'No access to this organization');
+    const organization = member.tabula_organizations as unknown as {
+      id: string; name: string; slug: string; plan: string; trial_ends_at: string | null;
+    } | null;
+    if (!organization || organization.id !== orgId) return jsonError(res, 403, 'Organization not found');
+    if (!['owner', 'admin', 'member'].includes(member.role)) return jsonError(res, 403, 'Invalid membership role');
+    // Idempotent, verified provisioning. The legacy organization ID remains the
+    // canonical ID; no frontend-supplied name, role or ownership is trusted.
+    await sql`
+      INSERT INTO organizations (id, legacy_supabase_id, name, slug, plan, trial_ends_at)
+      VALUES (${orgId}::uuid, ${orgId}::uuid, ${organization.name}, ${organization.slug},
+              ${organization.plan}, ${organization.trial_ends_at}::timestamptz)
+      ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, plan = EXCLUDED.plan,
+        trial_ends_at = EXCLUDED.trial_ends_at`;
+    await sql`
+      INSERT INTO memberships (organization_id, user_id, role)
+      VALUES (${orgId}::uuid, ${userId}::uuid, ${member.role})
+      ON CONFLICT (organization_id, user_id) DO UPDATE SET role = EXCLUDED.role`;
     if (req.method === 'GET') {
       const projectId = String(req.query.projectId ?? '');
       if (projectId) {
