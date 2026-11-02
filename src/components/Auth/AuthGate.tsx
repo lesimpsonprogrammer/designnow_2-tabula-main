@@ -263,7 +263,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
     }
     const title = mode === 'signup' ? 'Create your Tabula account' : mode === 'forgot' ? 'Reset your password' : mode === 'forgot-email' ? 'Find your sign-in email' : 'Log in to Tabula';
     return (
-      <main className="auth-screen">
+      <main className="auth-screen auth-screen-split">
+        <aside className="auth-art" aria-hidden="true"><div className="auth-art-orbit orbit-one" /><div className="auth-art-orbit orbit-two" /><div className="auth-art-orbit orbit-three" /><div className="auth-art-caption">Design Without Limits<span>Make room for your next idea.</span></div></aside>
         <section className="auth-card" aria-labelledby="auth-title">
           <span className="auth-brand">Tabula</span>
           <h1 id="auth-title">{title}</h1>
