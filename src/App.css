@@ -1148,3 +1148,27 @@ button.active, .rail-tab.active { background: var(--surface-active-row); color: 
   tab-size: 2;
 }
 .auth-back-link { align-self: center; margin-top: 20px; color: #666666; }
+
+
+/* Light mode is the default for editor chrome and entry screens. */
+:root { color-scheme: light; }
+body { background: #f5f6f7; color: #17232b; }
+.auth-screen { background: #f7f9f8; color: #17232b; }
+.auth-card { padding: 32px; border: 1px solid #dde5e2; border-radius: 12px; background: #fff; box-shadow: 0 16px 42px rgba(25,51,43,.07); }
+.auth-card h1 { color: #17232b; }
+.auth-card > p, .auth-card label, .auth-message, .auth-loading, .auth-help-list { color: #53646a; }
+.auth-card input { border-color: #cbd5d4; background: #fff; color: #17232b; }
+.auth-card input::placeholder { color: #6f7e82; }
+.auth-card input:focus { border-color: #088669; box-shadow: 0 0 0 3px rgba(8,134,105,.12); }
+.auth-card form button { background: #087b62; border-color: #087b62; color: #fff; }
+.auth-card form button:hover:not(:disabled) { background: #07674f; border-color: #07674f; color: #fff; }
+.auth-card code { background: #eef3f1; color: #34464e; }
+.auth-text-link, .auth-card form .auth-text-link { color: #087b62; }
+.auth-text-link:hover:not(:disabled), .auth-card form .auth-text-link:hover:not(:disabled) { color: #075b49; }
+.auth-help-list a, .auth-switch-mode strong { color: #087b62; }
+.auth-divider { background: #e4e9e8; }
+.header-primary { background: #087b62; color: #fff; border-color: #087b62; }
+.header-primary:hover:not(:disabled) { background: #07674f; color: #fff; }
+.menu-popover, .completion-popover { box-shadow: 0 14px 38px rgba(35,60,53,.13); }
+.license-admin-backdrop { background: rgba(28,46,43,.36); }
+.license-admin { box-shadow: 0 22px 60px rgba(25,51,43,.18); }
