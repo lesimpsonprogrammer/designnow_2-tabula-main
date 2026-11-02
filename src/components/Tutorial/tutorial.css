@@ -297,3 +297,40 @@
     flex-direction: column;
   }
 }
+
+/* Tabula Design Now light tutorial — matches the welcome and sign-in workspace. */
+.tutorial-backdrop { background: rgba(26, 44, 78, .35); backdrop-filter: blur(8px); }
+.tutorial-dialog {
+  --border: #dce4ef;
+  --panel: #ffffff;
+  --text: #172b48;
+  --muted: #596a80;
+  --accent: #2255c7;
+  color-scheme: light;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 26px 78px rgba(29, 56, 101, .18);
+}
+.tutorial-header { background: linear-gradient(110deg, #f4f7fd 0%, #fff 78%); }
+.tutorial-header, .tutorial-footer, .tutorial-progress { border-color: var(--border); }
+.tutorial-header h2, .tutorial-step-heading h3, .tutorial-item strong,
+.tutorial-question legend, .tutorial-score strong { color: var(--text); }
+.tutorial-header p, .tutorial-step-heading p, .tutorial-item p,
+.tutorial-explanation, .tutorial-footer-status, .tutorial-tip span { color: var(--muted); }
+.tutorial-kicker, .tutorial-step-heading > span { color: var(--accent); }
+.tutorial-item { background: #f7f9fc; border: 1px solid var(--border); border-radius: 4px; }
+.tutorial-tip { background: #edf2fd; border-left-color: var(--accent); border-radius: 3px; }
+.tutorial-question, .tutorial-score { background: #fff; border-color: var(--border); border-radius: 4px; }
+.tutorial-options label { border-color: var(--border); border-radius: 4px; background: #f8fafd; color: var(--text); }
+.tutorial-options label.selected { border-color: var(--accent); background: #eef3fd; }
+.tutorial-progress button { border-color: var(--border); border-radius: 4px; color: var(--muted); background: #fff; }
+.tutorial-progress button.active { border-color: #2255c7; color: #fff; background: linear-gradient(110deg, #2255c7 0%, #2457c7 60%, #bb5a39 100%); }
+.tutorial-progress button.complete { border-color: #9fb4e1; color: #1946a9; background: #edf2fb; }
+.tutorial-actions button.primary { border: 1px solid #2255c7; background: linear-gradient(110deg, #2255c7 0%, #2457c7 60%, #bb5a39 100%); color: #fff; }
+.tutorial-actions button.primary:hover:not(:disabled) { filter: brightness(.94); }
+.tutorial-dialog button:focus-visible, .tutorial-options label:focus-within { outline: 3px solid #81a4e8; outline-offset: 2px; }
+.tutorial-start-card { border-color: #dce4ef; background: #f7f9fc; border-radius: 4px; color: #172b48; }
+.tutorial-start-card span { color: #596a80; }
+@media (prefers-reduced-motion: reduce) { .tutorial-dialog *, .tutorial-start-card * { scroll-behavior: auto; transition: none; } }
