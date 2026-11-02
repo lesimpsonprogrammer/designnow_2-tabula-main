@@ -1210,5 +1210,23 @@ body { background: #f5f6f7; color: #17232b; }
 @keyframes tabula-art-flow { to { transform: rotate(160deg) scale(1.16) translate(3%, -3%); } }
 .auth-art-caption { position: absolute; left: 7%; bottom: 8%; z-index: 2; color: white; font-size: clamp(28px, 4vw, 58px); font-weight: 700; letter-spacing: -.045em; }
 .auth-art-caption span { display: block; margin-top: 10px; font-size: 16px; font-weight: 400; letter-spacing: 0; }
-@media (max-width: 780px) { .auth-screen-split { display: flex; flex-direction: column; padding: 24px 16px; }.auth-screen-split .auth-art { display: none; }.auth-screen-split .auth-card { width: min(420px, 100%); } .start-category-intro { flex-direction: column; gap: 4px; }.start-category-intro span { text-align: left; } }
+/* Keep animated artwork present on tablet and desktop, including narrow desktop windows. */
+.auth-screen.auth-screen-split {
+  width: 100%;
+  min-height: 100dvh;
+  grid-template-columns: minmax(240px, 1fr) minmax(350px, 1fr);
+}
+.auth-screen-split .auth-art { display: block; min-width: 0; min-height: 100dvh; }
+@media (max-width: 640px) {
+  .auth-screen.auth-screen-split { grid-template-columns: 1fr; padding: 0 16px 32px; }
+  .auth-screen-split .auth-art { min-height: 175px; height: 175px; margin: 0 -16px 24px; }
+  .auth-art-orbit { width: 38%; top: -36%; }
+  .auth-art-orbit.orbit-two { width: 28%; top: -20%; }
+  .auth-art-orbit.orbit-three { width: 25%; top: 10%; }
+  .auth-art-caption { bottom: 18px; font-size: 27px; }
+  .auth-art-caption span { font-size: 12px; margin-top: 2px; }
+  .auth-screen-split .auth-card { width: min(420px, 100%); }
+  .start-category-intro { flex-direction: column; gap: 4px; }
+  .start-category-intro span { text-align: left; }
+}
 @media (prefers-reduced-motion: reduce) { .start-actions .start-primary, .auth-art-orbit { animation: none; } }
