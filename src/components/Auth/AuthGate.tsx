@@ -3,6 +3,7 @@ import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
 import { makeSupabaseClient, saveSupabaseConfig } from '../../lib/supabase';
 import { slugify } from '../../lib/slug';
 import { Landing } from '../Landing/Landing';
+import './auth-art.css';
 
 type Org = { id: string; name: string; slug: string; role: 'owner' | 'admin' | 'member'; plan: 'trial' | 'active' | 'expired'; trialEndsAt: string };
 type Invite = { id: string; org_id: string; email: string; role: 'admin' | 'member'; tabula_organizations: { name: string } | null };
