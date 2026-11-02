@@ -1,0 +1,36 @@
+name: Repair Tabula Neon dependency lockfile
+on:
+  push:
+    branches:
+      - feature/tabula-neon-api
+    paths:
+      - .github/workflows/repair-neon-lockfile.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Synchronize dependencies
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Validate clean installation
+        run: npm ci --no-audit --no-fund
+      - name: Validate build
+        run: npm run build
+      - name: Commit repaired lockfile
+        run: |
+          if ! git diff --quiet -- package-lock.json; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add package-lock.json
+            git commit -m "fix: synchronize Tabula Neon dependency lockfile"
+            git push
+          fi
