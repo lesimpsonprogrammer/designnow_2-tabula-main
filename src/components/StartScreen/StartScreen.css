@@ -1,0 +1,26 @@
+/* Focused, two-step Tabula welcome flow */
+.start-card.start-card-focused { width: min(490px, 100%); }
+.start-flow-actions { display: grid; gap: 10px; margin-top: 22px; }
+.start-flow-actions > button { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; width: 100%; min-height: 66px; padding: 14px 16px; text-align: left; border: 1px solid #dbe3ee; border-radius: 9px; background: #fff; color: #192738; }
+.start-flow-actions > button:hover { border-color: #3168cf; background: #f3f7ff; }
+.start-flow-actions strong { color: #192738; font-size: 13px; }
+.start-flow-actions span, .start-flow-note { color: #596b83; font-size: 11px; line-height: 1.5; }
+.start-flow-fields { display: grid; gap: 14px; margin-top: 22px; }
+.start-flow-fields label { display: grid; gap: 6px; color: #24354b; font-size: 12px; font-weight: 600; }
+.start-flow-fields input, .start-flow-fields select { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid #ced9e8; border-radius: 7px; background: white; color: #182a40; font: inherit; }
+.start-flow-footer { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.start-flow-footer button { min-height: 38px; padding: 9px 14px; }
+.start-flow-cta { background: #2255c7; color: white; border-color: #2255c7; font-weight: 600; }
+.start-flow-cta:hover { background: #1946a9; color: white; }
+.start-flow-save { margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f2; }
+.start-flow-save label { display: grid; gap: 6px; color: #24354b; font-weight: 600; }
+.start-flow-save select { min-height: 36px; padding: 6px 9px; border-radius: 7px; border: 1px solid #ced9e8; background: white; color: #182a40; }
+.start-flow-mini { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.start-flow-mini button { padding: 8px 10px; }
+.start-flow-status { margin: 10px 0 0 !important; color: #2255c7 !important; font-size: 11px; }
+.start-flow-utilities { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; align-items: center; }
+.start-flow-utilities button { background: transparent; color: #315787; border: 0; text-decoration: underline; text-underline-offset: 3px; padding: 6px; }
+.start-flow-utilities span { color: #66758b; font-size: 11px; }
+.start-card-focused h1 { color: #17283b; }
+.start-card-focused > p { color: #5e6c80; }
+@media (max-width: 620px) { .start-screen { padding: 16px; overflow: auto; } .start-card.start-card-focused { padding: 22px; } }
