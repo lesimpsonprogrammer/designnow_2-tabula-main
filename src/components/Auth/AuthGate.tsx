@@ -32,7 +32,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [setupKey, setSetupKey] = useState('');
   const [setupError, setSetupError] = useState('');
 
-  const [showAuthForm, setShowAuthForm] = useState(false);
+  const isTypography = window.location.pathname.startsWith('/typography');
+  const productName = isTypography ? 'Tabula Typography' : 'Tabula';
+  const [showAuthForm, setShowAuthForm] = useState(isTypography);
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot' | 'forgot-email'>('signin');
   const [recovering, setRecovering] = useState(false);
   const [email, setEmail] = useState('');
@@ -145,7 +147,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     if (mode === 'forgot') {
       setBusy(true);
       setMessage('');
-      const { error } = await client.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin });
+      const { error } = await client.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + (isTypography ? '/typography' : '/') });
       setMessage(error ? error.message : 'If an account exists for that email, a password reset link is on its way.');
       setBusy(false);
       return;
@@ -233,7 +235,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return (
       <main className="auth-screen">
         <section className="auth-card">
-          <span className="auth-brand">Tabula</span>
+          <span className="auth-brand">{productName}</span>
           <h1>Connect cloud authentication</h1>
           <p>Enter the API details from your Supabase project settings. Use only the public publishable key—never a secret or service-role key.</p>
           <form onSubmit={saveSetup}>
@@ -262,12 +264,12 @@ export function AuthGate({ children }: { children: ReactNode }) {
         />
       );
     }
-    const title = mode === 'signup' ? 'Create your Tabula account' : mode === 'forgot' ? 'Reset your password' : mode === 'forgot-email' ? 'Find your sign-in email' : 'Log in to Tabula';
+    const title = mode === 'signup' ? `Create your ${productName} account` : mode === 'forgot' ? 'Reset your password' : mode === 'forgot-email' ? 'Find your sign-in email' : `Log in to ${productName}`;
     return (
       <main className="auth-screen auth-screen-split">
         <aside className="auth-art" aria-hidden="true"><div className="auth-art-orbit orbit-one" /><div className="auth-art-orbit orbit-two" /><div className="auth-art-orbit orbit-three" /><div className="auth-art-caption">Design Without Limits<span>Make room for your next idea.</span></div></aside>
         <section className="auth-card" aria-labelledby="auth-title">
-          <span className="auth-brand">Tabula</span>
+          <span className="auth-brand">{productName}</span>
           <h1 id="auth-title">{title}</h1>
           {mode === 'forgot' ? <p>Enter your email and we’ll send you a link to choose a new password.</p> : null}
           {mode === 'forgot-email' ? (
@@ -310,7 +312,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
               {mode === 'signup' ? <>Already have an account? <strong>Log in</strong></> : <>Don’t have an account? <strong>Sign up</strong></>}
             </button>
           )}
-          <button type="button" className="auth-text-link auth-back-link" onClick={() => setShowAuthForm(false)}>← Back to home</button>
+          <button type="button" className="auth-text-link auth-back-link" onClick={() => { if (isTypography) window.location.assign("/"); else setShowAuthForm(false); }}>← Back to home</button>
         </section>
       </main>
     );
@@ -320,7 +322,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return (
       <main className="auth-screen">
         <section className="auth-card" aria-labelledby="recovery-title">
-          <span className="auth-brand">Tabula</span>
+          <span className="auth-brand">{productName}</span>
           <h1 id="recovery-title">Choose a new password</h1>
           <p>Signed in as {session.user.email}.</p>
           <form onSubmit={submitNewPassword}>
@@ -342,7 +344,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return (
       <main className="auth-screen">
         <section className="auth-card" aria-labelledby="org-title">
-          <span className="auth-brand">Tabula</span>
+          <span className="auth-brand">{productName}</span>
           <h1 id="org-title">
             {invites && invites.length > 0 ? 'You have a pending invitation' : 'Design your organization'}
           </h1>

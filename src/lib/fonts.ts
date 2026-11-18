@@ -1,21 +1,20 @@
-export const MOMENTUM_SCRIPT_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
-
+/** Tabula typography catalog. Custom Momentum Script is in beta and needs a verified font asset. */
+export const MOMENTUM_SCRIPT_FONT = '"Momentum Script", "Segoe Print", "Bradley Hand", cursive';
 export const TYPOGRAPHY_PRESETS = [
-  {
-    name: 'Momentum Hand Script',
-    head: MOMENTUM_SCRIPT_FONT,
-    body: 'DM Sans, sans-serif',
-    description: 'Casual handwritten headings paired with DM Sans body text.',
-  },
+  { name: 'Momentum Corporate', head: 'DM Sans, sans-serif', body: 'DM Sans, sans-serif', description: 'Clear enterprise typography for Momentum Data Solutions.' },
+  { name: 'Data Preview', head: 'Space Grotesk, sans-serif', body: 'DM Sans, sans-serif', description: 'Precise technology headings with readable content.' },
+  { name: 'GLASS Security', head: 'Archivo, sans-serif', body: 'DM Sans, sans-serif', description: 'Direct, structured security communication.' },
+  { name: 'Alba Reset', head: 'Instrument Serif, serif', body: 'DM Sans, sans-serif', description: 'Warm editorial headings with accessible interface text.' },
+  { name: 'Momentum Hand Script — preview only', head: MOMENTUM_SCRIPT_FONT, body: 'DM Sans, sans-serif', description: 'Relaxed, closely spaced connected script. Requires final custom font asset for reliable rendering.' },
 ] as const;
-
 export const FONT_OPTIONS = [
-  { label: 'Archivo', value: 'Archivo, sans-serif' },
-  { label: 'DM Sans', value: 'DM Sans, sans-serif' },
-  { label: 'Momentum Hand Script', value: MOMENTUM_SCRIPT_FONT },
-  { label: 'Instrument Serif', value: 'Instrument Serif, serif' },
-  { label: 'Space Grotesk', value: 'Space Grotesk, sans-serif' },
-  { label: 'Libre Baskerville', value: 'Libre Baskerville, serif' },
+  { label: 'DM Sans — Interface', value: 'DM Sans, sans-serif' },
+  { label: 'Space Grotesk — Technical', value: 'Space Grotesk, sans-serif' },
+  { label: 'Archivo — Corporate', value: 'Archivo, sans-serif' },
+  { label: 'Instrument Serif — Editorial', value: 'Instrument Serif, serif' },
+  { label: 'Libre Baskerville — Classic', value: 'Libre Baskerville, serif' },
+  { label: 'Momentum Script — preview fallback', value: MOMENTUM_SCRIPT_FONT },
+  { label: 'JetBrains Mono — Code', value: 'JetBrains Mono, monospace' },
   { label: 'System Sans', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
   { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
   { label: 'Helvetica Neue', value: '"Helvetica Neue", Helvetica, Arial, sans-serif' },
@@ -28,3 +27,4 @@ export const FONT_OPTIONS = [
   { label: 'Monaco', value: 'Monaco, Menlo, Consolas, monospace' },
   { label: 'Impact', value: 'Impact, Haettenschweiler, sans-serif' },
 ] as const;
+export const TYPE_SCALE = { caption: 12, label: 14, body: 16, h3: 24, h2: 32, h1: 40, hero: 56 } as const;

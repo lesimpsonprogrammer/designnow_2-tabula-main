@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
+const TypographyStudio = lazy(() => import('./modules/typography/TypographyStudio'));
 import { Header } from './components/Header/Header';
 import { LeftRail } from './components/LeftRail/LeftRail';
 import { CanvasArea } from './components/CanvasArea/CanvasArea';
@@ -49,6 +50,9 @@ function TabulaWorkspace() {
 }
 
 function App() {
+  if (window.location.pathname.startsWith('/typography')) {
+    return <Suspense fallback={<main style={{ padding: 32 }}>Loading Typography Studio…</main>}><TypographyStudio /></Suspense>;
+  }
   return (
     <TeamsProvider>
       <TutorialProvider>
