@@ -6,6 +6,7 @@ import { LicenseAdmin } from '../LicenseAdmin/LicenseAdmin';
 import { useTeams } from '../Teams/TeamsProvider';
 import { useTutorial } from '../Tutorial/Tutorial';
 import { MenuButton } from '../Menu/MenuButton';
+import { downloadAzurFlameTokens } from '../../lib/azurFlameExport';
 
 const SAVE_LABEL = { error: 'Autosave failed', pending: 'Saving…', saved: 'Saved', idle: 'Autosave on' } as const;
 
@@ -97,6 +98,9 @@ export function Header() {
               <a role="menuitem" href="#" download onClick={(event) => { prepareProjectDownload(event.currentTarget); close(); }}>
                 Save a copy (.tabula)
               </a>
+              <button type="button" role="menuitem" onClick={() => { downloadAzurFlameTokens(useTabulaStore.getState()); close(); }}>
+                Export AzurFlame design tokens (.json)
+              </button>
               {saveStatus === 'error' ? (
                 <button type="button" role="menuitem" onClick={() => { close(); flushPendingSave(); }}>Retry autosave</button>
               ) : null}
