@@ -1,0 +1,46 @@
+name: Build Momentum Script font assets
+on:
+  push:
+    branches:
+      - feat/tabula-typography-cloud-script-v1-1
+    paths:
+      - tools/build_momentum_script.py
+      - .github/workflows/build-momentum-font.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  font-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install font compiler
+        run: python -m pip install 'fonttools[woff]==4.63.0'
+      - name: Generate original font assets
+        run: python tools/build_momentum_script.py
+      - name: Validate generated fonts
+        run: |
+          python - <<'PY'
+          from fontTools.ttLib import TTFont
+          font=TTFont('public/fonts/MomentumScript-Regular.ttf')
+          required='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+          cmap=font.getBestCmap()
+          assert all(ord(char) in cmap for char in required)
+          woff=TTFont('public/fonts/MomentumScript-Regular.woff2')
+          assert woff['name'].getDebugName(1)=='Momentum Script'
+          print('Validated glyph coverage, TTF and WOFF2 font parsing')
+          PY
+      - name: Commit generated font assets to this feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/fonts/MomentumScript-Regular.ttf public/fonts/MomentumScript-Regular.woff2
+          if ! git diff --cached --quiet; then
+            git commit -m "build(font): generate Momentum Script font binaries"
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi
